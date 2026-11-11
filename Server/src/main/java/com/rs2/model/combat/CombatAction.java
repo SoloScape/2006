@@ -193,30 +193,30 @@ public class CombatAction {
                 // It cannot override quest/attack restrictions checked above.
                 if (!CombatManager.isVeracsDefilerHit(combatAction.attacker, combatAction.hitDefinition)) {
                     value4 = CombatManager.calculateDefenceRoll(combatAction.target, combatAction.hitDefinition);
-                value3 = CombatManager.calculateAttackRoll(combatAction.attacker, combatAction.hitDefinition);
-                if (!ServerSettings.modernCombatSystemEnabled) {
-                    Player player;
-                    if (combatAction.hitDefinition.getAttackStyle().getCombatType() == CombatType.MELEE && combatAction.attacker.isPlayer()) {
-                        Player player2 = (Player)combatAction.attacker;
-                        if (player2.hasFullVoidMeleeSet()) {
-                            combatAction.damage = (int)((double)combatAction.damage * 1.1);
+                    value3 = CombatManager.calculateAttackRoll(combatAction.attacker, combatAction.hitDefinition);
+                    if (!ServerSettings.modernCombatSystemEnabled) {
+                        Player player;
+                        if (combatAction.hitDefinition.getAttackStyle().getCombatType() == CombatType.MELEE && combatAction.attacker.isPlayer()) {
+                            Player player2 = (Player)combatAction.attacker;
+                            if (player2.hasFullVoidMeleeSet()) {
+                                combatAction.damage = (int)((double)combatAction.damage * 1.1);
+                            }
+                            if (player2.getEquipmentManager().getItemIdAtSlot(2) == 11128 && (player2.getEquipmentManager().getItemIdAtSlot(3) == 6523 || player2.getEquipmentManager().getItemIdAtSlot(3) == 6528 || player2.getEquipmentManager().getItemIdAtSlot(3) == 6527 || player2.getEquipmentManager().getItemIdAtSlot(3) == 6525)) {
+                                combatAction.damage = (int)((double)combatAction.damage * 1.2);
+                            }
                         }
-                        if (player2.getEquipmentManager().getItemIdAtSlot(2) == 11128 && (player2.getEquipmentManager().getItemIdAtSlot(3) == 6523 || player2.getEquipmentManager().getItemIdAtSlot(3) == 6528 || player2.getEquipmentManager().getItemIdAtSlot(3) == 6527 || player2.getEquipmentManager().getItemIdAtSlot(3) == 6525)) {
+                        if (combatAction.hitDefinition.getAttackStyle().getCombatType() == CombatType.RANGED && combatAction.attacker.isPlayer() && (player = (Player)combatAction.attacker).hasFullVoidRangedSet()) {
                             combatAction.damage = (int)((double)combatAction.damage * 1.2);
                         }
                     }
-                    if (combatAction.hitDefinition.getAttackStyle().getCombatType() == CombatType.RANGED && combatAction.attacker.isPlayer() && (player = (Player)combatAction.attacker).hasFullVoidRangedSet()) {
-                        combatAction.damage = (int)((double)combatAction.damage * 1.2);
+                    value2 = CombatManager.calculateHitChance(value3, value4);
+                    boolean enabled = CombatManager.rollAccuracy(value2);
+                    if (combatAction.getAttacker().isPlayer()) {
+                        entity2 = (Player)combatAction.getAttacker();
                     }
-                }
-                value2 = CombatManager.calculateHitChance(value3, value4);
-                boolean enabled = CombatManager.rollAccuracy(value2);
-                if (combatAction.getAttacker().isPlayer()) {
-                    entity2 = (Player)combatAction.getAttacker();
-                }
-                if (combatAction.getTarget().isPlayer()) {
-                    entity2 = (Player)combatAction.getTarget();
-                }
+                    if (combatAction.getTarget().isPlayer()) {
+                        entity2 = (Player)combatAction.getTarget();
+                    }
                     combatAction.hitSuccessful = enabled;
                 }
             }
