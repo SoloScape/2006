@@ -207,7 +207,11 @@ public final class BarrowsEquipmentDurabilityChecks {
         player.getEquipmentManager().getContainer().setItem(7, new ItemStack(4759));
         player.getEquipmentManager().refreshBarrowsSetEffects();
         require(player.isVeracSetEffectActive(),
-                "A valid full Verac set was not recognised");
+                "A valid full Verac set was not recognised; names="
+                        + new ItemStack(4753).getDefinition().getName() + ", "
+                        + new ItemStack(4755).getDefinition().getName() + ", "
+                        + new ItemStack(4757).getDefinition().getName() + ", "
+                        + new ItemStack(4759).getDefinition().getName());
         player.getEquipmentManager().getContainer().setItem(0, new ItemStack(4980));
         player.getEquipmentManager().refreshBarrowsSetEffects();
         require(!player.isVeracSetEffectActive(),
