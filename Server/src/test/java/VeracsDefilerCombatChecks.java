@@ -205,6 +205,9 @@ public final class VeracsDefilerCombatChecks {
         player.setPosition(new Position(3551, 9700, 0));
         int[] levels = player.getSkillManager().getCurrentLevels();
         for (int id : new int[]{0, 1, 2, 4, 5, 6, 16}) levels[id] = 70;
+        // A real equipment refresh populates the 12 combat-bonus slots.
+        // Standalone combat fixtures need those zeros explicitly.
+        for (int slot = 0; slot < 12; slot++) player.setCombatBonus(slot, 0);
         player.setCurrentHitpoints(90);
         return player;
     }
