@@ -1,11 +1,17 @@
 import com.rs2.ServerSettings;
 import com.rs2.model.Position;
+import com.rs2.model.gameplay.barrows.BarrowsNpcSpawnPlacement;
 import com.rs2.model.npc.Npc;
 import com.rs2.model.npc.NpcDefinition;
 import com.rs2.model.objects.ObjectDefinition;
 import com.rs2.util.path.WalkingCollisionMap;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /** Prints a full audit of static Barrows monsters against the revision 443 map. */
 public final class BarrowsNpcSpawnAuditChecks {
@@ -37,6 +43,9 @@ public final class BarrowsNpcSpawnAuditChecks {
             if (id >= 2031 && id <= 2037) counts[id - 2031]++;
             if (impassable) blocked++;
             if (npc.getMaxHitpoints() <= 0) zeroHp++;
+            if (!impassable) {
+                verifyPlacement(new Position(x, y, plane), size);
+            }
             System.out.println("BARROWS STATIC id=" + id + " name=" + npc.getDefinition().getName()
                     + " pos=" + x + "," + y + "," + plane
                     + " size=" + size + " flags=0x" + Integer.toHexString(f)
@@ -51,6 +60,7 @@ public final class BarrowsNpcSpawnAuditChecks {
             System.out.println("BARROWS CRYPT ENTRY " + entry[0] + "," + entry[1] + "," + entry[2]
                 + " flags=0x" + Integer.toHexString(f)
                 + " blocked=" + ((f & 0x1280100) != 0));
+            verifyPlacement(new Position(entry[0], entry[1], entry[2]), 1);
         }
         int nonZero = 0, blockedTiles = 0;
         for (int x = 3526; x <= 3578; x++) {
@@ -62,11 +72,109 @@ public final class BarrowsNpcSpawnAuditChecks {
         }
         System.out.println("BARROWS 443 MAP nonzeroFlags=" + nonZero
                 + " blockedFootprintTiles=" + blockedTiles);
+        verifyDoorApproaches();
+        verifySyntheticBlockedAndWallCases();
         System.out.println("BARROWS AUDIT total=" + inBarrows
                 + " blocked=" + blocked + " zeroHitpoints=" + zeroHp
                 + " npc2031-2037=" + java.util.Arrays.toString(counts));
         if (inBarrows != 32) throw new AssertionError("Expected 32 fixed Barrows tunnel NPCs");
     }
+    private static void verifyPlacement(Position origin, int npcSize) {
+        Position chosen = BarrowsNpcSpawnPlacement.findSafeSpawn(origin, origin, npcSize);
+        if (chosen == null) throw new AssertionError("No reachable spawn near " + origin
+                + " for " + npcSize + "x" + npcSize + " NPC");
+        if (origin.equals(chosen)) throw new AssertionError("Spawn overlaps player at " + origin);
+        if (chosen.getPlane() != origin.getPlane()) throw new AssertionError("Wrong spawn plane " + chosen);
+        for (int dx = 0; dx < npcSize; dx++) {
+            for (int dy = 0; dy < npcSize; dy++) {
+                if ((WalkingCollisionMap.getTileFlags(chosen.getX()+dx, chosen.getY()+dy,
+                        chosen.getPlane()) & 0x1280100) != 0)
+                    throw new AssertionError("NPC footprint enters wall " + chosen);
+            }
+        }
+    }
+
+    private static void verifyDoorApproaches() throws Exception {
+        String src = new String(Files.readAllBytes(Paths.get(
+                "src/main/java/com/rs2/model/gameplay/barrows/BarrowsManager.java")),
+                StandardCharsets.UTF_8);
+        Pattern door = Pattern.compile("openDoubleDoorPair\\\\(\\\\d+, \\\\d+, "
+                + "(\\\\d+), (\\\\d+), (\\\\d+), (\\\\d+), 0\\\\)");
+        Matcher match = door.matcher(src);
+        int doorPairs = 0, openApproaches = 0;
+        while (match.find()) {
+            doorPairs++;
+            int x1=Integer.parseInt(match.group(1)), y1=Integer.parseInt(match.group(2));
+            int x2=Integer.parseInt(match.group(3)), y2=Integer.parseInt(match.group(4));
+            for (int sign : new int[]{-1, 1}) {
+                int x = x1 == x2 ? x1 + sign : x1;
+                int y = y1 == y2 ? y1 + sign : y1;
+                if (!BarrowsNpcSpawnPlacement.isOpen(x, y, 0)) continue;
+                openApproaches++;
+                // Every open door approach must have at least one reachable,
+                // collision-safe 1x1 monster placement on its own side.
+                verifyPlacement(new Position(x, y, 0), 1);
+            }
+        }
+        System.out.println("BARROWS DOORS pairs=" + doorPairs + " openSides=" + openApproaches);
+        if (doorPairs != 32 || openApproaches < 20) {
+            throw new AssertionError("Barrows tunnel door enumeration failed");
+        }
+    }
+
+    private static void verifySyntheticBlockedAndWallCases() throws Exception {
+        // Inject a miniature 443 collision region to test a narrow passage and
+        // a completely surrounded doorway, then restore the real cache map.
+        int x=3533, y=9711, regionId=(x>>6<<8)|(y>>6);
+        Field lookupField=WalkingCollisionMap.class.getDeclaredField("regionLookup");
+        lookupField.setAccessible(true);
+        WalkingCollisionMap[] lookup=(WalkingCollisionMap[])lookupField.get(null);
+        WalkingCollisionMap original=lookup[regionId];
+        Constructor<WalkingCollisionMap> ctor=WalkingCollisionMap.class
+                .getDeclaredConstructor(int.class);
+        ctor.setAccessible(true);
+        WalkingCollisionMap synthetic=ctor.newInstance(regionId);
+        Field flagsField=WalkingCollisionMap.class.getDeclaredField("tileFlags");
+        flagsField.setAccessible(true);
+        int[][][] masks=(int[][][])flagsField.get(synthetic);
+        int[][] floor=new int[64][64];
+        masks[0]=floor;
+        lookup[regionId]=synthetic;
+        try {
+            for(int[] row:floor)java.util.Arrays.fill(row,0x200000);
+            floor[x&63][y&63]=0;
+            // A two-tile northern passage is the only viable exit.
+            floor[x&63][(y+1)&63]=0;
+            floor[x&63][(y+2)&63]=0;
+            Position center=new Position(x,y,0);
+            Position safe=BarrowsNpcSpawnPlacement.findSafeSpawn(center,center,1);
+            if(safe==null||safe.getX()!=x||safe.getY()!=y+2)
+                throw new AssertionError("Failed to choose reachable open passage " + safe);
+
+            for(int[] row:floor)java.util.Arrays.fill(row,0x200000);
+            floor[x&63][y&63]=0;
+            if(BarrowsNpcSpawnPlacement.findSafeSpawn(center,center,1)!=null)
+                throw new AssertionError("Spawned into a sealed-off wall");
+
+            for(int[] row:floor)java.util.Arrays.fill(row,0);
+            // Tile is clear, but a blocking wall edge must prevent travel.
+            floor[(x+1)&63][y&63]=128;
+            Position result=BarrowsNpcSpawnPlacement.findSafeSpawn(center,center,1);
+            if(result==null||result.equals(center))
+                throw new AssertionError("Did not reject an occupied player tile");
+            for(int dx=0;dx<2;dx++)for(int dy=0;dy<2;dy++){
+                if(dx==0 && dy==0)continue;
+                floor[(x+dx)&63][(y+dy)&63]=0x200000;
+            }
+            Position large=BarrowsNpcSpawnPlacement.findSafeSpawn(center,center,2);
+            if(large!=null && (large.getX()==x||large.getY()==y))
+                throw new AssertionError("Large monster straddles blocked footprint");
+        } finally {
+            lookup[regionId]=original;
+        }
+        System.out.println("BARROWS SYNTHETIC blocked/wall/size cases passed");
+    }
+
     private static int u16(byte[] d,int offset) {
         return (d[offset] & 255) << 8 | d[offset+1] & 255;
     }
