@@ -1065,6 +1065,16 @@ public final class BarrowsManager {
     /*
      * Enabled aggressive block sorting
      */
+    /**
+     * The Barrows crypt above the tunnels has the same X/Y coordinates
+     * but is on plane 3. Escaping through a tunnel ladder must end the
+     * post-loot collapse immediately; region-only isInBarrows() is not enough.
+     */
+    public static boolean isInBarrowsTunnels(Player player) {
+        return player != null && player.getPosition().getPlane() == 0
+                && player.isInBarrows();
+    }
+
     public static void resetBarrowsState(Player player) {
         int index = 0;
         while (index < 6) {
@@ -1073,6 +1083,13 @@ public final class BarrowsManager {
         }
         player.setBarrowsKillCount(0);
         player.barrowsRewardPotential = 0;
+        // The last run's tunnel locks and puzzle answer must not leak into
+        // the next attempt. Before a chest is looted, exiting does not reset.
+        player.barrowsDoorPuzzleSolved = false;
+        player.activeBarrowsDoorPuzzleIndex = -1;
+        player.activeBarrowsDoorPuzzleAnswerObjectIds = new int[3];
+        player.packetSender.sendConfig(452, 0);
+        player.configStates[452] = 0;
         player.setBarrowsTargetBrotherIndex(GameUtil.randomInclusive(5));
         Player player2 = player;
         player2.packetSender.sendConfig(453, 0);
