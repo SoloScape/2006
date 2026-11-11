@@ -515,9 +515,35 @@ public final class BarrowsManager {
         return false;
     }
 
-    private static void spawnRandomCryptNpc(Player player, Position position) {
-        int value = cryptNpcIds[GameUtil.randomInt(7)];
-        GameplayHelper.spawnOwnedNpcAtPosition(player, position, new Npc(value), true, false);
+    private static void spawnRandomCryptNpc(Player player, Position arrivalTile) {
+        // Door packets queue the player's step: use the future landing tile,
+        // and fall back to the current side only if the door is still blocked.
+        int npcId = cryptNpcIds[GameUtil.randomInt(cryptNpcIds.length)];
+        Npc npc = new Npc(npcId);
+        Position arrival = new Position(arrivalTile.getX(), arrivalTile.getY(),
+                player.getPosition().getPlane());
+        Position safe = BarrowsNpcSpawnPlacement.findSafeSpawn(arrival,
+                player.getPosition(), npc.getDefinition().getSize());
+        if (safe == null) {
+            player.getPacketSender().sendGameMessage(
+                    "There is not enough room for a creature to emerge.");
+            return;
+        }
+        GameplayHelper.spawnOwnedNpcAtPosition(player, safe, npc, true, false);
+    }
+
+    private static boolean spawnBarrowsBrother(Player player, int npcId) {
+        Npc brother = new Npc(npcId);
+        Position safe = BarrowsNpcSpawnPlacement.findSafeSpawn(
+                player.getPosition(), player.getPosition(), brother.getDefinition().getSize());
+        if (safe == null) {
+            player.getPacketSender().sendGameMessage(
+                    "There is not enough room for the brother to emerge.");
+            return false;
+        }
+        GameplayHelper.spawnOwnedNpcAtPosition(player, safe, brother, true, false);
+        player.getPacketSender().sendEntityHintIcon(1, brother.getIndex());
+        return true;
     }
 
     /*
@@ -535,7 +561,12 @@ public final class BarrowsManager {
                     player2.packetSender.sendConfig(453, value);
                     player.configStates[453] = value;
                     if (player.getBarrowsKilledBrothers()[player.getBarrowsTargetBrotherIndex()]) return true;
-                    GameplayHelper.spawnOwnedNpcAdjacentToPlayer(player, new Npc(brotherSarcophagusNpcIds[player.getBarrowsTargetBrotherIndex()][1]), true, true);
+                    if (!BarrowsManager.spawnBarrowsBrother(player,
+                            brotherSarcophagusNpcIds[player.getBarrowsTargetBrotherIndex()][1])) {
+                        // Do not mark a brother as summoned if the room is full.
+                        player.configStates[453] = 0;
+                        player.getPacketSender().sendConfig(453, 0);
+                    }
                     return true;
                 }
                 if ((player.configStates[453] & value) != 0) {
@@ -563,7 +594,12 @@ public final class BarrowsManager {
                     int objectType = SkillActionHelper.getObjectType(objectId, value2, interactionTargetY, player.getPosition().getPlane());
                     ObjectManager.getInstance().addDynamicObject(new DynamicObject(6775, value2, interactionTargetY, player.getPosition().getPlane(), objectOrientation, objectType, objectId, 500), true);
                     if (player.getBarrowsKilledBrothers()[player.getBarrowsTargetBrotherIndex()]) return true;
-                    GameplayHelper.spawnOwnedNpcAdjacentToPlayer(player, new Npc(brotherSarcophagusNpcIds[player.getBarrowsTargetBrotherIndex()][1]), true, true);
+                    if (!BarrowsManager.spawnBarrowsBrother(player,
+                            brotherSarcophagusNpcIds[player.getBarrowsTargetBrotherIndex()][1])) {
+                        // Do not mark a brother as summoned if the room is full.
+                        player.configStates[453] = 0;
+                        player.getPacketSender().sendConfig(453, 0);
+                    }
                     return true;
                 }
             }
@@ -577,7 +613,12 @@ public final class BarrowsManager {
                     player5.packetSender.sendConfig(453, value3);
                     player.configStates[453] = value3;
                     if (player.getBarrowsKilledBrothers()[player.getBarrowsTargetBrotherIndex()]) return true;
-                    GameplayHelper.spawnOwnedNpcAdjacentToPlayer(player, new Npc(brotherSarcophagusNpcIds[player.getBarrowsTargetBrotherIndex()][1]), true, true);
+                    if (!BarrowsManager.spawnBarrowsBrother(player,
+                            brotherSarcophagusNpcIds[player.getBarrowsTargetBrotherIndex()][1])) {
+                        // Do not mark a brother as summoned if the room is full.
+                        player.configStates[453] = 0;
+                        player.getPacketSender().sendConfig(453, 0);
+                    }
                     return true;
                 }
                 if ((player.configStates[453] & value3) != 0) {
@@ -616,7 +657,7 @@ public final class BarrowsManager {
                             player8.packetSender.sendGameMessage("You have already searched this sarcophagus.");
                             return true;
                         }
-                        GameplayHelper.spawnOwnedNpcAdjacentToPlayer(player, new Npc(brotherSarcophagusNpcIds[index][1]), true, true);
+                        if (!BarrowsManager.spawnBarrowsBrother(player, brotherSarcophagusNpcIds[index][1])) return true;
                         if (index == player.getBarrowsTargetBrotherIndex()) return true;
                         Player player9 = player;
                         player9.packetSender.sendGameMessage("You don't find anything.");
