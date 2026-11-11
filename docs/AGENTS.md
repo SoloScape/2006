@@ -32,7 +32,6 @@ Suggested flexible outline:
 ```markdown
 # [Feature or area] — [Clear PR purpose]
 
-> **Status:** Draft / Ready for review
 > **Goal:** One-sentence explanation
 
 ## Overview
