@@ -15,6 +15,7 @@ on:
       - 'Server/src/main/java/com/rs2/net/packet/handler/ButtonClickPacketHandler.java'
       - 'Server/src/test/java/MorytaniaBarrowsInteractionChecks.java'
       - 'Server/src/test/java/Barrows443PuzzleInterfaceChecks.java'
+      - 'Server/src/test/java/BarrowsHistoricalPuzzleChecks.java'
       - 'Server/src/test/java/BarrowsNpcSpawnAuditChecks.java'
       - 'Server/src/test/java/BarrowsTunnelEncounterChecks.java'
       - '.github/workflows/verify-barrows-morytania.yml'
@@ -50,9 +51,11 @@ jobs:
           javac -encoding UTF-8 -cp 'lib/*' -d barrows-test-classes @/tmp/barrows-sources.txt
           javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
             src/test/java/MorytaniaBarrowsInteractionChecks.java \
-            src/test/java/Barrows443PuzzleInterfaceChecks.java
+            src/test/java/Barrows443PuzzleInterfaceChecks.java \
+            src/test/java/BarrowsHistoricalPuzzleChecks.java
           java -cp 'barrows-test-classes:lib/*' MorytaniaBarrowsInteractionChecks
           java -cp 'barrows-test-classes:lib/*' Barrows443PuzzleInterfaceChecks
+          java -cp 'barrows-test-classes:lib/*' BarrowsHistoricalPuzzleChecks
       - name: Audit Barrows NPC spawns against native collision and combat definitions
         working-directory: Server
         run: |
