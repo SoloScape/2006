@@ -48,6 +48,10 @@ public final class MorytaniaBarrowsInteractionChecks {
         Player visitor = new Player(null);
         visitor.isBot = true;
         visitor.setUsername("Dialogue Tester");
+        // In a detached fixture the normal NPC definition bootstrap has not run.
+        // The renderer still needs a non-null definition for the NPC portrait.
+        com.rs2.model.World.getNpcDefinitions()[2996] =
+                com.rs2.model.npc.NpcDefinition.forId(2996);
         visitor.getDialogueManager().setDialogueNpcId(2996);
         require(OldCroneDialogue.continueDialogue(visitor, 1, 0), "Old Crone greeting not handled");
         require(OldCroneDialogue.continueDialogue(visitor, 2, 0), "Old Crone introduction not handled");
