@@ -6,6 +6,7 @@ on:
     paths:
       - 'Server/src/main/java/com/rs2/model/gameplay/barrows/**'
       - 'Server/src/main/java/com/rs2/model/combat/CombatAction.java'
+      - 'Server/src/main/java/com/rs2/model/combat/CombatManager.java'
       - 'Server/src/main/java/com/rs2/model/combat/special/SpecialAttackDefinition.java'
       - 'Server/src/main/java/com/rs2/model/interaction/TableItemPlacement.java'
       - 'Server/src/main/java/com/rs2/model/interaction/ItemOnObjectTask.java'
@@ -21,6 +22,7 @@ on:
       - 'Server/src/test/java/BarrowsNpcSpawnAuditChecks.java'
       - 'Server/src/test/java/BarrowsTunnelEncounterChecks.java'
       - 'Server/src/test/java/BarrowsBrotherSpecialCombatChecks.java'
+      - 'Server/src/test/java/VeracsDefilerCombatChecks.java'
       - '.github/workflows/verify-barrows-morytania.yml'
   workflow_dispatch:
 
@@ -71,5 +73,7 @@ jobs:
         working-directory: Server
         run: |
           javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
-            src/test/java/BarrowsBrotherSpecialCombatChecks.java
+            src/test/java/BarrowsBrotherSpecialCombatChecks.java \
+            src/test/java/VeracsDefilerCombatChecks.java
           java -cp 'barrows-test-classes:lib/*' BarrowsBrotherSpecialCombatChecks
+          java -cp 'barrows-test-classes:lib/*' VeracsDefilerCombatChecks
