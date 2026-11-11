@@ -27,6 +27,9 @@ public final class VeracsDefilerCombatChecks {
     public static void main(String[] args) {
         ServerSettings.clientBuild = 443;
         NpcDefinition.loadDefinitions();
+        // Real hits are queued through the global combat manager, which is
+        // not bootstrapped by detached Java regression fixtures by default.
+        CombatManager.initialize();
         boolean initialMode = ServerSettings.modernCombatSystemEnabled;
         try {
             testDefilerEligibility();
