@@ -176,6 +176,8 @@ public final class BarrowsChestRewardChecks {
         // EntityReference resolves detached test players by a live index.
         player.setIndex(1);
         player.setPosition(new Position(3552, 9694, 0));
+        // The ground-item visibility check needs the normal local view area.
+        player.refreshLocalViewArea();
         return player;
     }
 
