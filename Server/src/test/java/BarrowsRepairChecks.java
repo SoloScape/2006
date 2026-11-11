@@ -5,6 +5,7 @@ import com.rs2.model.item.ItemStack;
 import com.rs2.model.item.action.BarrowsRepairHandler;
 import com.rs2.model.npc.NpcDefinition;
 import com.rs2.model.player.Player;
+import com.rs2.model.quest.QuestDefinition;
 
 /**
  * Regression coverage for the 2005-2006 Barrows NPC repair rules.
@@ -37,6 +38,8 @@ public final class BarrowsRepairChecks {
     public static void main(String[] args) {
         ServerSettings.clientBuild = 443;
         NpcDefinition.loadDefinitions();
+        // Item definitions include quest requirements and need the quest count initialized.
+        QuestDefinition.loadDefinitions();
         ItemDefinition.loadDefinitions();
         checkRepairers();
         checkPricesAcrossEveryPiece();
@@ -116,8 +119,7 @@ public final class BarrowsRepairChecks {
                 }
             }
             // Unset legacy metadata denotes a complete remaining quarter.
-            int expected = fullCost * 0 / 4;
-            assertCost(new ItemStack(DEGRADED[i], 1, -1), expected,
+            assertCost(new ItemStack(DEGRADED[i], 1, -1), 0,
                     "unset legacy first quarter " + REPAIRED[i]);
         }
         require(BarrowsRepairHandler.calculateRepairCost(new ItemStack(995)) == -1,
