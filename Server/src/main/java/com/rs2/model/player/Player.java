@@ -3452,7 +3452,7 @@ extends Entity {
                 player.packetSender.closeInterfaces();
             }
         }
-        if (this.barrowsChestOpened && !this.isInBarrows()) {
+        if (this.barrowsChestOpened && !BarrowsManager.isInBarrowsTunnels(this)) {
             player = this;
             player.packetSender.resetCamera();
             this.barrowsChestOpened = false;
