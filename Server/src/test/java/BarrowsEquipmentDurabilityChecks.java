@@ -9,6 +9,7 @@ import com.rs2.model.item.action.BarrowsRepairHandler;
 import com.rs2.model.npc.Npc;
 import com.rs2.model.npc.NpcDefinition;
 import com.rs2.model.player.Player;
+import com.rs2.model.quest.QuestDefinition;
 
 /**
  * Exhaustive 24-piece Barrows wear regression: 90,000 x 600ms ticks = 15h.
@@ -36,6 +37,8 @@ public final class BarrowsEquipmentDurabilityChecks {
     public static void main(String[] args) {
         ServerSettings.clientBuild = 443;
         NpcDefinition.loadDefinitions();
+        // Item definitions include quest requirements and need the quest count initialized.
+        QuestDefinition.loadDefinitions();
         ItemDefinition.loadDefinitions();
         assertAllTwentyFourPieces();
         assertLoginPersistence();
@@ -79,8 +82,8 @@ public final class BarrowsEquipmentDurabilityChecks {
             require(BarrowsEquipmentDurability.consumeCombatTicks(item, 200000) == item,
                     "Broken gear changed after additional combat");
 
-            // The still-open price audit is separate, but every stage must
-            // remain recognised by the repair system after metadata changes.
+            // Every stage remains repairable; historical NPC prices are
+            // checked exhaustively by BarrowsRepairChecks.
             require(BarrowsRepairHandler.forItem(item) != null,
                     "Broken gear cannot be found by repair handler: " + item.getId());
             require(BarrowsRepairHandler.calculateRepairCost(item) > 0,
