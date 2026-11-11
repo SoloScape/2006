@@ -99,6 +99,11 @@ extends TickTask {
             this.stop();
             return;
         }
+        if (TableItemPlacement.use(this.player, this.itemId, this.objectId,
+                this.objectX, this.objectY, this.objectPlane)) {
+            this.stop();
+            return;
+        }
         if (JungleCutting.handleItemOnObject(this.player, this.itemId, this.objectId,
                 this.objectX, this.objectY, this.objectPlane)) {
             this.stop();
