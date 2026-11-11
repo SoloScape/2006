@@ -8,7 +8,7 @@ import com.rs2.model.player.Player;
 
 public final class BarrowsRepairHandler {
     // Bob (Lumbridge), Dunstan (Burthorpe), Tindel Marchant (Port Khazard).
-    private static final int[] repairNpcIds = {519, 4105, 1358};
+    private static final int[] repairNpcIds = {519, 1082, 1799};
     private final int repairedItemId;
     private final int baseDegradedItemId;
     private final int fullRepairCost;
