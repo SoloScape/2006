@@ -14,7 +14,7 @@ import java.util.Locale;
 
 /** Translates 443 cache actions to gameplay operations, independently of menu slots. */
 public final class NpcActionRouter {
-    public enum Action { NONE, TALK, ATTACK, BANK, TRADE, PICKPOCKET, FISH, TELEPORT, TAN, EXCHANGE, SHEAR, WOODCUT, HEAL, REWARDS, PELT, LEGACY }
+    public enum Action { NONE, TALK, ATTACK, BANK, TRADE, BUY_MEAD, PICKPOCKET, FISH, TELEPORT, TAN, EXCHANGE, SHEAR, WOODCUT, HEAL, REWARDS, PELT, LEGACY }
 
     private NpcActionRouter() { }
 
@@ -28,6 +28,7 @@ public final class NpcActionRouter {
         if (action.equals("bank")) return Action.BANK;
         if (action.equals("trade") || action.equals("trade-with")) {
             if (isTanner(definition.getId())) return Action.TAN;
+            if (definition.getId() == 1042) return Action.BUY_MEAD;
             if (definition.getId() == 3103) return Action.REWARDS;
             return Action.TRADE;
         }

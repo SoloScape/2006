@@ -8,9 +8,11 @@ import com.rs2.model.combat.CombatAction;
 import com.rs2.model.c.ProjectileDefinition;
 import com.rs2.model.gameplay.castlewars.CastleWarsManager;
 import com.rs2.model.gameplay.magetrainingarena.MageTrainingArenaRewardShop;
+import com.rs2.model.item.ItemStack;
 import com.rs2.model.npc.Npc;
 import com.rs2.model.player.BankManager;
 import com.rs2.model.player.GrandExchangeManager;
+import com.rs2.model.player.InventoryManager;
 import com.rs2.model.player.Player;
 import com.rs2.model.shop.ShopManager;
 import com.rs2.model.skill.fishing.FishingSpotDefinition;
@@ -88,6 +90,27 @@ public final class RoutedNpcActionTask extends TickTask {
                 } else if (!GameplayHelper.openNpcShop(player, npcId)) {
                     unsupported("No shop is configured for this NPC.");
                     return;
+                }
+                break;
+            case BUY_MEAD:
+                if (!allowMembers()) return;
+                InventoryManager inventory = player.getInventoryManager();
+                ItemStack price = new ItemStack(995, 5);
+                int coins = inventory.getContainer().getItemAmount(price.getId());
+                if (coins < price.getAmount()) {
+                    reject("You need 5 coins to buy Moonlight mead.");
+                    return;
+                }
+                if (coins > price.getAmount() && inventory.getContainer().getFreeSlots() == 0) {
+                    reject("You need a free inventory slot to buy Moonlight mead.");
+                    return;
+                }
+                if (inventory.removeItem(price)) {
+                    if (inventory.addItem(new ItemStack(2955, 1))) {
+                        player.packetSender.sendGameMessage("You buy a pint of Moonlight mead.");
+                    } else {
+                        inventory.addItem(price);
+                    }
                 }
                 break;
             case PICKPOCKET:

@@ -220,28 +220,33 @@ public class Class14
 	return is_36_;
     }
     
-    public static int method212(int i, int i_37_, int i_38_, int i_39_) {
-	int i_40_ = i_39_ >> 7;
-	int i_41_ = i >> 7;
-	if (i_40_ < 0 || i_41_ < 0 || i_40_ > 103 || i_41_ > 103)
-	    return 0;
-	int i_42_ = i_38_;
-	if (i_42_ < 3
-	    && (Class55.tileFlags[1][i_40_][i_41_] & 0x2) == 2)
-	    i_42_++;
-	int i_43_ = i_39_ & 0x7f;
-	int i_44_ = i & 0x7f;
-	int i_45_ = (((Class67.heightMap[i_42_][i_40_][i_41_]
-		       * (128 - i_43_))
-		      + i_43_ * (Class67.heightMap[i_42_]
-				 [i_40_ + 1][i_41_]))
-		     >> 7);
-	int i_46_ = ((i_43_ * (Class67.heightMap[i_42_]
-			       [i_40_ + 1][i_41_ + 1])
-		      + (-i_43_ + 128) * (Class67.heightMap
-					  [i_42_][i_40_][i_41_ + 1]))
-		     >> 7);
-	return (-i_44_ + 128) * i_45_ + i_44_ * i_46_ >> 7;
+    public static int method212(int localY, int unused, int plane, int localX) {
+        int tileX = localX >> 7;
+        int tileY = localY >> 7;
+        if (tileX < 0 || tileY < 0 || tileX > 103 || tileY > 103)
+            return 0;
+        int surfacePlane = plane;
+        if (plane < 3 && (Class55.tileFlags[1][tileX][tileY] & 0x2) != 0)
+            surfacePlane++;
+        int offsetX = localX & 0x7f;
+        int offsetY = localY & 0x7f;
+        int surface = interpolateHeight(surfacePlane, tileX, tileY, offsetX, offsetY);
+        if (plane == 0 && surfacePlane == 1 && !Class63.aBoolean1120
+                && Class65.anInt1145 + tileX == 3507 && JKeyListener.anInt618 + tileY == 3480) {
+            // The Canifis bank steps (4375) rise east to the top tread, 96 units into the tile.
+            // Sample both planes so the bridge flag does not snap actors up to the landing.
+            int street = interpolateHeight(0, tileX, tileY, offsetX, offsetY);
+            int stairRun = 96;
+            return street + (surface - street) * Math.min(offsetX, stairRun) / stairRun;
+        }
+        return surface;
+    }
+
+    private static int interpolateHeight(int plane, int tileX, int tileY, int offsetX, int offsetY) {
+        int[][] heights = Class67.heightMap[plane];
+        int south = (heights[tileX][tileY] * (128 - offsetX) + heights[tileX + 1][tileY] * offsetX) >> 7;
+        int north = (heights[tileX][tileY + 1] * (128 - offsetX) + heights[tileX + 1][tileY + 1] * offsetX) >> 7;
+        return (south * (128 - offsetY) + north * offsetY) >> 7;
     }
     
     public static void method213(int i) {
