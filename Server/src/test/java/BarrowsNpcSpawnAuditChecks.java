@@ -24,14 +24,22 @@ public final class BarrowsNpcSpawnAuditChecks {
             if (x < 3529 || x > 3574 || y < 9672 || y > 9717 || plane != 0) continue;
             inBarrows++;
             int f = WalkingCollisionMap.getTileFlags(x, y, plane);
-            boolean impassable = (f & 0x1280100) != 0;
             Npc npc = new Npc(id);
+            int size = Math.max(1, npc.getDefinition().getSize());
+            boolean impassable = false;
+            for (int dx = 0; dx < size; dx++) {
+                for (int dy = 0; dy < size; dy++) {
+                    if ((WalkingCollisionMap.getTileFlags(x+dx, y+dy, plane) & 0x1280100) != 0) {
+                        impassable = true;
+                    }
+                }
+            }
             if (id >= 2031 && id <= 2037) counts[id - 2031]++;
             if (impassable) blocked++;
             if (npc.getMaxHitpoints() <= 0) zeroHp++;
             System.out.println("BARROWS STATIC id=" + id + " name=" + npc.getDefinition().getName()
                     + " pos=" + x + "," + y + "," + plane
-                    + " flags=0x" + Integer.toHexString(f)
+                    + " size=" + size + " flags=0x" + Integer.toHexString(f)
                     + " blocked=" + impassable + " hp=" + npc.getMaxHitpoints());
         }
         int[][] entries = {
@@ -44,6 +52,16 @@ public final class BarrowsNpcSpawnAuditChecks {
                 + " flags=0x" + Integer.toHexString(f)
                 + " blocked=" + ((f & 0x1280100) != 0));
         }
+        int nonZero = 0, blockedTiles = 0;
+        for (int x = 3526; x <= 3578; x++) {
+            for (int y = 9669; y <= 9720; y++) {
+                int flags = WalkingCollisionMap.getTileFlags(x,y,0);
+                if (flags != 0) nonZero++;
+                if ((flags & 0x1280100) != 0) blockedTiles++;
+            }
+        }
+        System.out.println("BARROWS 443 MAP nonzeroFlags=" + nonZero
+                + " blockedFootprintTiles=" + blockedTiles);
         System.out.println("BARROWS AUDIT total=" + inBarrows
                 + " blocked=" + blocked + " zeroHitpoints=" + zeroHp
                 + " npc2031-2037=" + java.util.Arrays.toString(counts));
