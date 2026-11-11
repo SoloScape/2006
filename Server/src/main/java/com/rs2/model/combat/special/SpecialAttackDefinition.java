@@ -230,10 +230,58 @@ public abstract class SpecialAttackDefinition {
         player.packetSender.refreshSpecialAttackConfig();
     }
 
+    /**
+     * NPC Barrows effects must run through the normal combat hit pipeline.
+     * Restrict dispatch to the matching original brother/effect pairing:
+     * generic NPCs cannot activate player-only weapon special attacks.
+     */
+    private static void applyNpcBarrowsSpecialEffect(Npc brother, Entity target,
+                                                     int effectId, int damage) {
+        if (target == null || damage <= 0) return;
+        switch (brother.getNpcId()) {
+            case 2027: // Guthan: heal for the damage actually dealt.
+                if (effectId == 7) {
+                    target.getUpdateState().setGraphic(398);
+                    brother.heal(Math.min(damage, Math.max(0, target.getCurrentHitpoints())));
+                }
+                return;
+            case 2029: // Torag: drain run energy (magnitude audited separately).
+                if (effectId == 8 && target.isPlayer()) {
+                    target.getUpdateState().setGraphic(399);
+                    Player player = (Player)target;
+                    player.addRunEnergyPercent(-4);
+                    player.packetSender.sendRunEnergy();
+                }
+                return;
+            case 2025: // Ahrim: lower Strength.
+                if (effectId == 9 && target.isPlayer()) {
+                    target.getUpdateState().setGraphicHeight100(400);
+                    ((Player)target).packetSender.modifySkillLevel(2, -5, false);
+                }
+                return;
+            case 2028: // Karil: lower Agility.
+                if (effectId == 10 && target.isPlayer()) {
+                    target.getUpdateState().setGraphicHeight100(401);
+                    Player player = (Player)target;
+                    int agility = player.getSkillManager().getCurrentLevels()[16];
+                    player.packetSender.modifySkillLevel(16, -(int)(agility * 0.2), true);
+                }
+                return;
+            // Dharok (2026) and Verac (2030) have independent combat logic.
+            // Do not accidentally run their effects through this stat-drain path.
+            default:
+                return;
+        }
+    }
+
     public static void applyHitSpecialEffect(Entity entity, Entity target, HitDefinition hitDefinition, int damage) {
-        if (entity == null || !entity.isPlayer()) {
+        if (entity == null || hitDefinition == null) return;
+        if (entity.isNpc()) {
+            applyNpcBarrowsSpecialEffect((Npc)entity, target,
+                    hitDefinition.getSpecialEffectId(), damage);
             return;
         }
+        if (!entity.isPlayer()) return;
         Player player = (Player)entity;
         // Ordinary hits also pass through this handler. Keep Tutorial Island's
         // instruction panel visible when the player's arrow reaches the rat.
