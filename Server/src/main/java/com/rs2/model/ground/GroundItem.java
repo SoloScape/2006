@@ -17,6 +17,8 @@ public final class GroundItem {
     private Position position;
     private boolean respawning;
     private int respawnDelayTicks;
+    // Zero means use the normal ground-item lifetime.
+    private int lifetimeTicks;
     private boolean restrictedModePickupAllowed = false;
 
     public GroundItem(ItemStack itemStack, Position position, int respawnDelayTicks, boolean enabled2) {
@@ -98,6 +100,14 @@ public final class GroundItem {
 
     public final ElapsedTicks getTimer() {
         return this.timer;
+    }
+
+    public final int getLifetimeTicks() {
+        return this.lifetimeTicks;
+    }
+
+    public final void setLifetimeTicks(int lifetimeTicks) {
+        this.lifetimeTicks = Math.max(0, lifetimeTicks);
     }
 
     public final int getRespawnDelayTicks() {
