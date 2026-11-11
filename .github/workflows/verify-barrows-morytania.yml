@@ -16,6 +16,7 @@ on:
       - 'Server/src/test/java/MorytaniaBarrowsInteractionChecks.java'
       - 'Server/src/test/java/Barrows443PuzzleInterfaceChecks.java'
       - 'Server/src/test/java/BarrowsNpcSpawnAuditChecks.java'
+      - 'Server/src/test/java/BarrowsTunnelEncounterChecks.java'
       - '.github/workflows/verify-barrows-morytania.yml'
   workflow_dispatch:
 
@@ -56,5 +57,7 @@ jobs:
         working-directory: Server
         run: |
           javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
-            src/test/java/BarrowsNpcSpawnAuditChecks.java
+            src/test/java/BarrowsNpcSpawnAuditChecks.java \
+            src/test/java/BarrowsTunnelEncounterChecks.java
           java -cp 'barrows-test-classes:lib/*' BarrowsNpcSpawnAuditChecks
+          java -cp 'barrows-test-classes:lib/*' BarrowsTunnelEncounterChecks
