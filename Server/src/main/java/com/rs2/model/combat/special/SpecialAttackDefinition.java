@@ -418,16 +418,9 @@ public abstract class SpecialAttackDefinition {
                 return;
             }
             case 11: {
-                if (damage <= 0 || !target.isPlayer()) break;
-                Player targetPlayer = (Player)target;
-                targetPlayer.packetSender.sendGameMessage("You have been drained.");
-                int remainder = targetPlayer.packetSender.modifySkillLevelReturningRemainder(1, -damage, true);
-                if (remainder <= 0) break;
-                if ((remainder = targetPlayer.packetSender.modifySkillLevelReturningRemainder(2, -remainder, true)) <= 0) break;
-                if ((remainder = targetPlayer.packetSender.modifySkillLevelReturningRemainder(0, -remainder, true)) <= 0) break;
-                if ((remainder = targetPlayer.packetSender.modifySkillLevelReturningRemainder(5, -remainder, true)) <= 0) break;
-                if ((remainder = targetPlayer.packetSender.modifySkillLevelReturningRemainder(6, -remainder, true)) <= 0) break;
-                targetPlayer.packetSender.modifySkillLevelReturningRemainder(4, -remainder, true);
+                // Verac's Defiler never drains skills. The armour/Defence
+                // accuracy and protection-prayer bypass is handled by
+                // CombatAction, where hit success and damage are calculated.
                 return;
             }
             case 12: {
