@@ -62,8 +62,8 @@ public final class BarrowsBrotherSpecialCombatChecks {
         Player victim = victim();
         Npc torag = brother(2029);
         hit(torag, victim, 8, 10, true);
-        require(victim.getRunEnergyPercent() == 76,
-                "Torag's damaging hit did not drain run energy; actual="
+        require(victim.getRunEnergyPercent() == 64,
+                "Torag's damaging hit did not drain 20% of remaining run energy; actual="
                         + victim.getRunEnergyPercent() + " raw=" + victim.getRunEnergyRaw()
                         + " hp=" + victim.getCurrentHitpoints());
         require(victim.getCurrentHitpoints() == 80, "Torag did not deal normal hit damage");
