@@ -964,74 +964,88 @@ public final class BarrowsManager {
     }
 
     public static void generateTunnelRoute(Player player, boolean moveToEntry) {
-        // An incorrect answer must not lead back to the same puzzle door.
-        int previousPuzzleDoorBit = moveToEntry
+        // A failed puzzle moves to one of the *other* central doors.
+        int previousDoorBit = moveToEntry
                 ? -1 : findOpenPuzzleDoorBit(player.configStates[452]);
-        int routeConfig = 0;
-        int currentRoomId = 0;
+        int centralDoorIndex = GameUtil.randomInt(
+                previousDoorBit == -1 ? CENTER_PUZZLE_DOOR_BITS.length
+                        : CENTER_PUZZLE_DOOR_BITS.length - 1);
+        if (previousDoorBit != -1) {
+            int previousIndex = -1;
+            for (int i = 0; i < CENTER_PUZZLE_DOOR_BITS.length; i++) {
+                if (CENTER_PUZZLE_DOOR_BITS[i] == previousDoorBit) {
+                    previousIndex = i;
+                    break;
+                }
+            }
+            if (centralDoorIndex >= previousIndex) centralDoorIndex++;
+        }
+
         player.barrowsDoorPuzzleSolved = false;
         player.activeBarrowsDoorPuzzleIndex = -1;
-        ArrayList<BarrowsTunnelRoom> routeRooms = new ArrayList<BarrowsTunnelRoom>();
-        for (int bitIndex = 10; bitIndex <= 25; ++bitIndex) {
-            routeConfig += (int)Math.pow(2.0, bitIndex);
-        }
-        int tunnelIndex = GameUtil.randomInt(4);
-        routeConfig += (int)Math.pow(2.0, tunnelIndex + 6);
+
+        int tunnelIndex = GameUtil.randomInt(tunnelTargetRoomIds.length);
         int targetRoomId = tunnelTargetRoomIds[tunnelIndex];
-        if (moveToEntry) {
-            player.moveTo(tunnelEntryPositions[tunnelIndex]);
-        }
-        for (int roomIndex = 0; roomIndex < tunnelRooms.length; ++roomIndex) {
-            BarrowsTunnelRoom room = tunnelRooms[roomIndex];
+        if (moveToEntry) player.moveTo(tunnelEntryPositions[tunnelIndex]);
+
+        int currentRoomId = 0;
+        for (BarrowsTunnelRoom room : tunnelRooms) {
             if (room.roomBounds.contains(player.getPosition())) {
                 currentRoomId = room.roomId;
                 break;
             }
         }
-        int nextRoomId = 5;
-        routeRooms.add(tunnelRooms[nextRoomId - 1]);
-        boolean reachedTargetRoom = false;
-        boolean returnedToCurrentRoom = false;
-        while (!reachedTargetRoom || !returnedToCurrentRoom) {
-            BarrowsTunnelRoom previousRoom = null;
-            if (routeRooms.size() - 2 >= 0) {
-                previousRoom = routeRooms.get(routeRooms.size() - 2);
-            }
-            BarrowsTunnelRoom currentRouteRoom = routeRooms.get(routeRooms.size() - 1);
-            ArrayList<Integer> candidateConnectionIndexes = new ArrayList<Integer>();
-            for (int connectionIndex = 0; connectionIndex < currentRouteRoom.connectedRoomIds.length; ++connectionIndex) {
-                // Prevent immediate backtracking by comparing ROOM IDs,
-                // not the connection's array index to a room ID.
-                int adjacentRoomId = currentRouteRoom.connectedRoomIds[connectionIndex];
-                if (previousRoom != null && adjacentRoomId == previousRoom.roomId) continue;
-                // On failure, choose a different one of the four central doors.
-                if (routeRooms.size() == 1 && currentRouteRoom.roomId == 5
-                        && currentRouteRoom.doorBitIndexes[connectionIndex] == previousPuzzleDoorBit) continue;
-                candidateConnectionIndexes.add(connectionIndex);
-            }
-            int chosenConnectionIndex = GameUtil.randomInt(candidateConnectionIndexes.size());
-            int chosenRoomId = currentRouteRoom.connectedRoomIds[chosenConnectionIndex];
-            boolean alreadyInRoute = false;
-            for (BarrowsTunnelRoom routeRoom : routeRooms) {
-                if (routeRoom.roomId == chosenRoomId) {
-                    alreadyInRoute = true;
-                }
-            }
-            if (!alreadyInRoute) {
-                routeConfig -= (int)Math.pow(2.0, currentRouteRoom.doorBitIndexes[chosenConnectionIndex]);
-            }
-            nextRoomId = chosenRoomId;
-            routeRooms.add(tunnelRooms[nextRoomId - 1]);
-            if (chosenRoomId == targetRoomId) {
-                reachedTargetRoom = true;
-            }
-            if (chosenRoomId == currentRoomId) {
-                returnedToCurrentRoom = true;
-            }
+        // If the player is outside the tunnels, keep a reachable route to
+        // the exit rather than looping forever waiting to visit room zero.
+        if (currentRoomId == 0) currentRoomId = targetRoomId;
+
+        int[] routeConfig = new int[1];
+        for (int bitIndex = 10; bitIndex <= 25; bitIndex++) {
+            routeConfig[0] |= 1 << bitIndex;
         }
-        Player player2 = player;
-        player2.packetSender.sendConfig(452, routeConfig);
-        player.configStates[452] = routeConfig;
+        routeConfig[0] |= 1 << (tunnelIndex + 6);
+
+        // The centre room (5) has four exits, corresponding to the four
+        // puzzle doors. Opening precisely one of them makes the entrance
+        // unambiguous. Other rooms form a connected eight-room graph.
+        BarrowsTunnelRoom centre = tunnelRooms[4];
+        int centralNeighbour = centre.connectedRoomIds[centralDoorIndex];
+        routeConfig[0] &= ~(1 << CENTER_PUZZLE_DOOR_BITS[centralDoorIndex]);
+
+        // A randomised depth-first spanning tree opens corridor doors until
+        // both the exit ladder and the player's current room are reachable.
+        // Every room is visited at most once: no infinite random walk.
+        boolean[] visited = new boolean[tunnelRooms.length + 1];
+        visited[5] = true;
+        visited[centralNeighbour] = true;
+        exploreTunnelRoute(centralNeighbour, targetRoomId, currentRoomId,
+                visited, routeConfig);
+        if (!visited[targetRoomId] || !visited[currentRoomId]) {
+            throw new IllegalStateException("Barrows room graph failed to connect the route");
+        }
+
+        player.packetSender.sendConfig(452, routeConfig[0]);
+        player.configStates[452] = routeConfig[0];
+    }
+
+    /** Randomised DFS on the original eight outer Barrows tunnel rooms. */
+    private static void exploreTunnelRoute(int roomId, int targetRoomId,
+                                           int currentRoomId, boolean[] visited,
+                                           int[] routeConfig) {
+        if (visited[targetRoomId] && visited[currentRoomId]) return;
+        BarrowsTunnelRoom room = tunnelRooms[roomId - 1];
+        int count = room.connectedRoomIds.length;
+        int first = GameUtil.randomInt(count);
+        for (int offset = 0; offset < count; offset++) {
+            if (visited[targetRoomId] && visited[currentRoomId]) return;
+            int index = (first + offset) % count;
+            int neighbour = room.connectedRoomIds[index];
+            if (neighbour == 5 || visited[neighbour]) continue;
+            visited[neighbour] = true;
+            routeConfig[0] &= ~(1 << room.doorBitIndexes[index]);
+            exploreTunnelRoute(neighbour, targetRoomId, currentRoomId,
+                    visited, routeConfig);
+        }
     }
 
     /*
