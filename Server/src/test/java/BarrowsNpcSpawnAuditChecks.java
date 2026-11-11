@@ -168,8 +168,15 @@ public final class BarrowsNpcSpawnAuditChecks {
                 floor[(x+dx)&63][(y+dy)&63]=0x200000;
             }
             Position large=BarrowsNpcSpawnPlacement.findSafeSpawn(center,center,2);
-            if(large!=null && (large.getX()==x||large.getY()==y))
-                throw new AssertionError("Large monster straddles blocked footprint");
+            if (large != null) {
+                if (large.getX() <= x && x < large.getX()+2
+                        && large.getY() <= y && y < large.getY()+2)
+                    throw new AssertionError("Large monster overlaps player");
+                for (int dx=0; dx<2; dx++) for (int dy=0; dy<2; dy++) {
+                    if (!BarrowsNpcSpawnPlacement.isOpen(large.getX()+dx, large.getY()+dy, 0))
+                        throw new AssertionError("Large monster straddles blocked footprint");
+                }
+            }
         } finally {
             lookup[regionId]=original;
         }
