@@ -4,6 +4,7 @@ import com.rs2.model.World;
 import com.rs2.model.item.BarrowsEquipmentDurability;
 import com.rs2.model.item.DegradableEquipmentHandler;
 import com.rs2.model.item.ItemStack;
+import com.rs2.model.item.ItemDefinition;
 import com.rs2.model.item.action.BarrowsRepairHandler;
 import com.rs2.model.npc.Npc;
 import com.rs2.model.npc.NpcDefinition;
@@ -35,6 +36,7 @@ public final class BarrowsEquipmentDurabilityChecks {
     public static void main(String[] args) {
         ServerSettings.clientBuild = 443;
         NpcDefinition.loadDefinitions();
+        ItemDefinition.loadDefinitions();
         assertAllTwentyFourPieces();
         assertLoginPersistence();
         assertMigrationFromAttackCharges();
