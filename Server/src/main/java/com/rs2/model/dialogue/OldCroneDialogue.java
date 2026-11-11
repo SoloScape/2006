@@ -1,5 +1,6 @@
 package com.rs2.model.dialogue;
 
+import com.rs2.model.World;
 import com.rs2.model.npc.NpcDefinition;
 import com.rs2.model.player.Player;
 
@@ -14,6 +15,8 @@ public final class OldCroneDialogue {
     private OldCroneDialogue() { }
 
     public static boolean isOldCrone(int npcId) {
+        // Scripted dialogue IDs (e.g. Barrows repair dialogue 10089) are not NPC IDs.
+        if (npcId < 0 || npcId >= World.getNpcDefinitions().length) return false;
         NpcDefinition npc = NpcDefinition.forId(npcId);
         return npc != null && "Old crone".equalsIgnoreCase(npc.getName());
     }
