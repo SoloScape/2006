@@ -55,12 +55,18 @@ public final class BarrowsNpcSpawnAuditChecks {
             {3578,9706,3},{3568,9683,3},{3546,9684,3},
             {3534,9704,3},{3556,9718,3},{3557,9703,3}
         };
-        for (int[] entry : entries) {
+        for (int brother = 0; brother < entries.length; brother++) {
+            int[] entry = entries[brother];
+            Npc npc = new Npc(2030 - brother);
             int f = WalkingCollisionMap.getTileFlags(entry[0],entry[1],entry[2]);
-            System.out.println("BARROWS CRYPT ENTRY " + entry[0] + "," + entry[1] + "," + entry[2]
+            System.out.println("BARROWS CRYPT BROTHER id=" + npc.getNpcId()
+                + " size=" + npc.getDefinition().getSize()
+                + " pos=" + entry[0] + "," + entry[1] + "," + entry[2]
                 + " flags=0x" + Integer.toHexString(f)
-                + " blocked=" + ((f & 0x1280100) != 0));
-            verifyPlacement(new Position(entry[0], entry[1], entry[2]), 1);
+                + " hp=" + npc.getMaxHitpoints());
+            if (npc.getMaxHitpoints() <= 0) throw new AssertionError("Inactive Barrows brother definition");
+            verifyPlacement(new Position(entry[0], entry[1], entry[2]),
+                    Math.max(1,npc.getDefinition().getSize()));
         }
         int nonZero = 0, blockedTiles = 0;
         for (int x = 3526; x <= 3578; x++) {
@@ -112,9 +118,17 @@ public final class BarrowsNpcSpawnAuditChecks {
                 int y = y1 == y2 ? y1 + sign : y1;
                 if (!BarrowsNpcSpawnPlacement.isOpen(x, y, 0)) continue;
                 openApproaches++;
-                // Every open door approach must have at least one reachable,
-                // collision-safe 1x1 monster placement on its own side.
+                // Every open door approach needs a reachable spawn; giant
+                // crypt rats require a 2x2 footprint and are checked too.
                 verifyPlacement(new Position(x, y, 0), 1);
+                Position large = BarrowsNpcSpawnPlacement.findSafeSpawn(
+                        new Position(x,y,0), new Position(x,y,0), 2);
+                if (large != null) {
+                    for (int dx=0;dx<2;dx++) for (int dy=0;dy<2;dy++) {
+                        if (!BarrowsNpcSpawnPlacement.isOpen(large.getX()+dx,large.getY()+dy,0))
+                            throw new AssertionError("Giant crypt rat inside a wall: "+large);
+                    }
+                }
             }
         }
         System.out.println("BARROWS DOORS pairs=" + doorPairs + " openSides=" + openApproaches);
