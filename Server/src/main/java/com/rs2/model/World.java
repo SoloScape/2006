@@ -130,6 +130,10 @@ public final class World {
                         } else {
                             processRevision443Player((Player)value2);
                         }
+                        // Combat wear must tick for both 443 players (whose
+                        // legacy process() is bypassed) and other revisions.
+                        com.rs2.model.item.DegradableEquipmentHandler
+                                .processBarrowsCombatTick((Player)value2);
                     }
                     catch (Exception exception) {
                         value = exception;
