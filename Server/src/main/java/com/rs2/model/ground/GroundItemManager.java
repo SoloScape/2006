@@ -76,7 +76,9 @@ implements Runnable {
                         break;
                     }
                     case PUBLIC: {
-                        if (groundItem.getTimer().elapsed() < publicItemLifetimeTicks) break;
+                        int lifetime = groundItem.getLifetimeTicks() > 0
+                                ? groundItem.getLifetimeTicks() : publicItemLifetimeTicks;
+                        if (groundItem.getTimer().elapsed() < lifetime) break;
                         groundItem.getTimer().reset();
                         if (groundItem.isRespawning()) break;
                         linkedList.remove(groundItem);
@@ -167,6 +169,7 @@ implements Runnable {
         }
         groundItem2.getItem().setAmount(groundItem2.getItem().getAmount() + groundItem.getItem().getAmount());
         groundItem2.getTimer().reset();
+        groundItem2.setLifetimeTicks(Math.max(groundItem.getLifetimeTicks(), groundItem2.getLifetimeTicks()));
         for (Player player : affectedPlayers) {
             if (player == null || !groundItem.isVisibleTo(player)) {
                 continue;
