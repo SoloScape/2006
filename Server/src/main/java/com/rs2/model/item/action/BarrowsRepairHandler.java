@@ -57,11 +57,13 @@ public final class BarrowsRepairHandler {
     }
 
     public static int calculateRepairCost(ItemStack itemStack) {
-        int definition = itemStack.getDefinition().getEquipmentSlot();
         BarrowsRepairHandler barrowsRepairHandler = BarrowsRepairHandler.forItem(itemStack);
         if (barrowsRepairHandler == null) {
             return -1;
         }
+        // Use the repaired form's slot; the broken form may be unwearable.
+        int definition = new ItemStack(barrowsRepairHandler.repairedItemId)
+                .getDefinition().getEquipmentSlot();
         int id = itemStack.getId() - barrowsRepairHandler.baseDegradedItemId;
         double metadata = itemStack.getMetadata() < 0 ? 0 : 4500 - itemStack.getMetadata();
         double value = 1.0;
@@ -93,37 +95,16 @@ public final class BarrowsRepairHandler {
     }
 
     public static BarrowsRepairHandler forItem(ItemStack itemStack) {
-        if (itemStack == null) {
-            return null;
-        }
+        if (itemStack == null) return null;
+        // Broken (0%) items may intentionally have no equipment slot.
+        // Match all original item ID ranges instead of looking up a slot
+        // that no longer exists on an unequippable item definition.
         int id = itemStack.getId();
-        int definition = itemStack.getDefinition().getEquipmentSlot();
-        if (definition == 0) {
-            return BarrowsRepairHandler.findByDegradedItemIdAndPartIndex(id, 0);
-        }
-        if (definition == 3) {
-            return BarrowsRepairHandler.findByDegradedItemIdAndPartIndex(id, 1);
-        }
-        if (definition == 4) {
-            return BarrowsRepairHandler.findByDegradedItemIdAndPartIndex(id, 2);
-        }
-        if (definition == 7) {
-            return BarrowsRepairHandler.findByDegradedItemIdAndPartIndex(id, 3);
-        }
-        return null;
-    }
-
-    private static BarrowsRepairHandler findByDegradedItemIdAndPartIndex(int itemId, int value2) {
-        int index = 0;
-        while (index < repairDefinitions.length) {
-            BarrowsRepairHandler barrowsRepairHandler = repairDefinitions[index][value2];
-            if (itemId >= barrowsRepairHandler.baseDegradedItemId) {
-                barrowsRepairHandler = repairDefinitions[index][value2];
-                if (itemId <= barrowsRepairHandler.baseDegradedItemId + 4) {
-                    return repairDefinitions[index][value2];
-                }
+        for (BarrowsRepairHandler[] set : repairDefinitions) {
+            for (BarrowsRepairHandler part : set) {
+                if (id >= part.baseDegradedItemId
+                        && id <= part.baseDegradedItemId + 4) return part;
             }
-            ++index;
         }
         return null;
     }
