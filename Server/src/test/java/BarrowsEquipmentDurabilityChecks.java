@@ -43,6 +43,7 @@ public final class BarrowsEquipmentDurabilityChecks {
         assertCombatTickConditions();
         assertCrystalStillDegradesOnAttacks();
         assertBrokenSetCannotProvideEffect();
+        assertBrokenItemCannotBeReequipped();
         System.out.println("Barrows durability: 24/24 pieces, 15h transitions, persistence, combat-only wear, crystal and repairs passed.");
     }
 
@@ -218,6 +219,17 @@ public final class BarrowsEquipmentDurabilityChecks {
         player.getEquipmentManager().refreshBarrowsSetEffects();
         require(!player.isVeracSetEffectActive(),
                 "Fully broken Barrows helm still granted set effect");
+    }
+
+    private static void assertBrokenItemCannotBeReequipped() {
+        Player player = player();
+        ItemStack broken = new ItemStack(4980);
+        player.getInventoryManager().getContainer().setItem(0, broken);
+        player.getEquipmentManager().equipFromInventorySlot(0);
+        require(player.getEquipmentManager().getContainer().getItemAt(0) == null,
+                "Fully broken Verac helm was equipped without repair");
+        require(player.getInventoryManager().getContainer().getItemAt(0) == broken,
+                "A rejected equip attempt consumed the broken armour");
     }
 
     private static Player player() {
