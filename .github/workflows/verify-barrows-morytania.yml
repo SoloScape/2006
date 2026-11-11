@@ -13,6 +13,8 @@ on:
       - 'Server/src/main/java/com/rs2/model/item/DegradableEquipmentHandler.java'
       - 'Server/src/main/java/com/rs2/model/item/action/BarrowsRepairHandler.java'
       - 'Server/src/main/java/com/rs2/model/player/EquipmentManager.java'
+      - 'Server/src/main/java/com/rs2/model/player/Player.java'
+      - 'Server/src/main/java/com/rs2/model/player/BarrowsChestDamageTask.java'
       - 'Server/src/main/java/com/rs2/model/World.java'
       - 'Server/src/main/java/com/rs2/model/interaction/TableItemPlacement.java'
       - 'Server/src/main/java/com/rs2/model/interaction/ItemOnObjectTask.java'
@@ -25,6 +27,7 @@ on:
       - 'Server/src/test/java/MorytaniaBarrowsInteractionChecks.java'
       - 'Server/src/test/java/Barrows443PuzzleInterfaceChecks.java'
       - 'Server/src/test/java/BarrowsHistoricalPuzzleChecks.java'
+      - 'Server/src/test/java/BarrowsPostLootEscapeChecks.java'
       - 'Server/src/test/java/BarrowsNpcSpawnAuditChecks.java'
       - 'Server/src/test/java/BarrowsTunnelEncounterChecks.java'
       - 'Server/src/test/java/BarrowsBrotherSpecialCombatChecks.java'
@@ -111,3 +114,9 @@ jobs:
           javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
             src/test/java/BarrowsSpecialEffectAccuracyChecks.java
           java -cp 'barrows-test-classes:lib/*' BarrowsSpecialEffectAccuracyChecks
+      - name: Verify 2006 Barrows post-loot escape and collapse cleanup
+        working-directory: Server
+        run: |
+          javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
+            src/test/java/BarrowsPostLootEscapeChecks.java
+          java -cp 'barrows-test-classes:lib/*' BarrowsPostLootEscapeChecks
