@@ -1,12 +1,14 @@
 package com.rs2.model.item.action;
 
 import com.rs2.model.dialogue.DialogueManager;
+import com.rs2.model.item.BarrowsEquipmentDurability;
 import com.rs2.model.item.ItemStack;
 import com.rs2.model.player.InventoryManager;
 import com.rs2.model.player.Player;
 
 public final class BarrowsRepairHandler {
-    private static int[] repairNpcIds = new int[]{519};
+    // Bob (Lumbridge), Dunstan (Burthorpe), Tindel Marchant (Port Khazard).
+    private static final int[] repairNpcIds = {519, 4105, 1358};
     private int repairedItemId;
     private int baseDegradedItemId;
     private static BarrowsRepairHandler[][] repairDefinitions = new BarrowsRepairHandler[][]{{new BarrowsRepairHandler(4708, 4856), new BarrowsRepairHandler(4710, 4862), new BarrowsRepairHandler(4712, 4868), new BarrowsRepairHandler(4714, 4874)}, {new BarrowsRepairHandler(4716, 4880), new BarrowsRepairHandler(4718, 4886), new BarrowsRepairHandler(4720, 4892), new BarrowsRepairHandler(4722, 4898)}, {new BarrowsRepairHandler(4724, 4904), new BarrowsRepairHandler(4726, 4910), new BarrowsRepairHandler(4728, 4916), new BarrowsRepairHandler(4730, 4922)}, {new BarrowsRepairHandler(4732, 4928), new BarrowsRepairHandler(4734, 4934), new BarrowsRepairHandler(4736, 4940), new BarrowsRepairHandler(4738, 4946)}, {new BarrowsRepairHandler(4745, 4952), new BarrowsRepairHandler(4747, 4958), new BarrowsRepairHandler(4749, 4964), new BarrowsRepairHandler(4751, 4970)}, {new BarrowsRepairHandler(4753, 4976), new BarrowsRepairHandler(4755, 4982), new BarrowsRepairHandler(4757, 4988), new BarrowsRepairHandler(4759, 4994)}};
@@ -35,6 +37,7 @@ public final class BarrowsRepairHandler {
 
     public static boolean repairItem(Player player, ItemStack itemStack) {
         int repairCost = BarrowsRepairHandler.calculateRepairCost(itemStack);
+        if (repairCost < 0) return false;
         if (!player.getInventoryManager().containsItemStack(new ItemStack(995, repairCost)) && repairCost > 0) {
             player.packetSender.sendGameMessage("You don't have enough coins to fix that.");
             return false;
@@ -56,42 +59,34 @@ public final class BarrowsRepairHandler {
         return this.baseDegradedItemId + 4;
     }
 
+    /**
+     * NPC repair prices from the 2005 Barrows changes (also recorded in 2006):
+     * helm 60k, body 90k, legs 80k, weapon 100k. Early repairs are
+     * proportional to combat life already spent, including partial quarters.
+     *
+     * Use the shared durability decoder for both legacy 4500-charge metadata
+     * and flagged 90,000-tick metadata; a broken (0%) item has no life left.
+     */
     public static int calculateRepairCost(ItemStack itemStack) {
-        BarrowsRepairHandler barrowsRepairHandler = BarrowsRepairHandler.forItem(itemStack);
-        if (barrowsRepairHandler == null) {
-            return -1;
-        }
-        // Use the repaired form's slot; the broken form may be unwearable.
-        int definition = new ItemStack(barrowsRepairHandler.repairedItemId)
+        BarrowsRepairHandler repairDefinition = forItem(itemStack);
+        if (repairDefinition == null) return -1;
+
+        // The broken item definition may have no equipment slot.
+        int slot = new ItemStack(repairDefinition.repairedItemId)
                 .getDefinition().getEquipmentSlot();
-        int id = itemStack.getId() - barrowsRepairHandler.baseDegradedItemId;
-        double metadata = itemStack.getMetadata() < 0 ? 0 : 4500 - itemStack.getMetadata();
-        double value = 1.0;
-        double value2 = metadata / 4500.0;
-        // The durability fix stores each of the 90,000 remaining combat ticks
-        // inside flagged item metadata. Interpret those ticks for the existing
-        // repair-price calculation, without resetting partially worn gear.
-        // Pricing and missing repair NPCs are audited separately in finding #4.
-        if (com.rs2.model.item.BarrowsEquipmentDurability.isTickMetadata(
-                itemStack.getMetadata())) {
-            int remaining = com.rs2.model.item.BarrowsEquipmentDurability
-                    .remainingCombatTicks(itemStack);
-            int quarterTicks = com.rs2.model.item.BarrowsEquipmentDurability
-                    .COMBAT_TICKS_PER_QUARTER;
-            int remainingInStage = remaining - (3 - id) * quarterTicks;
-            value2 = id == 4 ? 1.0 : 1.0 - Math.max(0.0,
-                    Math.min(1.0, (double)remainingInStage / quarterTicks));
+        int fullRepairCost;
+        switch (slot) {
+            case 0: fullRepairCost = 60000; break;  // Helmet
+            case 3: fullRepairCost = 100000; break; // Weapon
+            case 4: fullRepairCost = 90000; break;  // Body
+            case 7: fullRepairCost = 80000; break;  // Legs
+            default: return -1;
         }
-        if (definition == 0) {
-            value = 15000.0;
-        } else if (definition == 3) {
-            value = 25000.0;
-        } else if (definition == 4) {
-            value = 22500.0;
-        } else if (definition == 7) {
-            value = 20000.0;
-        }
-        return (int)(value * (double)id + value * value2);
+
+        int remaining = BarrowsEquipmentDurability.remainingCombatTicks(itemStack);
+        if (remaining < 0) return -1;
+        int total = BarrowsEquipmentDurability.FULL_COMBAT_TICKS;
+        return (int) ((long) fullRepairCost * (total - remaining) / total);
     }
 
     public static BarrowsRepairHandler forItem(ItemStack itemStack) {
