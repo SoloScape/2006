@@ -9,13 +9,13 @@ import java.nio.ByteBuffer;
 
 /**
  * Verifies the native revision-443 Barrows puzzle's model mappings and answer
- * clicks. Both native click packet families must reach the legacy solver.
+ * clicks. The native cache has the sequence across top row 1-3 and the\n * three clickable answer symbols at 6-8. Both click packet families must\n * reach the legacy solver.
  */
 public final class Barrows443PuzzleInterfaceChecks {
     private static final int GROUP = 25;
     private static final int LEGACY_ROOT = 4543;
-    private static final int[] PROMPT_CHILDREN = {6, 7, 8};
-    private static final int[] ANSWER_CHILDREN = {2, 3, 5};
+    private static final int[] PROMPT_CHILDREN = {1, 2, 3};
+    private static final int[] ANSWER_CHILDREN = {6, 7, 8};
 
     public static void main(String[] args) {
         ServerSettings.clientBuild = 443;
