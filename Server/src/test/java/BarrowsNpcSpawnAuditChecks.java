@@ -43,6 +43,9 @@ public final class BarrowsNpcSpawnAuditChecks {
             if (id >= 2031 && id <= 2037) counts[id - 2031]++;
             if (impassable) blocked++;
             if (npc.getMaxHitpoints() <= 0) zeroHp++;
+            if (!npc.getDefinition().isAttackable()) {
+                throw new AssertionError("Barrows monster lacks Attack action: " + id);
+            }
             if (!impassable) {
                 verifyPlacement(new Position(x, y, plane), size);
             }
@@ -65,6 +68,8 @@ public final class BarrowsNpcSpawnAuditChecks {
                 + " flags=0x" + Integer.toHexString(f)
                 + " hp=" + npc.getMaxHitpoints());
             if (npc.getMaxHitpoints() <= 0) throw new AssertionError("Inactive Barrows brother definition");
+            if (!npc.getDefinition().isAttackable())
+                throw new AssertionError("Barrows brother lacks Attack action: " + npc.getNpcId());
             verifyPlacement(new Position(entry[0], entry[1], entry[2]),
                     Math.max(1,npc.getDefinition().getSize()));
         }
