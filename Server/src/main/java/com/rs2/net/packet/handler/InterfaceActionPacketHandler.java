@@ -263,6 +263,16 @@ public final class InterfaceActionPacketHandler implements PacketHandler {
             if (handleSkillGuideCategory(player, packedWidgetId, -1, child)) {
                 return;
             }
+            // Barrows puzzle group 25 may deliver answer clicks as WIDGET_SELECT
+            // rather than INTERFACE_BUTTON. Only accept its three answers while
+            // the puzzle window is open; the legacy handler checks correctness.
+            if ((packedWidgetId >>> 16) == 25 && player.getOpenInterfaceId() == 4543) {
+                int barrowsButton = InterfaceBridge.toLegacyComponent(packedWidgetId);
+                if (barrowsButton >= 4550 && barrowsButton <= 4552) {
+                    buttonHandler.handleButton(player, barrowsButton);
+                    return;
+                }
+            }
             // Group 307's four Cook buttons are action-type-6 widgets and
             // therefore send WIDGET_SELECT (153), not INTERFACE_BUTTON (54).
             // Ignoring opcode 153 leaves the client's action text at
