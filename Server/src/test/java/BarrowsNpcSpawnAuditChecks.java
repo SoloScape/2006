@@ -98,14 +98,15 @@ public final class BarrowsNpcSpawnAuditChecks {
         String src = new String(Files.readAllBytes(Paths.get(
                 "src/main/java/com/rs2/model/gameplay/barrows/BarrowsManager.java")),
                 StandardCharsets.UTF_8);
-        Pattern door = Pattern.compile("openDoubleDoorPair\\\\(\\\\d+, \\\\d+, "
-                + "(\\\\d+), (\\\\d+), (\\\\d+), (\\\\d+), 0\\\\)");
+        Pattern door = Pattern.compile("openDoubleDoorPair\\(([^)]*)\\)");
         Matcher match = door.matcher(src);
         int doorPairs = 0, openApproaches = 0;
         while (match.find()) {
             doorPairs++;
-            int x1=Integer.parseInt(match.group(1)), y1=Integer.parseInt(match.group(2));
-            int x2=Integer.parseInt(match.group(3)), y2=Integer.parseInt(match.group(4));
+            String[] values = match.group(1).split(",");
+            if (values.length != 7) throw new AssertionError("Unexpected door data " + match.group(1));
+            int x1=Integer.parseInt(values[2].trim()), y1=Integer.parseInt(values[3].trim());
+            int x2=Integer.parseInt(values[4].trim()), y2=Integer.parseInt(values[5].trim());
             for (int sign : new int[]{-1, 1}) {
                 int x = x1 == x2 ? x1 + sign : x1;
                 int y = y1 == y2 ? y1 + sign : y1;
