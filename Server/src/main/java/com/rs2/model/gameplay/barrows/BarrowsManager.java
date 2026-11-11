@@ -887,58 +887,37 @@ public final class BarrowsManager {
     }
 
     public static boolean handlePuzzleButtonClick(Player player, int buttonId) {
-        if (player.activeBarrowsDoorPuzzleIndex < 0) {
+        // Answers are only valid while the actual puzzle is open. A second
+        // click from an old packet must never unlock or reroute the dungeon.
+        if (buttonId < 4550 || buttonId > 4552
+                || player.getOpenInterfaceId() != 4543
+                || player.activeBarrowsDoorPuzzleIndex < 0
+                || player.activeBarrowsDoorPuzzleIndex >= doorPuzzles.length
+                || player.activeBarrowsDoorPuzzleAnswerObjectIds == null
+                || player.activeBarrowsDoorPuzzleAnswerObjectIds.length != 3) {
             return false;
         }
-        BarrowsDoorPuzzle barrowsDoorPuzzle = doorPuzzles[player.activeBarrowsDoorPuzzleIndex];
-        switch (buttonId) {
-            case 4550: {
-                Object value = barrowsDoorPuzzle;
-                if (player.activeBarrowsDoorPuzzleAnswerObjectIds[0] == ((BarrowsDoorPuzzle)value).answerObjectIds[0]) {
-                    player.barrowsDoorPuzzleSolved = true;
-                    value = player;
-                    ((Player)value).packetSender.sendGameMessage("You hear the doors' locking mechanism grind open.");
-                } else {
-                    BarrowsManager.generateTunnelRoute(player, false);
-                    value = player;
-                    ((Player)value).packetSender.sendGameMessage("You got the puzzle wrong! You can hear the catacombs moving around you.");
-                }
-                value = player;
-                ((Player)value).packetSender.closeInterfaces();
-                return true;
-            }
-            case 4551: {
-                Object value2 = barrowsDoorPuzzle;
-                if (player.activeBarrowsDoorPuzzleAnswerObjectIds[1] == ((BarrowsDoorPuzzle)value2).answerObjectIds[0]) {
-                    player.barrowsDoorPuzzleSolved = true;
-                    value2 = player;
-                    ((Player)value2).packetSender.sendGameMessage("You hear the doors' locking mechanism grind open.");
-                } else {
-                    BarrowsManager.generateTunnelRoute(player, false);
-                    value2 = player;
-                    ((Player)value2).packetSender.sendGameMessage("You got the puzzle wrong! You can hear the catacombs moving around you.");
-                }
-                value2 = player;
-                ((Player)value2).packetSender.closeInterfaces();
-                return true;
-            }
-            case 4552: {
-                Object value3 = barrowsDoorPuzzle;
-                if (player.activeBarrowsDoorPuzzleAnswerObjectIds[2] == ((BarrowsDoorPuzzle)value3).answerObjectIds[0]) {
-                    player.barrowsDoorPuzzleSolved = true;
-                    value3 = player;
-                    ((Player)value3).packetSender.sendGameMessage("You hear the doors' locking mechanism grind open.");
-                } else {
-                    BarrowsManager.generateTunnelRoute(player, false);
-                    value3 = player;
-                    ((Player)value3).packetSender.sendGameMessage("You got the puzzle wrong! You can hear the catacombs moving around you.");
-                }
-                value3 = player;
-                ((Player)value3).packetSender.closeInterfaces();
-                return true;
-            }
+        int answer = buttonId - 4550;
+        BarrowsDoorPuzzle puzzle = doorPuzzles[player.activeBarrowsDoorPuzzleIndex];
+        boolean correct = player.activeBarrowsDoorPuzzleAnswerObjectIds[answer]
+                == puzzle.answerObjectIds[0];
+
+        // Consume immediately so duplicate clicks cannot repeat the result.
+        player.activeBarrowsDoorPuzzleIndex = -1;
+        player.activeBarrowsDoorPuzzleAnswerObjectIds = new int[3];
+        if (correct) {
+            player.barrowsDoorPuzzleSolved = true;
+            player.packetSender.sendGameMessage(
+                    "You hear the doors' locking mechanism grind open.");
+        } else {
+            // A failed 2006 puzzle moves the puzzle doorway to another side,
+            // and the accessible route changes with it.
+            BarrowsManager.generateTunnelRoute(player, false);
+            player.packetSender.sendGameMessage(
+                    "You got the puzzle wrong! You can hear the catacombs moving around you.");
         }
-        return false;
+        player.packetSender.closeInterfaces();
+        return true;
     }
 
     /*
@@ -968,10 +947,30 @@ public final class BarrowsManager {
         ((Player)value2).packetSender.showInterface(4543);
     }
 
+    // The four physical entrances to the central chest room are controlled
+    // by these bits in the door configuration (north, west, east, south).
+    private static final int[] CENTER_PUZZLE_DOOR_BITS = {14, 18, 19, 21};
+
+    /** Returns the one currently accessible puzzle door, or -1 if unknown. */
+    public static int findOpenPuzzleDoorBit(int routeConfig) {
+        if (routeConfig == 0) return -1; // No route has been generated yet.
+        int unlocked = -1;
+        for (int bit : CENTER_PUZZLE_DOOR_BITS) {
+            if ((routeConfig & (1 << bit)) != 0) continue;
+            if (unlocked != -1) return -1;
+            unlocked = bit;
+        }
+        return unlocked;
+    }
+
     public static void generateTunnelRoute(Player player, boolean moveToEntry) {
+        // An incorrect answer must not lead back to the same puzzle door.
+        int previousPuzzleDoorBit = moveToEntry
+                ? -1 : findOpenPuzzleDoorBit(player.configStates[452]);
         int routeConfig = 0;
         int currentRoomId = 0;
         player.barrowsDoorPuzzleSolved = false;
+        player.activeBarrowsDoorPuzzleIndex = -1;
         ArrayList<BarrowsTunnelRoom> routeRooms = new ArrayList<BarrowsTunnelRoom>();
         for (int bitIndex = 10; bitIndex <= 25; ++bitIndex) {
             routeConfig += (int)Math.pow(2.0, bitIndex);
@@ -1001,13 +1000,14 @@ public final class BarrowsManager {
             BarrowsTunnelRoom currentRouteRoom = routeRooms.get(routeRooms.size() - 1);
             ArrayList<Integer> candidateConnectionIndexes = new ArrayList<Integer>();
             for (int connectionIndex = 0; connectionIndex < currentRouteRoom.connectedRoomIds.length; ++connectionIndex) {
-                if (previousRoom != null) {
-                    if (connectionIndex != previousRoom.roomId) {
-                        candidateConnectionIndexes.add(connectionIndex);
-                    }
-                } else {
-                    candidateConnectionIndexes.add(connectionIndex);
-                }
+                // Prevent immediate backtracking by comparing ROOM IDs,
+                // not the connection's array index to a room ID.
+                int adjacentRoomId = currentRouteRoom.connectedRoomIds[connectionIndex];
+                if (previousRoom != null && adjacentRoomId == previousRoom.roomId) continue;
+                // On failure, choose a different one of the four central doors.
+                if (routeRooms.size() == 1 && currentRouteRoom.roomId == 5
+                        && currentRouteRoom.doorBitIndexes[connectionIndex] == previousPuzzleDoorBit) continue;
+                candidateConnectionIndexes.add(connectionIndex);
             }
             int chosenConnectionIndex = GameUtil.randomInt(candidateConnectionIndexes.size());
             int chosenRoomId = currentRouteRoom.connectedRoomIds[chosenConnectionIndex];
