@@ -5,6 +5,7 @@ import com.rs2.model.player.Player;
 import com.rs2.util.GameUtil;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -96,7 +97,7 @@ public final class BarrowsHistoricalPuzzleChecks {
         require(seenPositions.size() >= 12, "Answer choices were not shuffled");
     }
 
-    private static void checkRerouteAfterWrongAnswer() {
+    private static void checkRerouteAfterWrongAnswer() throws Exception {
         // All 4 starting puzzle doors should remain possible in a new run.
         Set<Integer> initialDoors = new HashSet<Integer>();
         Player player = makePlayer();
@@ -105,6 +106,7 @@ public final class BarrowsHistoricalPuzzleChecks {
             BarrowsManager.generateTunnelRoute(player, false);
             int first = BarrowsManager.findOpenPuzzleDoorBit(player.configStates[452]);
             require(isCentralDoor(first), "Initial route must have exactly one centre puzzle door");
+            assertRoomConnectivity(player.configStates[452]);
             initialDoors.add(first);
 
             // The 2006 game requires a different puzzle door after failure.
@@ -113,6 +115,7 @@ public final class BarrowsHistoricalPuzzleChecks {
                 BarrowsManager.generateTunnelRoute(player, false);
                 int after = BarrowsManager.findOpenPuzzleDoorBit(player.configStates[452]);
                 require(isCentralDoor(after), "Reroute lost or duplicated the puzzle door");
+                assertRoomConnectivity(player.configStates[452]);
                 require(after != before, "Wrong answer can leave puzzle door unchanged"
                         + " iteration=" + iteration + " reroll=" + reroll
                         + " previous=" + before + " selected=" + after
@@ -134,10 +137,54 @@ public final class BarrowsHistoricalPuzzleChecks {
         require(oldDoor != BarrowsManager.findOpenPuzzleDoorBit(wrong.configStates[452]),
                 "Wrong answer did not relocate the puzzle doorway");
         require(wrong.activeBarrowsDoorPuzzleIndex == -1, "Wrong answer left puzzle active");
+        assertRoomConnectivity(wrong.configStates[452]);
         int routeAfter = wrong.configStates[452];
         require(!BarrowsManager.handlePuzzleButtonClick(wrong, 4550),
                 "Late wrong answer generated a second route");
         require(routeAfter == wrong.configStates[452], "Late wrong answer changed the route");
+    }
+
+    private static void assertRoomConnectivity(int routeConfig) throws Exception {
+        // Cross-check the generated config against the *actual* room graph
+        // rather than trusting a single unlocked central door bit.
+        Field roomsField = BarrowsManager.class.getDeclaredField("tunnelRooms");
+        roomsField.setAccessible(true);
+        Object[] rooms = (Object[]) roomsField.get(null);
+        Class<?> cls = rooms[0].getClass();
+        Field connectedField = cls.getDeclaredField("connectedRoomIds");
+        Field bitsField = cls.getDeclaredField("doorBitIndexes");
+        connectedField.setAccessible(true);
+        bitsField.setAccessible(true);
+
+        int ladderIndex = -1;
+        for (int i = 0; i < 4; i++) {
+            if ((routeConfig & (1 << (6 + i))) == 0) continue;
+            require(ladderIndex == -1, "Multiple Barrows ladder rooms active");
+            ladderIndex = i;
+        }
+        require(ladderIndex != -1, "No Barrows ladder room active");
+        int[] ladders = {1, 3, 7, 9};
+
+        boolean[] reached = new boolean[rooms.length + 1];
+        ArrayDeque<Integer> queue = new ArrayDeque<Integer>();
+        queue.add(5);
+        reached[5] = true;
+        while (!queue.isEmpty()) {
+            int room = queue.removeFirst();
+            int[] connected = (int[]) connectedField.get(rooms[room - 1]);
+            int[] bits = (int[]) bitsField.get(rooms[room - 1]);
+            for (int i = 0; i < connected.length; i++) {
+                if ((routeConfig & (1 << bits[i])) != 0) continue;
+                int neighbor = connected[i];
+                if (reached[neighbor]) continue;
+                reached[neighbor] = true;
+                queue.addLast(neighbor);
+            }
+        }
+        require(reached[ladders[ladderIndex]],
+                "Puzzle door is open but the active ladder room is unreachable");
+        require(reached[1],
+                "Puzzle door is open but the player's starting room is unreachable");
     }
 
     private static Player makePlayer() {
