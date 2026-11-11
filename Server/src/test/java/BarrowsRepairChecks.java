@@ -33,7 +33,7 @@ public final class BarrowsRepairChecks {
     };
     // Each brother's array is helm, weapon, body, legs.
     private static final int[] FULL_COSTS = {60000, 100000, 90000, 80000};
-    private static final int[] REPAIR_NPCS = {519, 4105, 1358};
+    private static final int[] REPAIR_NPCS = {519, 1082, 1799};
 
     public static void main(String[] args) {
         ServerSettings.clientBuild = 443;
@@ -50,12 +50,16 @@ public final class BarrowsRepairChecks {
     }
 
     private static void checkRepairers() {
+        System.out.println("Repair NPC definitions: Bob(519)="
+                + NpcDefinition.forId(519).getName() + ", Dunstan(1082)="
+                + NpcDefinition.forId(1082).getName() + ", Tindel(1799)="
+                + NpcDefinition.forId(1799).getName());
         require("Bob".equalsIgnoreCase(NpcDefinition.forId(519).getName()),
                 "NPC 519 must be Bob");
-        require("Dunstan".equalsIgnoreCase(NpcDefinition.forId(4105).getName()),
-                "NPC 4105 must be Dunstan");
-        require("Tindel Marchant".equalsIgnoreCase(NpcDefinition.forId(1358).getName()),
-                "NPC 1358 must be Tindel Marchant");
+        require("Dunstan".equalsIgnoreCase(NpcDefinition.forId(1082).getName()),
+                "NPC 1082 must be Dunstan");
+        require("Tindel Marchant".equalsIgnoreCase(NpcDefinition.forId(1799).getName()),
+                "NPC 1799 must be Tindel Marchant");
 
         Player player = player();
         ItemStack damaged = new ItemStack(DEGRADED[0] + 4, 1, -1);
