@@ -14,7 +14,6 @@ import com.rs2.model.item.ItemStack;
 import com.rs2.model.npc.Npc;
 import com.rs2.model.objects.DynamicObject;
 import com.rs2.model.objects.ObjectManager;
-import com.rs2.model.player.GrandExchangeManager;
 import com.rs2.model.player.Player;
 import com.rs2.model.skill.SkillActionHelper;
 import com.rs2.util.CharacterFileManager;
@@ -586,7 +585,8 @@ public final class BarrowsManager {
         switch (objectId) {
             case 10284: {
                 if (player.barrowsChestOpened) {
-                    return false;
+                    // Consume repeated chest clicks without allowing another reward roll.
+                    return true;
                 }
                 int value = (int)Math.pow(2.0, 16.0);
                 if ((player.configStates[453] & value) == 0 || player.configStates[453] == 0) {
@@ -614,7 +614,8 @@ public final class BarrowsManager {
             }
             case 6774: {
                 if (player.barrowsChestOpened) {
-                    return false;
+                    // Consume repeated chest clicks without allowing another reward roll.
+                    return true;
                 }
                 int value2 = (int)Math.pow(2.0, 16.0);
                 if ((player.configStates[453] & value2) == 0 || player.configStates[453] == 0) {
@@ -638,7 +639,8 @@ public final class BarrowsManager {
             }
             case 6775: {
                 if (player.barrowsChestOpened) {
-                    return false;
+                    // Consume repeated chest clicks without allowing another reward roll.
+                    return true;
                 }
                 int value3 = (int)Math.pow(2.0, 16.0);
                 if ((player.configStates[453] & value3) == 0 || player.configStates[453] == 0) {
@@ -762,6 +764,8 @@ public final class BarrowsManager {
     }
 
     private static void awardChestRewards(Player player) {
+        // A chest may only produce one reward bundle per Barrows run.
+        if (player.barrowsChestOpened) return;
         ArrayList<ItemStack> rewards = new ArrayList<ItemStack>();
         int killedBrothers = BarrowsManager.countKilledBrothers(player);
         int rewardPotential = player.barrowsRewardPotential + (killedBrothers << 1);
@@ -834,28 +838,38 @@ public final class BarrowsManager {
             }
         }
 
-        if (rewards.size() == 0) {
-            player.packetSender.sendGameMessage("The chest was empty!");
-        } else {
-            ItemStack[] rewardItems = new ItemStack[rewards.size()];
-            int slot = 0;
-            for (ItemStack reward : rewards) {
-                rewardItems[slot] = reward;
-                ++slot;
-            }
-            player.packetSender.sendItemContainer(19555, rewardItems);
-            player.packetSender.showInterface(19550);
-            ++player.barrowsRunsCompleted;
-            int chestValue = 0;
-            for (ItemStack reward : rewards) {
-                player.getInventoryManager().addOrDropItem(reward);
-                int guidePrice = GrandExchangeManager.getGuidePrice(reward.getId());
-                chestValue += guidePrice * reward.getAmount();
-            }
-            player.packetSender.sendGameMessage("Your chest is worth around " + GameUtil.formatNumber(chestValue) + " coins!");
-        }
+        deliverChestRewards(player, rewards);
         player.startBarrowsChestDamage();
         CharacterFileManager.savePlayer(player);
+    }
+
+    /**
+     * 2006-era Barrows chest delivery: put treasure directly into the inventory.
+     * OSRS introduced a separate chest reward popup only in September 2015.
+     * When space runs out, InventoryManager retains the remaining rewards as
+     * player-owned ground items rather than discarding them.
+     */
+    static void deliverChestRewards(Player player, ArrayList<ItemStack> rewards) {
+        if (rewards.isEmpty()) {
+            player.packetSender.sendGameMessage("The chest was empty!");
+            return;
+        }
+        boolean overflowed = false;
+        for (ItemStack reward : rewards) {
+            int freeSlots = player.getInventoryManager().getContainer().getFreeSlots();
+            if (!player.getInventoryManager().hasSpaceFor(reward)
+                    || (!reward.getDefinition().isStackable()
+                            && reward.getAmount() > freeSlots)) {
+                overflowed = true;
+            }
+            player.getInventoryManager().addOrDropItem(reward);
+        }
+        ++player.barrowsRunsCompleted;
+        player.packetSender.sendGameMessage("You find some treasure in the chest.");
+        if (overflowed) {
+            player.packetSender.sendGameMessage(
+                    "Some of the treasure was dropped on the ground because your inventory is full.");
+        }
     }
 
     public static int countKilledBrothers(Player player) {
