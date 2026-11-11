@@ -88,6 +88,7 @@ public final class InterfaceBridge {
         mappings.put(197, 380);   // Wilderness level overlay
         mappings.put(201, 389);   // duel-area overlay
         mappings.put(4535, 24);   // Barrows overlay
+        mappings.put(4543, 25);   // Barrows door puzzle (native 443 widget group)
         mappings.put(837, 49);   // Native 443 two-page book: Castle Wars manual
         mappings.put(11333, 55); // Native Castle Wars seasonal wins scoreboard
         mappings.put(11169, 54); // Native revision-443 Castle Wars catapult controls
@@ -395,6 +396,15 @@ public final class InterfaceBridge {
         put(mappings, 4540, 24, 4);
         put(mappings, 4541, 24, 5);
         put(mappings, 4542, 24, 6);
+        // Legacy 377 Barrows puzzle uses flat widgets 4545-47 and 4550-52.
+        // The native 443 group 25 has sequence models at 6-8 and clickable
+        // answer models at 2, 3, 5 (the last answer is not child 4).
+        put(mappings, 4545, 25, 6);
+        put(mappings, 4546, 25, 7);
+        put(mappings, 4547, 25, 8);
+        put(mappings, 4550, 25, 2);
+        put(mappings, 4551, 25, 3);
+        put(mappings, 4552, 25, 5);
         put(mappings, 12415, 96, 0); // cave darkness, opacity 50
         put(mappings, 12417, 97, 0); // cave darkness, opacity 200
         put(mappings, 12419, 98, 0); // cave darkness, opacity 150
