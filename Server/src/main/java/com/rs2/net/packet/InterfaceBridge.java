@@ -396,15 +396,16 @@ public final class InterfaceBridge {
         put(mappings, 4540, 24, 4);
         put(mappings, 4541, 24, 5);
         put(mappings, 4542, 24, 6);
-        // Legacy 377 Barrows puzzle uses flat widgets 4545-47 and 4550-52.
-        // The native 443 group 25 has sequence models at 6-8 and clickable
-        // answer models at 2, 3, 5 (the last answer is not child 4).
-        put(mappings, 4545, 25, 6);
-        put(mappings, 4546, 25, 7);
-        put(mappings, 4547, 25, 8);
-        put(mappings, 4550, 25, 2);
-        put(mappings, 4551, 25, 3);
-        put(mappings, 4552, 25, 5);
+        // Rev 443 Barrows group 25 uses children 1-3 for the three
+        // sequence models along the top, and 6-8 for the clickable answers.
+        // Live client traces show clicks on 25:6, 25:7 and 25:8; mapping
+        // these to the sequence was rendering the symbols in the wrong row.
+        put(mappings, 4545, 25, 1);
+        put(mappings, 4546, 25, 2);
+        put(mappings, 4547, 25, 3);
+        put(mappings, 4550, 25, 6);
+        put(mappings, 4551, 25, 7);
+        put(mappings, 4552, 25, 8);
         put(mappings, 12415, 96, 0); // cave darkness, opacity 50
         put(mappings, 12417, 97, 0); // cave darkness, opacity 200
         put(mappings, 12419, 98, 0); // cave darkness, opacity 150
