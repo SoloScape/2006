@@ -27,6 +27,19 @@ jobs:
         with:
           distribution: temurin
           java-version: '8'
+      - name: Audit native book widget text-line dimensions
+        working-directory: Server
+        run: |
+          mkdir -p widget-audit-classes
+          javac -cp 'lib/*' -d widget-audit-classes \
+            src/main/java/com/rs2/cache/js5/ConfigReader.java \
+            src/main/java/com/rs2/cache/js5/Js5CacheStore.java \
+            src/main/java/com/rs2/cache/js5/Js5Container.java \
+            src/main/java/com/rs2/cache/js5/Js5Group.java \
+            src/main/java/com/rs2/cache/js5/Js5ReferenceTable.java \
+            src/main/java/com/rs2/cache/js5/Interfaces.java \
+            src/test/java/BarrowsBookWidgetAudit.java
+          java -cp 'widget-audit-classes:lib/*' BarrowsBookWidgetAudit
       - name: Compile server and run Barrows interaction regressions
         working-directory: Server
         run: |
