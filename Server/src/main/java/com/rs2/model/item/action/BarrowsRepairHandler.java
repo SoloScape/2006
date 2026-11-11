@@ -9,9 +9,10 @@ import com.rs2.model.player.Player;
 public final class BarrowsRepairHandler {
     // Bob (Lumbridge), Dunstan (Burthorpe), Tindel Marchant (Port Khazard).
     private static final int[] repairNpcIds = {519, 4105, 1358};
-    private int repairedItemId;
-    private int baseDegradedItemId;
-    private static BarrowsRepairHandler[][] repairDefinitions = new BarrowsRepairHandler[][]{{new BarrowsRepairHandler(4708, 4856), new BarrowsRepairHandler(4710, 4862), new BarrowsRepairHandler(4712, 4868), new BarrowsRepairHandler(4714, 4874)}, {new BarrowsRepairHandler(4716, 4880), new BarrowsRepairHandler(4718, 4886), new BarrowsRepairHandler(4720, 4892), new BarrowsRepairHandler(4722, 4898)}, {new BarrowsRepairHandler(4724, 4904), new BarrowsRepairHandler(4726, 4910), new BarrowsRepairHandler(4728, 4916), new BarrowsRepairHandler(4730, 4922)}, {new BarrowsRepairHandler(4732, 4928), new BarrowsRepairHandler(4734, 4934), new BarrowsRepairHandler(4736, 4940), new BarrowsRepairHandler(4738, 4946)}, {new BarrowsRepairHandler(4745, 4952), new BarrowsRepairHandler(4747, 4958), new BarrowsRepairHandler(4749, 4964), new BarrowsRepairHandler(4751, 4970)}, {new BarrowsRepairHandler(4753, 4976), new BarrowsRepairHandler(4755, 4982), new BarrowsRepairHandler(4757, 4988), new BarrowsRepairHandler(4759, 4994)}};
+    private final int repairedItemId;
+    private final int baseDegradedItemId;
+    private final int fullRepairCost;
+    private static BarrowsRepairHandler[][] repairDefinitions = new BarrowsRepairHandler[][]{{new BarrowsRepairHandler(4708, 4856, 60000), new BarrowsRepairHandler(4710, 4862, 100000), new BarrowsRepairHandler(4712, 4868, 90000), new BarrowsRepairHandler(4714, 4874, 80000)}, {new BarrowsRepairHandler(4716, 4880, 60000), new BarrowsRepairHandler(4718, 4886, 100000), new BarrowsRepairHandler(4720, 4892, 90000), new BarrowsRepairHandler(4722, 4898, 80000)}, {new BarrowsRepairHandler(4724, 4904, 60000), new BarrowsRepairHandler(4726, 4910, 100000), new BarrowsRepairHandler(4728, 4916, 90000), new BarrowsRepairHandler(4730, 4922, 80000)}, {new BarrowsRepairHandler(4732, 4928, 60000), new BarrowsRepairHandler(4734, 4934, 100000), new BarrowsRepairHandler(4736, 4940, 90000), new BarrowsRepairHandler(4738, 4946, 80000)}, {new BarrowsRepairHandler(4745, 4952, 60000), new BarrowsRepairHandler(4747, 4958, 100000), new BarrowsRepairHandler(4749, 4964, 90000), new BarrowsRepairHandler(4751, 4970, 80000)}, {new BarrowsRepairHandler(4753, 4976, 60000), new BarrowsRepairHandler(4755, 4982, 100000), new BarrowsRepairHandler(4757, 4988, 90000), new BarrowsRepairHandler(4759, 4994, 80000)}};
 
     public static boolean handleItemOnNpc(Player player, int npcId, ItemStack itemStack) {
         int initialValue = -1;
@@ -50,9 +51,10 @@ public final class BarrowsRepairHandler {
         return true;
     }
 
-    private BarrowsRepairHandler(int repairedItemId, int baseDegradedItemId) {
+    private BarrowsRepairHandler(int repairedItemId, int baseDegradedItemId, int fullRepairCost) {
         this.repairedItemId = repairedItemId;
         this.baseDegradedItemId = baseDegradedItemId;
+        this.fullRepairCost = fullRepairCost;
     }
 
     public final int getFullyDegradedItemId() {
@@ -71,22 +73,10 @@ public final class BarrowsRepairHandler {
         BarrowsRepairHandler repairDefinition = forItem(itemStack);
         if (repairDefinition == null) return -1;
 
-        // The broken item definition may have no equipment slot.
-        int slot = new ItemStack(repairDefinition.repairedItemId)
-                .getDefinition().getEquipmentSlot();
-        int fullRepairCost;
-        switch (slot) {
-            case 0: fullRepairCost = 60000; break;  // Helmet
-            case 3: fullRepairCost = 100000; break; // Weapon
-            case 4: fullRepairCost = 90000; break;  // Body
-            case 7: fullRepairCost = 80000; break;  // Legs
-            default: return -1;
-        }
-
         int remaining = BarrowsEquipmentDurability.remainingCombatTicks(itemStack);
         if (remaining < 0) return -1;
         int total = BarrowsEquipmentDurability.FULL_COMBAT_TICKS;
-        return (int) ((long) fullRepairCost * (total - remaining) / total);
+        return (int) ((long) repairDefinition.fullRepairCost * (total - remaining) / total);
     }
 
     public static BarrowsRepairHandler forItem(ItemStack itemStack) {
