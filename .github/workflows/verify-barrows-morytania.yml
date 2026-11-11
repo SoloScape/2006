@@ -1,0 +1,40 @@
+name: Verify Barrows Morytania Interactions
+on:
+  push:
+    branches:
+      - Feature/Barrows
+    paths:
+      - 'Server/src/main/java/com/rs2/model/gameplay/barrows/**'
+      - 'Server/src/main/java/com/rs2/model/interaction/TableItemPlacement.java'
+      - 'Server/src/main/java/com/rs2/model/interaction/ItemOnObjectTask.java'
+      - 'Server/src/main/java/com/rs2/model/dialogue/OldCroneDialogue.java'
+      - 'Server/src/main/java/com/rs2/model/dialogue/DialogueManager.java'
+      - 'Server/src/main/java/com/rs2/model/ground/GroundItem.java'
+      - 'Server/src/main/java/com/rs2/model/ground/GroundItemManager.java'
+      - 'Server/src/main/java/com/rs2/net/packet/handler/ItemActionPacketHandler.java'
+      - 'Server/src/main/java/com/rs2/net/packet/handler/ButtonClickPacketHandler.java'
+      - 'Server/src/test/java/MorytaniaBarrowsInteractionChecks.java'
+      - 'Server/src/test/java/Barrows443PuzzleInterfaceChecks.java'
+      - '.github/workflows/verify-barrows-morytania.yml'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+      - name: Compile server and run Barrows interaction regressions
+        working-directory: Server
+        run: |
+          mkdir -p barrows-test-classes
+          find src/main/java -name '*.java' > /tmp/barrows-sources.txt
+          javac -encoding UTF-8 -cp 'lib/*' -d barrows-test-classes @/tmp/barrows-sources.txt
+          javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
+            src/test/java/MorytaniaBarrowsInteractionChecks.java \
+            src/test/java/Barrows443PuzzleInterfaceChecks.java
+          java -cp 'barrows-test-classes:lib/*' MorytaniaBarrowsInteractionChecks
+          java -cp 'barrows-test-classes:lib/*' Barrows443PuzzleInterfaceChecks
