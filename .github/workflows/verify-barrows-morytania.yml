@@ -15,6 +15,7 @@ on:
       - 'Server/src/main/java/com/rs2/net/packet/handler/ButtonClickPacketHandler.java'
       - 'Server/src/test/java/MorytaniaBarrowsInteractionChecks.java'
       - 'Server/src/test/java/Barrows443PuzzleInterfaceChecks.java'
+      - 'Server/src/test/java/BarrowsNpcSpawnAuditChecks.java'
       - '.github/workflows/verify-barrows-morytania.yml'
   workflow_dispatch:
 
