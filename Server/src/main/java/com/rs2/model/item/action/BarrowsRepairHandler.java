@@ -66,6 +66,20 @@ public final class BarrowsRepairHandler {
         double metadata = itemStack.getMetadata() < 0 ? 0 : 4500 - itemStack.getMetadata();
         double value = 1.0;
         double value2 = metadata / 4500.0;
+        // The durability fix stores each of the 90,000 remaining combat ticks
+        // inside flagged item metadata. Interpret those ticks for the existing
+        // repair-price calculation, without resetting partially worn gear.
+        // Pricing and missing repair NPCs are audited separately in finding #4.
+        if (com.rs2.model.item.BarrowsEquipmentDurability.isTickMetadata(
+                itemStack.getMetadata())) {
+            int remaining = com.rs2.model.item.BarrowsEquipmentDurability
+                    .remainingCombatTicks(itemStack);
+            int quarterTicks = com.rs2.model.item.BarrowsEquipmentDurability
+                    .COMBAT_TICKS_PER_QUARTER;
+            int remainingInStage = remaining - (3 - id) * quarterTicks;
+            value2 = id == 4 ? 1.0 : 1.0 - Math.max(0.0,
+                    Math.min(1.0, (double)remainingInStage / quarterTicks));
+        }
         if (definition == 0) {
             value = 15000.0;
         } else if (definition == 3) {
