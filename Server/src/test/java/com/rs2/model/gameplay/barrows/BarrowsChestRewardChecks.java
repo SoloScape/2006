@@ -173,6 +173,8 @@ public final class BarrowsChestRewardChecks {
         Player player = new Player(null);
         player.isBot = true;
         player.setEncodedIndex(32768);
+        // EntityReference resolves detached test players by a live index.
+        player.setIndex(1);
         player.setPosition(new Position(3552, 9694, 0));
         return player;
     }
