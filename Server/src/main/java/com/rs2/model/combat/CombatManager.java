@@ -713,6 +713,27 @@ extends TickTask {
         return random.nextDouble() <= value2;
     }
 
+    /**
+     * Verac's Defiler is an armour/Defence and protection-prayer bypass,
+     * not a stat drain. An effect ID by itself must not grant the bypass
+     * to an unrelated weapon or NPC.
+     *
+     * The proc chance is selected by CombatAction.queue; this method only
+     * validates the resulting attack and is shared by accuracy and damage.
+     */
+    public static boolean isVeracsDefilerHit(Entity attacker, HitDefinition hitDefinition) {
+        if (attacker == null || hitDefinition == null
+                || hitDefinition.getSpecialEffectId() != 11
+                || hitDefinition.getAttackStyle() == null
+                || hitDefinition.getAttackStyle().getCombatType() != CombatType.MELEE) {
+            return false;
+        }
+        if (attacker.isNpc()) {
+            return ((Npc)attacker).getNpcId() == 2030;
+        }
+        return attacker.isPlayer() && ((Player)attacker).isVeracSetEffectActive();
+    }
+
     public static double calculateDefenceRoll(Entity entity, HitDefinition hitDefinition) {
         AttackStyleDefinition attackStyleDefinition = hitDefinition.getAttackStyle();
         if (ServerSettings.modernCombatSystemEnabled) {
@@ -793,9 +814,6 @@ extends TickTask {
                 int magicLevel = player.getSkillManager().getCurrentLevels()[6];
                 defenceRoll = (int)(Math.floor((double)magicLevel * 0.7) + Math.floor(defenceRoll * 0.3));
             }
-        }
-        if (hitDefinition.getSpecialEffectId() == 11) {
-            defenceRoll *= 0.75;
         }
         if (entity.isNpc()) {
             if (attackStyleDefinition.getCombatType() == CombatType.MAGIC) {
