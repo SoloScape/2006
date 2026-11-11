@@ -148,7 +148,9 @@ public class CombatAction {
                     combatAction.hitDefinition.setSpecialEffectId(9);
                 } else if (combatAction.attacker.isPlayer() && ((Player)combatAction.attacker).isKarilSetEffectActive() || combatAction.attacker.isNpc() && ((Npc)combatAction.attacker).getDefinition().getId() == 2028) {
                     combatAction.hitDefinition.setSpecialEffectId(10);
-                } else if (combatAction.attacker.isPlayer() && ((Player)combatAction.attacker).isVeracSetEffectActive() || combatAction.attacker.isNpc() && ((Npc)combatAction.attacker).getDefinition().getId() == 2030) {
+                } else if ((combatAction.attacker.isPlayer() && ((Player)combatAction.attacker).isVeracSetEffectActive()
+                        || combatAction.attacker.isNpc() && ((Npc)combatAction.attacker).getNpcId() == 2030)
+                        && combatAction.hitDefinition.getAttackStyle().getCombatType() == CombatType.MELEE) {
                     combatAction.hitDefinition.setSpecialEffectId(11);
                 }
             }
@@ -187,7 +189,10 @@ public class CombatAction {
                 combatAction.hitSuccessful = false;
             }
             if (combatAction.hitSuccessful) {
-                value4 = CombatManager.calculateDefenceRoll(combatAction.target, combatAction.hitDefinition);
+                // Defiler bypasses the Defence/armour accuracy roll entirely.
+                // It cannot override quest/attack restrictions checked above.
+                if (!CombatManager.isVeracsDefilerHit(combatAction.attacker, combatAction.hitDefinition)) {
+                    value4 = CombatManager.calculateDefenceRoll(combatAction.target, combatAction.hitDefinition);
                 value3 = CombatManager.calculateAttackRoll(combatAction.attacker, combatAction.hitDefinition);
                 if (!ServerSettings.modernCombatSystemEnabled) {
                     Player player;
@@ -212,7 +217,8 @@ public class CombatAction {
                 if (combatAction.getTarget().isPlayer()) {
                     entity2 = (Player)combatAction.getTarget();
                 }
-                combatAction.hitSuccessful = enabled;
+                    combatAction.hitSuccessful = enabled;
+                }
             }
             if ((combatAction.hitDefinition.getAttackStyle().getXpMode() == AttackXpMode.ICY_BREATH || combatAction.hitDefinition.getAttackStyle().getXpMode() == AttackXpMode.DRAGONFIRE || combatAction.hitDefinition.getAttackStyle().getXpMode() == AttackXpMode.DRAGONFIRE_FAR || combatAction.hitDefinition.getAttackStyle().getXpMode() == AttackXpMode.KBD_SPECIAL) && combatAction.target.isPlayer()) {
                 int initialValue = -1;
@@ -448,13 +454,9 @@ public class CombatAction {
                     combatAction.damage = initialValue;
                 }
             } else {
-                if (combatAction.target.isProtectedFrom(combatAction.hitDefinition.getAttackStyle().getCombatType()) && combatAction.hitDefinition.getSpecialEffectId() != 11 && !combatAction.hitDefinition.isProtectionPrayerReductionDeferred() && combatAction.damage > 0) {
+                if (combatAction.target.isProtectedFrom(combatAction.hitDefinition.getAttackStyle().getCombatType()) && !CombatManager.isVeracsDefilerHit(combatAction.attacker, combatAction.hitDefinition) && !combatAction.hitDefinition.isProtectionPrayerReductionDeferred() && combatAction.damage > 0) {
                     combatAction.damage = combatAction.attacker != null && combatAction.attacker.isPlayer() ? (int)Math.ceil((double)combatAction.damage * 0.6) : 0;
                 }
-            }
-            if (ServerSettings.modernCombatSystemEnabled && combatAction.hitDefinition.getSpecialEffectId() == 11) {
-                combatAction.hitSuccessful = true;
-                ++combatAction.damage;
             }
             if (!combatAction.hitSuccessful && !combatAction.hitDefinition.isAlwaysHit()) {
                 if (combatAction.hitDefinition.getAttackStyle() != null && combatAction.hitDefinition.getAttackStyle().getCombatType() == CombatType.MAGIC && combatAction.hitDefinition.getAttackStyle().getXpMode() != AttackXpMode.ICY_BREATH && combatAction.hitDefinition.getAttackStyle().getXpMode() != AttackXpMode.DRAGONFIRE && combatAction.hitDefinition.getAttackStyle().getXpMode() != AttackXpMode.DRAGONFIRE_FAR && combatAction.hitDefinition.getAttackStyle().getXpMode() != AttackXpMode.KBD_SPECIAL) {
@@ -904,7 +906,7 @@ public class CombatAction {
                         combatEffect.apply(this);
                     }
                 }
-            } else if (this.target.isProtectedFrom(this.hitDefinition.getAttackStyle().getCombatType()) && this.hitDefinition.getSpecialEffectId() != 11 && this.hitDefinition.isProtectionPrayerReductionDeferred() && this.damage > 0) {
+            } else if (this.target.isProtectedFrom(this.hitDefinition.getAttackStyle().getCombatType()) && !CombatManager.isVeracsDefilerHit(this.attacker, this.hitDefinition) && this.hitDefinition.isProtectionPrayerReductionDeferred() && this.damage > 0) {
                 this.damage = this.attacker != null && this.attacker.isPlayer() ? (int)Math.ceil((double)this.damage * 0.6) : 0;
             }
         }
