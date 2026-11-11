@@ -515,11 +515,38 @@ public final class BarrowsManager {
         return false;
     }
 
+    private static boolean[] activeTunnelBrothers(Player player) {
+        boolean[] active = new boolean[BarrowsTunnelEncounter.BROTHER_NPC_IDS.length];
+        // ownedNpc only tracks the most recently spawned monster, so looking
+        // at it alone could summon duplicates of a still-living brother.
+        for (Npc npc : World.getNpcs()) {
+            if (npc == null || !npc.isActive() || npc.isDead()) continue;
+            int index = BarrowsTunnelEncounter.brotherIndexForNpcId(npc.getNpcId());
+            if (index >= 0 && npc.getOwnerPlayer() == player) active[index] = true;
+        }
+        return active;
+    }
+
+    private static boolean hasActiveBarrowsBrother(Player player, int npcId) {
+        int index = BarrowsTunnelEncounter.brotherIndexForNpcId(npcId);
+        return index >= 0 && activeTunnelBrothers(player)[index];
+    }
+
     private static void spawnRandomCryptNpc(Player player, Position arrivalTile) {
-        // Door packets queue the player's step: use the future landing tile,
-        // and fall back to the current side only if the door is still blocked.
-        int npcId = cryptNpcIds[GameUtil.randomInt(cryptNpcIds.length)];
+        // The static rooms keep their original crypt spiders, giant rats and
+        // bloodworms. Doors instead roll only normal rats, bloodworms,
+        // skeletons and undefeated brothers, as in the historical guides.
+        boolean[] active = activeTunnelBrothers(player);
+        int[] remaining = BarrowsTunnelEncounter.eligibleBrothers(
+                player.getBarrowsKilledBrothers(), active);
+        int roll = GameUtil.randomInt(BarrowsTunnelEncounter.ROLL_COUNT);
+        int brotherIndex = remaining.length == 0 ? 0 : GameUtil.randomInt(remaining.length);
+        int npcId = BarrowsTunnelEncounter.npcForRoll(
+                roll, GameUtil.randomInt(2), brotherIndex, remaining);
         Npc npc = new Npc(npcId);
+
+        // The player step across a door is queued, not yet applied. Avoid the
+        // landing tile and preserve the prior collision-safe spawn search.
         Position arrival = new Position(arrivalTile.getX(), arrivalTile.getY(),
                 player.getPosition().getPlane());
         Position safe = BarrowsNpcSpawnPlacement.findSafeSpawn(arrival,
@@ -530,9 +557,15 @@ public final class BarrowsManager {
             return;
         }
         GameplayHelper.spawnOwnedNpcAtPosition(player, safe, npc, true, false);
+        if (BarrowsTunnelEncounter.brotherIndexForNpcId(npcId) >= 0) {
+            player.getPacketSender().sendEntityHintIcon(1, npc.getIndex());
+        }
     }
 
     private static boolean spawnBarrowsBrother(Player player, int npcId) {
+        // A brother may already have ambushed the player at a tunnel door.
+        // Do not summon a second copy at the reward chest or sarcophagus.
+        if (hasActiveBarrowsBrother(player, npcId)) return true;
         Npc brother = new Npc(npcId);
         Position safe = BarrowsNpcSpawnPlacement.findSafeSpawn(
                 player.getPosition(), player.getPosition(), brother.getDefinition().getSize());
@@ -647,7 +680,7 @@ public final class BarrowsManager {
                             DialogueManager.startDialogue(player, 10001);
                             return true;
                         }
-                        if (GameplayHelper.hasActiveTemporaryNpc(player, brotherSarcophagusNpcIds[index][1])) {
+                        if (hasActiveBarrowsBrother(player, brotherSarcophagusNpcIds[index][1])) {
                             Player player7 = player;
                             player7.packetSender.sendGameMessage("You must kill the the brother before searching this.");
                             return true;
