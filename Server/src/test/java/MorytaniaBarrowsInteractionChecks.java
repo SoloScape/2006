@@ -47,6 +47,7 @@ public final class MorytaniaBarrowsInteractionChecks {
 
         Player visitor = new Player(null);
         visitor.isBot = true;
+        visitor.setUsername("Dialogue Tester");
         visitor.getDialogueManager().setDialogueNpcId(2996);
         require(OldCroneDialogue.continueDialogue(visitor, 1, 0), "Old Crone greeting not handled");
         require(OldCroneDialogue.continueDialogue(visitor, 2, 0), "Old Crone introduction not handled");
