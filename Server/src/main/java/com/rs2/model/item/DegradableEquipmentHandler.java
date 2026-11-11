@@ -1,170 +1,111 @@
 package com.rs2.model.item;
 
-import com.rs2.model.item.ItemContainer;
-import com.rs2.model.item.ItemStack;
+import com.rs2.model.Entity;
+import com.rs2.model.npc.Npc;
 import com.rs2.model.player.Player;
+import com.rs2.util.GameUtil;
 
+/**
+ * Equipment degradation is split by its original trigger:
+ * Barrows wears once per combat tick, crystal/legacy gear retains the
+ * pre-existing per-attack charge behaviour.
+ */
 public final class DegradableEquipmentHandler {
-    private static String[] barrowsSetNameTokens = new String[]{"ahrims", "dharoks", "torags", "guthans", "karils", "veracs"};
+    private DegradableEquipmentHandler() { }
 
-    static {
-        (new String[1])[0] = "crystal";
+    /**
+     * One world tick = 600ms, so 90,000 engaged ticks exhaust 15 hours.
+     * The equipment's metadata persists the *full remaining tick count*;
+     * there is no session counter to reset on logging out or unequipping.
+     */
+    public static void processBarrowsCombatTick(Player player) {
+        if (player == null || !isEngagedInCombat(player)) return;
+
+        ItemContainer equipment = player.getEquipmentManager().getContainer();
+        boolean changedItemId = false;
+        boolean broke = false;
+        for (int slot = 0; slot < 14; slot++) {
+            ItemStack item = equipment.getItemAt(slot);
+            if (item == null || !BarrowsEquipmentDurability.isBarrowsItem(item.getId())
+                    || BarrowsEquipmentDurability.isBroken(item.getId())) continue;
+
+            ItemStack worn = BarrowsEquipmentDurability.consumeCombatTicks(item, 1);
+            if (worn != item) {
+                equipment.setItem(slot, worn);
+                changedItemId = true;
+                if (BarrowsEquipmentDurability.isBroken(worn.getId())) broke = true;
+            }
+        }
+        if (changedItemId) {
+            player.getEquipmentManager().refresh();
+            if (broke) {
+                player.packetSender.sendGameMessage(
+                        "Your Barrows equipment has broken and needs repairing.");
+            }
+        }
     }
 
+    /**
+     * Fighting includes engaging a live target and receiving attacks while
+     * standing still, praying, or not making your own attacks. The incoming
+     * combat timer is refreshed by CombatCycleEvent even for blocked hits.
+     * Chasing a far-away target or staying logged in while idle does not count.
+     */
+    public static boolean isEngagedInCombat(Player player) {
+        if (player == null || player.isDead() || player.getCurrentHitpoints() <= 0) {
+            return false;
+        }
+        Entity target = player.getCombatTarget();
+        if (target != null && !target.isDead()
+                && GameUtil.getDistance(player.getPosition(), target.getPosition())
+                    <= Math.max(1, player.getAttackRange())
+                && (!target.isNpc() || ((Npc) target).isActive())) {
+            return true;
+        }
+        Entity attacker = player.getSingleCombatTimer().getTarget();
+        return attacker != null && !attacker.isDead()
+                && !player.getSingleCombatTimer().hasElapsed()
+                && (!attacker.isNpc() || ((Npc) attacker).isActive());
+    }
+
+    /**
+     * Legacy per-attack degradation for non-Barrows items (notably crystal
+     * equipment). Kept separate so changing Barrows does not stop crystal wear.
+     */
     public static void degradeEquipmentAfterCombat(Player player) {
-        int index = 0;
-        while (index < 14) {
-            Object equipmentManager = player.getEquipmentManager().getContainer().getItemAt(index);
-            int value = index;
-            Player player2 = player;
-            if (equipmentManager != null) {
-                Object value2;
-                ItemStack itemStack = (ItemStack)equipmentManager;
-                int value3 = value;
-                equipmentManager = player2;
-                String[] stringValues = barrowsSetNameTokens;
-                int index2 = 0;
-                while (index2 < 6) {
-                    value2 = stringValues[index2];
-                    if (itemStack.getDefinition().getName().toLowerCase().contains((CharSequence)value2) && (itemStack.getId() < 4856 || itemStack.getId() > 4999)) {
-                        int value4;
-                        ItemContainer itemContainer = ((Player)equipmentManager).getEquipmentManager().getContainer();
-                        int id = itemStack.getId();
-                        switch (id) {
-                            case 4708: {
-                                value4 = 4856;
-                                break;
-                            }
-                            case 4710: {
-                                value4 = 4862;
-                                break;
-                            }
-                            case 4712: {
-                                value4 = 4868;
-                                break;
-                            }
-                            case 4714: {
-                                value4 = 4874;
-                                break;
-                            }
-                            case 4716: {
-                                value4 = 4880;
-                                break;
-                            }
-                            case 4718: {
-                                value4 = 4886;
-                                break;
-                            }
-                            case 4720: {
-                                value4 = 4892;
-                                break;
-                            }
-                            case 4722: {
-                                value4 = 4898;
-                                break;
-                            }
-                            case 4724: {
-                                value4 = 4904;
-                                break;
-                            }
-                            case 4726: {
-                                value4 = 4910;
-                                break;
-                            }
-                            case 4728: {
-                                value4 = 4916;
-                                break;
-                            }
-                            case 4730: {
-                                value4 = 4922;
-                                break;
-                            }
-                            case 4732: {
-                                value4 = 4928;
-                                break;
-                            }
-                            case 4734: {
-                                value4 = 4934;
-                                break;
-                            }
-                            case 4736: {
-                                value4 = 4940;
-                                break;
-                            }
-                            case 4738: {
-                                value4 = 4946;
-                                break;
-                            }
-                            case 4745: {
-                                value4 = 4952;
-                                break;
-                            }
-                            case 4747: {
-                                value4 = 4958;
-                                break;
-                            }
-                            case 4749: {
-                                value4 = 4964;
-                                break;
-                            }
-                            case 4751: {
-                                value4 = 4970;
-                                break;
-                            }
-                            case 4753: {
-                                value4 = 4976;
-                                break;
-                            }
-                            case 4755: {
-                                value4 = 4982;
-                                break;
-                            }
-                            case 4757: {
-                                value4 = 4988;
-                                break;
-                            }
-                            case 4759: {
-                                value4 = 4994;
-                                break;
-                            }
-                            default: {
-                                value4 = id;
-                            }
-                        }
-                        itemContainer.setItem(value3, new ItemStack(value4));
-                        ((Player)equipmentManager).getEquipmentManager().getContainer().getItemAt(value3).setMetadata(4500);
+        if (player == null) return;
+        ItemContainer equipment = player.getEquipmentManager().getContainer();
+        boolean changed = false;
+        for (int slot = 0; slot < 14; slot++) {
+            ItemStack item = equipment.getItemAt(slot);
+            if (item == null || BarrowsEquipmentDurability.isBarrowsItem(item.getId())) continue;
+
+            String name = item.getDefinition().getName().toLowerCase();
+            if (name.contains("crystal")) {
+                if (item.getId() == 4212 || item.getId() == 4224) {
+                    item = new ItemStack(item.getId() == 4212 ? 4214 : 4225);
+                    item.setMetadata(250);
+                    equipment.setItem(slot, item);
+                    changed = true;
+                } else if (item.getMetadata() == 0) {
+                    if (item.getId() == 4223 || item.getId() == 4234) {
+                        equipment.setItem(slot, null);
+                        changed = true;
+                        continue;
                     }
-                    ++index2;
-                }
-                if (itemStack.getId() >= 4856 && itemStack.getId() <= 4999 && !itemStack.getDefinition().getName().toLowerCase().contains(" 0") && ((Player)equipmentManager).getEquipmentManager().getContainer().getItemAt(value3).getMetadata() == 0) {
-                    ((Player)equipmentManager).getEquipmentManager().getContainer().setItem(value3, new ItemStack(itemStack.getId() + 1));
-                    if (!itemStack.getDefinition().getName().toLowerCase().contains(" 25")) {
-                        ((Player)equipmentManager).getEquipmentManager().getContainer().getItemAt(value3).setMetadata(4500);
-                    } else {
-                        value2 = equipmentManager;
-                        ((Player)value2).packetSender.sendGameMessage("Your barrow equipment has broke.");
-                    }
-                }
-                if (itemStack.getDefinition().getName().toLowerCase().contains("crystal")) {
-                    if (itemStack.getDefinition().getId() == 4212 || itemStack.getDefinition().getId() == 4224) {
-                        ((Player)equipmentManager).getEquipmentManager().getContainer().setItem(value3, new ItemStack(itemStack.getDefinition().getId() == 4212 ? 4214 : 4225));
-                        ((Player)equipmentManager).getEquipmentManager().getContainer().getItemAt(value3).setMetadata(250);
-                    } else if (((Player)equipmentManager).getEquipmentManager().getContainer().getItemAt(value3).getMetadata() == 0) {
-                        if (itemStack.getDefinition().getId() == 4223 || itemStack.getDefinition().getId() == 4234) {
-                            ((Player)equipmentManager).getEquipmentManager().getContainer().remove(itemStack);
-                        } else {
-                            ((Player)equipmentManager).getEquipmentManager().getContainer().setItem(value3, new ItemStack(itemStack.getId() + 1));
-                            ((Player)equipmentManager).getEquipmentManager().getContainer().getItemAt(value3).setMetadata(250);
-                        }
-                    }
-                }
-                if (player2.getEquipmentManager().getContainer().getItemAt(value).getMetadata() >= 0 && player2.getEquipmentManager().getItemIdAtSlot(value) != 11283 && player2.getEquipmentManager().getItemIdAtSlot(value) != 11284) {
-                    player2.getEquipmentManager().getContainer().getItemAt(value).setMetadata(player2.getEquipmentManager().getContainer().getItemAt(value).getMetadata() - 1);
+                    item = new ItemStack(item.getId() + 1);
+                    item.setMetadata(250);
+                    equipment.setItem(slot, item);
+                    changed = true;
                 }
             }
-            ++index;
+            // Preserve existing charge behaviour of other special items too.
+            if (item.getMetadata() >= 0 && item.getId() != 11283
+                    && item.getId() != 11284) {
+                item.setMetadata(item.getMetadata() - 1);
+                changed = true;
+            }
         }
-        player.getEquipmentManager().refresh();
+        if (changed) player.getEquipmentManager().refresh();
     }
 }
-
