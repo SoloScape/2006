@@ -231,6 +231,19 @@ public abstract class SpecialAttackDefinition {
     }
 
     /**
+     * Torag's Corruption removes 20% of the victim's remaining run energy,
+     * not a fixed number of percentage points. Preserve fractional run
+     * energy in the server's 0..10000-unit representation.
+     *
+     * Original-era 20% effect: https://forum.tip.it/topic/52625-a-new-special-effect-for-torag-the-corrupteds-barrows-set/
+     */
+    private static void drainToragRunEnergy(Player victim) {
+        int currentRaw = victim.getRunEnergyRaw();
+        victim.addRunEnergyRaw(-(currentRaw * 20 / 100));
+        victim.packetSender.sendRunEnergy();
+    }
+
+    /**
      * NPC Barrows effects must run through the normal combat hit pipeline.
      * Restrict dispatch to the matching original brother/effect pairing:
      * generic NPCs cannot activate player-only weapon special attacks.
@@ -245,12 +258,10 @@ public abstract class SpecialAttackDefinition {
                     brother.heal(Math.min(damage, Math.max(0, target.getCurrentHitpoints())));
                 }
                 return;
-            case 2029: // Torag: drain run energy (magnitude audited separately).
+            case 2029: // Torag: drain 20% of remaining run energy.
                 if (effectId == 8 && target.isPlayer()) {
                     target.getUpdateState().setGraphic(399);
-                    Player player = (Player)target;
-                    player.addRunEnergyPercent(-4);
-                    player.packetSender.sendRunEnergy();
+                    drainToragRunEnergy((Player)target);
                 }
                 return;
             case 2025: // Ahrim: lower Strength.
@@ -391,30 +402,28 @@ public abstract class SpecialAttackDefinition {
                 return;
             }
             case 7: {
+                if (damage <= 0 || target == null) return;
                 target.getUpdateState().setGraphic(398);
-                entity.heal(damage);
+                entity.heal(Math.min(damage, Math.max(0, target.getCurrentHitpoints())));
                 return;
             }
             case 8: {
+                if (damage <= 0 || target == null || !target.isPlayer()) return;
                 target.getUpdateState().setGraphic(399);
-                if (!target.isPlayer()) break;
-                Player targetPlayer = (Player)target;
-                targetPlayer.addRunEnergyPercent(-4);
-                targetPlayer.packetSender.sendRunEnergy();
+                drainToragRunEnergy((Player)target);
                 return;
             }
             case 9: {
+                if (damage <= 0 || target == null || !target.isPlayer()) return;
                 target.getUpdateState().setGraphicHeight100(400);
-                if (!target.isPlayer()) break;
-                Player targetPlayer = (Player)target;
-                targetPlayer.packetSender.modifySkillLevel(2, -5, false);
+                ((Player)target).packetSender.modifySkillLevel(2, -5, false);
                 return;
             }
             case 10: {
+                if (damage <= 0 || target == null || !target.isPlayer()) return;
                 target.getUpdateState().setGraphicHeight100(401);
-                if (!target.isPlayer()) break;
                 Player targetPlayer = (Player)target;
-                targetPlayer.packetSender.modifySkillLevel(16, -((int)((double)targetPlayer.getSkillManager().getCurrentLevels()[16] * 0.2)), true);
+                targetPlayer.packetSender.modifySkillLevel(16, -(int)(targetPlayer.getSkillManager().getCurrentLevels()[16] * 0.2), true);
                 return;
             }
             case 11: {
