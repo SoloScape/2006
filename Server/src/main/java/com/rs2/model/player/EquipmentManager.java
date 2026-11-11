@@ -8,6 +8,7 @@ import com.rs2.model.combat.WeaponProfile;
 import com.rs2.model.combat.special.SpecialAttackDefinition;
 import com.rs2.model.gameplay.castlewars.CastleWarsManager;
 import com.rs2.model.gameplay.duel.DuelRule;
+import com.rs2.model.item.BarrowsEquipmentDurability;
 import com.rs2.model.item.ItemContainer;
 import com.rs2.model.item.ItemContainerType;
 import com.rs2.model.item.ItemService;
@@ -154,6 +155,13 @@ public final class EquipmentManager {
                             }
                             if (ItemDefinition.isRemovedContent(itemStack.getId())) {
                                 this.player.packetSender.sendGameMessage("This item has been removed from the game.");
+                                return;
+                            }
+                            // Broken 0% Barrows kit must be repaired before
+                            // it can be equipped again.
+                            if (BarrowsEquipmentDurability.isBroken(itemStack.getId())) {
+                                this.player.packetSender.sendGameMessage(
+                                        "You must repair this Barrows equipment before wearing it.");
                                 return;
                             }
                             value2 = itemStack.getDefinition().getEquipmentSlot();
@@ -756,7 +764,9 @@ public final class EquipmentManager {
 
     private boolean hasEquippedName(int slot, String nameFragment) {
         ItemStack itemStack = this.container.getItemAt(slot);
-        return itemStack != null && itemStack.getDefinition().getName().toLowerCase().contains(nameFragment);
+        return itemStack != null
+                && !BarrowsEquipmentDurability.isBroken(itemStack.getId())
+                && itemStack.getDefinition().getName().toLowerCase().contains(nameFragment);
     }
 
     private boolean hasEquippedName(int slot, String nameFragment, String alternateNameFragment) {
