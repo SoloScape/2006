@@ -173,6 +173,9 @@ public final class BarrowsBrotherSpecialCombatChecks {
     private static Player victim() {
         Player player = new Player(null);
         player.isBot = true;
+        // Entity.isPlayer() checks encodedIndex, not the Java object type.
+        // Detached players need the same high-bit tag as registered players.
+        player.setEncodedIndex(32768);
         player.setPosition(new Position(3551, 9700, 0));
         player.getSkillManager().setCurrentLevel(3, 90);
         player.getSkillManager().setCurrentLevel(2, 70);
