@@ -10,9 +10,10 @@ import java.util.List;
  * a normal crypt rat, a skeleton, or an undefeated Barrows brother.
  *
  * 12/128 brothers, 52/128 skeletons, 32/128 bloodworms, 32/128 crypt rats
- * match the documented legacy encounter table. A brother roll with no
- * eligible brother falls back to a skeleton, so valid door openings never
- * attempt to spawn a defeated or already-present brother.
+ * are the documented OSRS-era odds used as a reference; the precise
+ * probabilities in 2006 have not been independently verified.
+ * A brother roll with no eligible brother falls back to a skeleton, so
+ * a defeated or currently present brother is never selected.
  */
 public final class BarrowsTunnelEncounter {
     public static final int ROLL_COUNT = 128;
@@ -53,17 +54,17 @@ public final class BarrowsTunnelEncounter {
         if (roll < 0 || roll >= ROLL_COUNT) {
             throw new IllegalArgumentException("Door encounter roll must be between 0 and 127");
         }
-        if (roll < BROTHER_ROLLS && eligible != null && eligible.length != 0) {
-            if (brotherIndex < 0 || brotherIndex >= eligible.length) {
-                throw new IllegalArgumentException("Invalid eligible brother index");
+        if (roll < BROTHER_ROLLS) {
+            if (eligible != null && eligible.length != 0) {
+                if (brotherIndex < 0 || brotherIndex >= eligible.length) {
+                    throw new IllegalArgumentException("Invalid eligible brother index");
+                }
+                return eligible[brotherIndex];
             }
-            return eligible[brotherIndex];
-        }
-        if (roll < BROTHER_ROLLS + SKELETON_ROLLS) {
+            // No eligible brother remained; retain a monster encounter.
             return (skeletonVariant & 1) == 0 ? SKELETON_A : SKELETON_B;
         }
-        if (roll < BROTHER_ROLLS) {
-            // No eligible brother remained; retain a monster encounter.
+        if (roll < BROTHER_ROLLS + SKELETON_ROLLS) {
             return (skeletonVariant & 1) == 0 ? SKELETON_A : SKELETON_B;
         }
         if (roll < BROTHER_ROLLS + SKELETON_ROLLS + BLOODWORM_ROLLS) {
