@@ -139,20 +139,14 @@ public class CombatAction {
             double value4;
             CombatAction combatAction = this;
             this.hitSuccessful = true;
-            if (combatAction.attacker != null && GameUtil.randomInclusive(4) == 0) {
-                if (combatAction.attacker.isPlayer() && ((Player)combatAction.attacker).isGuthanSetEffectActive() || combatAction.attacker.isNpc() && ((Npc)combatAction.attacker).getDefinition().getId() == 2027) {
-                    combatAction.hitDefinition.setSpecialEffectId(7);
-                } else if (combatAction.attacker.isPlayer() && ((Player)combatAction.attacker).isToragSetEffectActive() || combatAction.attacker.isNpc() && ((Npc)combatAction.attacker).getDefinition().getId() == 2029) {
-                    combatAction.hitDefinition.setSpecialEffectId(8);
-                } else if (combatAction.attacker.isPlayer() && ((Player)combatAction.attacker).isAhrimSetEffectActive() || combatAction.attacker.isNpc() && ((Npc)combatAction.attacker).getDefinition().getId() == 2025) {
-                    combatAction.hitDefinition.setSpecialEffectId(9);
-                } else if (combatAction.attacker.isPlayer() && ((Player)combatAction.attacker).isKarilSetEffectActive() || combatAction.attacker.isNpc() && ((Npc)combatAction.attacker).getDefinition().getId() == 2028) {
-                    combatAction.hitDefinition.setSpecialEffectId(10);
-                } else if ((combatAction.attacker.isPlayer() && ((Player)combatAction.attacker).isVeracSetEffectActive()
-                        || combatAction.attacker.isNpc() && ((Npc)combatAction.attacker).getNpcId() == 2030)
-                        && combatAction.hitDefinition.getAttackStyle().getCombatType() == CombatType.MELEE) {
-                    combatAction.hitDefinition.setSpecialEffectId(11);
-                }
+            // A one-in-four chance on eligible brother / full-set attacks.
+            // The selector also prevents wrong-style and unrelated-NPC procs.
+            int barrowsEffectId = BarrowsSpecialEffect.selectEffectId(
+                    combatAction.attacker,
+                    combatAction.hitDefinition.getAttackStyle().getCombatType(),
+                    GameUtil.randomInclusive(BarrowsSpecialEffect.PROC_ROLL_MAX_INCLUSIVE));
+            if (barrowsEffectId != -1) {
+                combatAction.hitDefinition.setSpecialEffectId(barrowsEffectId);
             }
             if (combatAction.attacker != null && (combatAction.attacker.isPlayer() && ((Player)combatAction.attacker).isDharokSetEffectActive() || combatAction.attacker.isNpc() && ((Npc)combatAction.attacker).getDefinition().getId() == 2026)) {
                 value4 = combatAction.attacker.getMaxHitpoints();
