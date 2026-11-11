@@ -113,7 +113,10 @@ public final class BarrowsHistoricalPuzzleChecks {
                 BarrowsManager.generateTunnelRoute(player, false);
                 int after = BarrowsManager.findOpenPuzzleDoorBit(player.configStates[452]);
                 require(isCentralDoor(after), "Reroute lost or duplicated the puzzle door");
-                require(after != before, "Wrong answer can leave puzzle door unchanged");
+                require(after != before, "Wrong answer can leave puzzle door unchanged"
+                        + " iteration=" + iteration + " reroll=" + reroll
+                        + " previous=" + before + " selected=" + after
+                        + " routeConfig=" + player.configStates[452]);
                 require(!player.barrowsDoorPuzzleSolved, "Reroute retained solved state");
                 before = after;
             }
