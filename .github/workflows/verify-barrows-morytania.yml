@@ -30,6 +30,7 @@ on:
       - 'Server/src/test/java/VeracsDefilerCombatChecks.java'
       - 'Server/src/test/java/BarrowsEquipmentDurabilityChecks.java'
       - 'Server/src/test/java/BarrowsRepairChecks.java'
+      - 'Server/src/test/java/com/rs2/model/gameplay/barrows/BarrowsChestRewardChecks.java'
       - '.github/workflows/verify-barrows-morytania.yml'
   workflow_dispatch:
 
@@ -96,3 +97,9 @@ jobs:
           javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
             src/test/java/BarrowsRepairChecks.java
           java -cp 'barrows-test-classes:lib/*' BarrowsRepairChecks
+      - name: Verify 2006 Barrows chest loot delivery and one-time rewards
+        working-directory: Server
+        run: |
+          javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
+            src/test/java/com/rs2/model/gameplay/barrows/BarrowsChestRewardChecks.java
+          java -cp 'barrows-test-classes:lib/*' com.rs2.model.gameplay.barrows.BarrowsChestRewardChecks
