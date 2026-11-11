@@ -51,3 +51,9 @@ jobs:
             src/test/java/Barrows443PuzzleInterfaceChecks.java
           java -cp 'barrows-test-classes:lib/*' MorytaniaBarrowsInteractionChecks
           java -cp 'barrows-test-classes:lib/*' Barrows443PuzzleInterfaceChecks
+      - name: Audit Barrows NPC spawns against native collision and combat definitions
+        working-directory: Server
+        run: |
+          javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
+            src/test/java/BarrowsNpcSpawnAuditChecks.java
+          java -cp 'barrows-test-classes:lib/*' BarrowsNpcSpawnAuditChecks
