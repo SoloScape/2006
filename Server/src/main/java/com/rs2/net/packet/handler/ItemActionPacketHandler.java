@@ -26,6 +26,7 @@ import com.rs2.model.combat.hit.HitDefinition;
 import com.rs2.model.combat.hit.HitType;
 import com.rs2.model.dialogue.DialogueManager;
 import com.rs2.model.gameplay.barrows.BarrowsManager;
+import com.rs2.model.gameplay.barrows.BarrowsTomeHandler;
 import com.rs2.model.gameplay.castlewars.CastleWarsEngineeringManager;
 import com.rs2.model.gameplay.castlewars.CastleWarsManager;
 import com.rs2.model.gameplay.magetrainingarena.MageTrainingArenaRewardShop;
@@ -1880,6 +1881,9 @@ implements PacketHandler {
             return;
         }
         if (player.getQuestManager().handleInventoryItemFirstOption(interfaceId, itemId)) {
+            return;
+        }
+        if (BarrowsTomeHandler.read(player, itemId)) {
             return;
         }
         if (BirdNestSearchHandler.searchNest(player, itemId)) {
