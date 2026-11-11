@@ -20,7 +20,10 @@ extends TickTask {
             this.stop();
             return;
         }
-        if (!this.player.barrowsChestOpened) {
+        // Climbing into the crypt leaves the Barrows X/Y region but changes
+        // plane. Collapse damage must not continue in the crypt above.
+        if (!this.player.barrowsChestOpened
+                || !com.rs2.model.gameplay.barrows.BarrowsManager.isInBarrowsTunnels(this.player)) {
             this.stop();
             return;
         }
