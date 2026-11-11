@@ -29,6 +29,7 @@ on:
       - 'Server/src/test/java/BarrowsBrotherSpecialCombatChecks.java'
       - 'Server/src/test/java/VeracsDefilerCombatChecks.java'
       - 'Server/src/test/java/BarrowsEquipmentDurabilityChecks.java'
+      - 'Server/src/test/java/BarrowsRepairChecks.java'
       - '.github/workflows/verify-barrows-morytania.yml'
   workflow_dispatch:
 
@@ -89,3 +90,9 @@ jobs:
           javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
             src/test/java/BarrowsEquipmentDurabilityChecks.java
           java -cp 'barrows-test-classes:lib/*' BarrowsEquipmentDurabilityChecks
+      - name: Verify historical Barrows repair NPCs and partial/full prices
+        working-directory: Server
+        run: |
+          javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
+            src/test/java/BarrowsRepairChecks.java
+          java -cp 'barrows-test-classes:lib/*' BarrowsRepairChecks
