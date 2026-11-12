@@ -3,6 +3,9 @@ import com.rs2.model.World;
 import com.rs2.model.gameplay.castlewars.CastleWarsEngineeringManager;
 import com.rs2.model.gameplay.castlewars.CastleWarsManager;
 import com.rs2.model.item.ItemStack;
+import com.rs2.model.objects.ObjectDefinition;
+import com.rs2.util.path.WalkingCollisionMap;
+import com.rs2.util.path.ProjectileCollisionMap;
 import com.rs2.model.player.Player;
 import com.rs2.model.task.CycleEventHandler;
 
@@ -13,6 +16,11 @@ import java.util.Map;
 public final class CastleWarsRockslideMiningChecks {
     @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
+        // Rockslide state changes call dynamic-object collision against the
+        // actual 443 cache; a standalone test must load that cache first.
+        ObjectDefinition.loadRevision443();
+        WalkingCollisionMap.loadCollisionMaps();
+        ProjectileCollisionMap.loadCollisionMaps();
         Player player = new Player(null);
         player.isBot = true; // Standalone regression has no network session.
         player.setIndex(1);
