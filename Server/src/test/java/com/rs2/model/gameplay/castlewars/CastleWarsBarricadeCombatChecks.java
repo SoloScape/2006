@@ -15,7 +15,7 @@ public final class CastleWarsBarricadeCombatChecks {
 
         BarricadeState state = new BarricadeState(CastleWarsManager.Team.SARADOMIN,
                 new Position(2400, 3100, 0),
-                CastleWarsEngineeringManager.BARRICADE_OBJECT_SARADOMIN);
+                CastleWarsEngineeringManager.BARRICADE_OBJECT_UNLIT);
         require(state.getHitpoints() == 50, "New barricades start at 50 HP");
         require(state.takeDamage(0) == 50, "Zero hits must not damage barricades");
         require(state.takeDamage(-10) == 50, "Negative hits must not heal barricades");
