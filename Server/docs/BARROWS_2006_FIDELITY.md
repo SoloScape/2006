@@ -96,3 +96,10 @@ Do not adjust these to speculative values without contemporary primary evidence 
 ## Testing
 
 The push-triggered `.github/workflows/verify-barrows-morytania.yml` compiles the Java server with JDK 8 and runs Barrows and associated Morytania regression checks. Use the Actions run for the actual branch commit when reporting CI status.
+
+## 12 November 2026 Strange Old Man surface movement correction
+
+- The original Strange Old Man (native revision-443 ID `2024`) is kept as one surface NPC. `ExtraNpcSpawns.load()` now skips duplicate homes even after an NPC wanders away, including second copies of ID 2024 anywhere in the Barrows surface area.
+- The Old Man uses a six-stop collision-aware `PathFinder` route derived from `BarrowsManager`'s six mound locations, with short digging-animation pauses at reached stops instead of the generic five-tile spawn-radius roaming.
+- `Barrows2006RestorationChecks` checks repeated NPC loading after the Old Man moves and checks the six paths over the native 443 collision map.
+- **Historical caution:** the specific patrol order, wait times and digging animation selection are reconstructions. They should be compared with 2006 capture footage before being described as exact original NPC behaviour.

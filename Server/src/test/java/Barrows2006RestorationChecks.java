@@ -6,6 +6,7 @@ import com.rs2.model.combat.CombatCycleEvent;
 import com.rs2.model.dialogue.BarrowsNpcDialogues;
 import com.rs2.model.dialogue.DialogueManager;
 import com.rs2.model.gameplay.barrows.BarrowsManager;
+import com.rs2.model.gameplay.barrows.BarrowsOldManPatrol;
 import com.rs2.model.item.DegradableEquipmentHandler;
 import com.rs2.model.item.ItemDefinition;
 import com.rs2.model.npc.ExtraNpcSpawns;
@@ -16,6 +17,7 @@ import com.rs2.model.objects.ObjectManager;
 import com.rs2.model.player.Player;
 import com.rs2.model.quest.QuestDefinition;
 import com.rs2.util.path.WalkingCollisionMap;
+import com.rs2.util.path.PathFinder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashSet;
@@ -44,6 +46,7 @@ public final class Barrows2006RestorationChecks {
             checkMembershipGate();
             checkCombatWearStopsAfterLeaving();
             checkNative2006NpcAndSpawnData();
+            checkStrangeOldManPatrolRouting();
             System.out.println("Barrows restoration: fresh-run randomisation, independent "
                     + "two-player combat/credit/chest, members entry, post-combat wear, "
                     + "original NPCs and native spade removal passed.");
@@ -358,6 +361,30 @@ public final class Barrows2006RestorationChecks {
         require(tome == 1, "Original 2005 crumbling tome table spawn was lost");
         require(spades == 0, "Post-2006 two-spade building spawn was not removed");
         ExtraNpcSpawns.load();
+        Npc originalMan = null;
+        for (Npc npc : World.getNpcs()) {
+            if (npc != null && npc.getNpcId() == 2024
+                    && npc.getSpawnPosition() != null
+                    && npc.getSpawnPosition().getX() == 3566
+                    && npc.getSpawnPosition().getY() == 3290) {
+                originalMan = npc;
+                break;
+            }
+        }
+        require(originalMan != null, "Strange Old Man missing before spawn deduplication test");
+        // A second load must not duplicate a roaming NPC whose current tile
+        // no longer matches its CSV home tile.
+        originalMan.moveTo(new Position(3557, 3298, 0));
+        ExtraNpcSpawns.load();
+        int surfaceOldMen = 0;
+        for (Npc npc : World.getNpcs()) {
+            if (npc != null && npc.getNpcId() == 2024
+                    && BarrowsOldManPatrol.isBarrowsSurface(npc.getSpawnPosition())) {
+                surfaceOldMen++;
+            }
+        }
+        require(surfaceOldMen == 1, "Duplicate Strange Old Man at Barrows: " + surfaceOldMen);
+        originalMan.moveTo(new Position(3566, 3290, 0));
         boolean foundMan = false, foundSquire = false;
         for (Npc npc : World.getNpcs()) {
             if (npc == null) continue;
@@ -380,6 +407,41 @@ public final class Barrows2006RestorationChecks {
         require(unpreparedVisitor.getDialogueManager().getDialogueStep() == 1,
                 "With-spade dialogue should proceed to the four 2006 conversation variants");
         checkOldManConversationFlow(unpreparedVisitor);
+    }
+
+
+    private static void checkStrangeOldManPatrolRouting() {
+        // These six destinations correspond to BarrowsManager's six surface
+        // digging rectangles. Changes must not silently regress to one mound.
+        int[][] expected = {
+            {3557, 3298}, {3553, 3283}, {3565, 3276},
+            {3578, 3284}, {3574, 3298}, {3565, 3290}
+        };
+        require(BarrowsOldManPatrol.moundCount() == expected.length,
+                "Strange Old Man patrol does not cover all six mounds");
+        Npc scout = new Npc(2024);
+        scout.setPosition(new Position(3566, 3290, 0));
+        scout.setSize(1);
+        for (int i = 0; i < expected.length; i++) {
+            Position target = BarrowsOldManPatrol.moundTarget(i);
+            require(target.getX() == expected[i][0] && target.getY() == expected[i][1],
+                    "Unexpected Old Man patrol mound " + i);
+            require(PathFinder.findPath(scout, target.getX(), target.getY(), true, 1, 1),
+                    "No collision-safe path to Old Man patrol mound " + i);
+            int endX = scout.getPosition().getX();
+            int endY = scout.getPosition().getY();
+            if (!scout.getMovementQueue().getSteps().isEmpty()) {
+                com.rs2.model.MovementStep last =
+                        (com.rs2.model.MovementStep) scout.getMovementQueue().getSteps().getLast();
+                endX = last.getX();
+                endY = last.getY();
+            }
+            require(Math.max(Math.abs(endX - target.getX()),
+                    Math.abs(endY - target.getY())) <= 10,
+                    "Barrows patrol cannot approach mound " + i);
+            scout.setPosition(new Position(endX, endY, 0));
+            scout.getMovementQueue().clear();
+        }
     }
 
     private static void checkOldManConversationFlow(Player visitor) {

@@ -12,6 +12,7 @@ import com.rs2.model.clue.ClueKeyHandler;
 import com.rs2.model.combat.CombatType;
 import com.rs2.model.combat.hit.HitType;
 import com.rs2.model.gameplay.abyss.AbyssManager;
+import com.rs2.model.gameplay.barrows.BarrowsOldManPatrol;
 import com.rs2.model.gameplay.partyroom.PartyRoomManager;
 import com.rs2.model.ground.GroundItem;
 import com.rs2.model.ground.GroundItemManager;
@@ -273,6 +274,9 @@ extends Entity {
                                     entityUpdateState.setFacePosition(position);
                                     break processControlExit6;
                                 }
+                                // The Strange Old Man follows a collision-safe tour of the six mounds.
+                                // Generic five-tile roaming keeps him stuck at the middle mound.
+                                if (BarrowsOldManPatrol.process(npc2)) break processControlExit6;
                                 if (npc2.isMovementLocked() || npc2.isStunned() || !GameUtil.rollChance(0.26)) break processControlExit6;
                                 if (!World.hasNearbyNonBotPlayer(npc2)) break processControlExit3;
                                 int x = npc2.spawnMinPosition.getX();
