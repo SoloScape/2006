@@ -21,7 +21,7 @@ SVG = ROOT / "docs" / "roadmap-progress.svg"
 
 START = "<!-- roadmap-progress:start -->"
 END = "<!-- roadmap-progress:end -->"
-ROW = re.compile(r"^\|\s*[^|\n]+\s*\|\s*(✅|🚧|⛔|➖)\s*\|\s*$", re.MULTILINE)
+ROW = re.compile(r"^\|\s*[^|\n]+\s*\|\s*(✅|📜|➖)\s*\|\s*$", re.MULTILINE)
 
 
 def build_progress(readme: str) -> tuple[str, str, int, int, str]:
