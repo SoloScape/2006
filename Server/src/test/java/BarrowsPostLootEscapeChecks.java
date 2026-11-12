@@ -20,6 +20,12 @@ import java.util.ArrayDeque;
 public final class BarrowsPostLootEscapeChecks {
     public static void main(String[] args) throws Exception {
         ServerSettings.clientBuild = 443;
+        require(com.rs2.model.player.BarrowsChestDamageTask.COLLAPSE_INTERVAL_TICKS == 50,
+                "Preserved chest collapse interval changed");
+        require(com.rs2.model.player.BarrowsChestDamageTask.MAX_COLLAPSE_DAMAGE == 5,
+                "Preserved chest collapse maximum damage changed");
+        require(com.rs2.model.player.BarrowsChestDamageTask.ROCKFALL_GRAPHIC_ID == 60,
+                "Native chest collapse graphic changed");
         testTunnelVsCryptCoordinates();
         testPostLootCollapsePreservesEscapePath();
         testExitViaLadderEndsCollapseAndResetsRun();
