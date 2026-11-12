@@ -68,38 +68,38 @@ Progress counts ✅ entries across all roadmap categories, including optional pl
 
 The goal is the **18 December 2006 / revision 443** experience. Open a category below to see its items and their current tracker statuses.
 
-**Status key:** ✅ Complete (Accurate as possible) · 🚧 Code Exists · ⛔ No Code Exists · ➖ Outside the December 2006 scope
+**Status key:** ✅ Complete (Accurate as possible) · 📜 Needs Audit · ➖ Outside the December 2006 scope
 
-Statuses are provisional: a quest, feature or activity may have code without a fully tested gameplay loop. Items marked ⛔ may still have partial implementations.
+📜 means the item needs an audit, whether code exists or not. A ✅ status reflects the roadmap's current assessment, not independent verification.
 
 <details>
 <summary><strong>Skills & combat</strong></summary>
 
 | Name | Status |
 | :--- | :---: |
-| Woodcutting | 🚧 |
-| Mining | ⛔ |
-| Agility | ⛔ |
-| Smithing | ⛔ |
-| Herblore | ⛔ |
-| Fishing | ⛔ |
-| Thieving | ⛔ |
-| Cooking | ⛔ |
-| Crafting | ⛔ |
-| Firemaking | ⛔ |
-| Fletching | ⛔ |
-| Runecrafting | ⛔ |
-| Slayer | ⛔ |
-| Farming | ⛔ |
-| Construction | ⛔ |
-| Hunter | ⛔ |
-| Prayer | ⛔ |
-| Magic | ⛔ |
-| Ranged | ⛔ |
-| Attack | ⛔ |
-| Strength | ⛔ |
-| Defence | ⛔ |
-| Hitpoints | ⛔ |
+| Woodcutting | 📜 |
+| Mining | 📜 |
+| Agility | 📜 |
+| Smithing | 📜 |
+| Herblore | 📜 |
+| Fishing | 📜 |
+| Thieving | 📜 |
+| Cooking | 📜 |
+| Crafting | 📜 |
+| Firemaking | 📜 |
+| Fletching | 📜 |
+| Runecrafting | 📜 |
+| Slayer | 📜 |
+| Farming | 📜 |
+| Construction | 📜 |
+| Hunter | 📜 |
+| Prayer | 📜 |
+| Magic | 📜 |
+| Ranged | 📜 |
+| Attack | 📜 |
+| Strength | 📜 |
+| Defence | 📜 |
+| Hitpoints | 📜 |
 
 </details>
 
@@ -108,13 +108,13 @@ Statuses are provisional: a quest, feature or activity may have code without a f
 
 | Name | Status |
 | :--- | :---: |
-| King Black Dragon | 🚧 |
-| Kalphite Queen | 🚧 |
-| Barrows brothers | 🚧 |
-| TzTok-Jad (Fight Caves) | 🚧 |
-| Dagannoth Kings | ⛔ |
-| Chaos Elemental | ⛔ |
-| Giant Mole / Wyson rewards | ⛔ |
+| King Black Dragon | 📜 |
+| Kalphite Queen | 📜 |
+| Barrows brothers | 📜 |
+| TzTok-Jad (Fight Caves) | 📜 |
+| Dagannoth Kings | 📜 |
+| Chaos Elemental | 📜 |
+| Giant Mole / Wyson rewards | 📜 |
 
 </details>
 
@@ -123,24 +123,24 @@ Statuses are provisional: a quest, feature or activity may have code without a f
 
 | Name | Status |
 | :--- | :---: |
-| Black Knights' Fortress | 🚧 |
-| Cook's Assistant | 🚧 |
-| Demon Slayer | 🚧 |
-| Doric's Quest | 🚧 |
-| Dragon Slayer | 🚧 |
-| Ernest the Chicken | 🚧 |
-| Goblin Diplomacy | 🚧 |
-| Imp Catcher | 🚧 |
-| The Knight's Sword | 🚧 |
-| Pirate's Treasure | 🚧 |
-| Prince Ali Rescue | 🚧 |
-| The Restless Ghost | 🚧 |
-| Romeo & Juliet | 🚧 |
-| Rune Mysteries | 🚧 |
-| Sheep Shearer | 🚧 |
-| Shield of Arrav | 🚧 |
-| Vampire Slayer | 🚧 |
-| Witch's Potion | 🚧 |
+| Black Knights' Fortress | 📜 |
+| Cook's Assistant | 📜 |
+| Demon Slayer | 📜 |
+| Doric's Quest | 📜 |
+| Dragon Slayer | 📜 |
+| Ernest the Chicken | 📜 |
+| Goblin Diplomacy | 📜 |
+| Imp Catcher | 📜 |
+| The Knight's Sword | 📜 |
+| Pirate's Treasure | 📜 |
+| Prince Ali Rescue | 📜 |
+| The Restless Ghost | 📜 |
+| Romeo & Juliet | 📜 |
+| Rune Mysteries | 📜 |
+| Sheep Shearer | 📜 |
+| Shield of Arrav | 📜 |
+| Vampire Slayer | 📜 |
+| Witch's Potion | 📜 |
 
 </details>
 
@@ -149,104 +149,104 @@ Statuses are provisional: a quest, feature or activity may have code without a f
 
 | Name | Status |
 | :--- | :---: |
-| Animal Magnetism | 🚧 |
-| Between a Rock... | 🚧 |
-| Big Chompy Bird Hunting | 🚧 |
-| Biohazard | 🚧 |
-| Cabin Fever | 🚧 |
+| Animal Magnetism | 📜 |
+| Between a Rock... | 📜 |
+| Big Chompy Bird Hunting | 📜 |
+| Biohazard | 📜 |
+| Cabin Fever | 📜 |
 | Clock Tower | ✅ |
-| Creature of Fenkenstrain | 🚧 |
-| Darkness of Hallowvale | 🚧 |
-| Death Plateau | 🚧 |
-| Death to the Dorgeshuun | 🚧 |
-| Desert Treasure | 🚧 |
-| Devious Minds | 🚧 |
-| The Dig Site | 🚧 |
-| Druidic Ritual | 🚧 |
-| Dwarf Cannon | 🚧 |
-| Eadgar's Ruse | 🚧 |
-| Eagles' Peak | 🚧 |
-| Elemental Workshop | 🚧 |
-| Elemental Workshop II | 🚧 |
-| Enakhra's Lament | 🚧 |
-| Enlightened Journey | 🚧 |
-| The Eyes of Glouphrie | 🚧 |
-| Fairy Tale I — Growing Pains | 🚧 |
-| Fairy Tale II — Cure a Queen | 🚧 |
-| Family Crest | 🚧 |
-| The Feud | 🚧 |
-| Fight Arena | 🚧 |
-| Fishing Contest | 🚧 |
-| Forgettable Tale of a Drunken Dwarf | 🚧 |
-| The Fremennik Trials | 🚧 |
-| Garden of Tranquillity | 🚧 |
-| Gertrude's Cat | 🚧 |
-| Ghosts Ahoy | 🚧 |
-| The Giant Dwarf | 🚧 |
-| The Golem | 🚧 |
-| The Grand Tree | 🚧 |
-| The Hand in the Sand | 🚧 |
-| Haunted Mine | 🚧 |
-| Hazeel Cult | 🚧 |
-| Heroes' Quest | 🚧 |
-| Holy Grail | 🚧 |
-| Horror from the Deep | 🚧 |
-| Icthlarin's Little Helper | 🚧 |
-| In Aid of the Myreque | 🚧 |
-| In Search of the Myreque | 🚧 |
-| Jungle Potion | 🚧 |
-| Legends' Quest | 🚧 |
-| Lost City | 🚧 |
-| The Lost Tribe | 🚧 |
-| Lunar Diplomacy | 🚧 |
-| Making History | 🚧 |
-| Merlin's Crystal | 🚧 |
+| Creature of Fenkenstrain | 📜 |
+| Darkness of Hallowvale | 📜 |
+| Death Plateau | 📜 |
+| Death to the Dorgeshuun | 📜 |
+| Desert Treasure | 📜 |
+| Devious Minds | 📜 |
+| The Dig Site | 📜 |
+| Druidic Ritual | 📜 |
+| Dwarf Cannon | 📜 |
+| Eadgar's Ruse | 📜 |
+| Eagles' Peak | 📜 |
+| Elemental Workshop | 📜 |
+| Elemental Workshop II | 📜 |
+| Enakhra's Lament | 📜 |
+| Enlightened Journey | 📜 |
+| The Eyes of Glouphrie | 📜 |
+| Fairy Tale I — Growing Pains | 📜 |
+| Fairy Tale II — Cure a Queen | 📜 |
+| Family Crest | 📜 |
+| The Feud | 📜 |
+| Fight Arena | 📜 |
+| Fishing Contest | 📜 |
+| Forgettable Tale of a Drunken Dwarf | 📜 |
+| The Fremennik Trials | 📜 |
+| Garden of Tranquillity | 📜 |
+| Gertrude's Cat | 📜 |
+| Ghosts Ahoy | 📜 |
+| The Giant Dwarf | 📜 |
+| The Golem | 📜 |
+| The Grand Tree | 📜 |
+| The Hand in the Sand | 📜 |
+| Haunted Mine | 📜 |
+| Hazeel Cult | 📜 |
+| Heroes' Quest | 📜 |
+| Holy Grail | 📜 |
+| Horror from the Deep | 📜 |
+| Icthlarin's Little Helper | 📜 |
+| In Aid of the Myreque | 📜 |
+| In Search of the Myreque | 📜 |
+| Jungle Potion | 📜 |
+| Legends' Quest | 📜 |
+| Lost City | 📜 |
+| The Lost Tribe | 📜 |
+| Lunar Diplomacy | 📜 |
+| Making History | 📜 |
+| Merlin's Crystal | 📜 |
 | Monk's Friend | ✅ |
-| Monkey Madness | 🚧 |
-| Mountain Daughter | 🚧 |
-| Mourning's End Part I | 🚧 |
-| Mourning's End Part II | 🚧 |
-| Murder Mystery | 🚧 |
-| My Arm's Big Adventure | 🚧 |
-| Nature Spirit | 🚧 |
-| Observatory Quest | 🚧 |
-| One Small Favour | 🚧 |
+| Monkey Madness | 📜 |
+| Mountain Daughter | 📜 |
+| Mourning's End Part I | 📜 |
+| Mourning's End Part II | 📜 |
+| Murder Mystery | 📜 |
+| My Arm's Big Adventure | 📜 |
+| Nature Spirit | 📜 |
+| Observatory Quest | 📜 |
+| One Small Favour | 📜 |
 | Plague City | ✅ |
 | Priest in Peril | ✅ |
-| Rag and Bone Man | 🚧 |
-| Ratcatchers | 🚧 |
-| Recipe for Disaster | 🚧 |
-| Recruitment Drive | 🚧 |
-| Regicide | 🚧 |
-| Roving Elves | 🚧 |
-| Royal Trouble | 🚧 |
-| Rum Deal | 🚧 |
-| Scorpion Catcher | 🚧 |
-| Sea Slug | 🚧 |
-| Shades of Mort'ton | 🚧 |
-| Shadow of the Storm | 🚧 |
+| Rag and Bone Man | 📜 |
+| Ratcatchers | 📜 |
+| Recipe for Disaster | 📜 |
+| Recruitment Drive | 📜 |
+| Regicide | 📜 |
+| Roving Elves | 📜 |
+| Royal Trouble | 📜 |
+| Rum Deal | 📜 |
+| Scorpion Catcher | 📜 |
+| Sea Slug | 📜 |
+| Shades of Mort'ton | 📜 |
+| Shadow of the Storm | 📜 |
 | Sheep Herder | ✅ |
-| Shilo Village | 🚧 |
-| The Slug Menace | 🚧 |
-| A Soul's Bane | 🚧 |
-| Spirits of the Elid | 🚧 |
-| Swan Song | 🚧 |
-| Tai Bwo Wannai Trio | 🚧 |
-| A Tail of Two Cats | 🚧 |
-| Tears of Guthix | 🚧 |
-| Temple of Ikov | 🚧 |
-| Throne of Miscellania | 🚧 |
-| The Tourist Trap | 🚧 |
-| Tree Gnome Village | 🚧 |
-| Tribal Totem | 🚧 |
-| Troll Romance | 🚧 |
-| Troll Stronghold | 🚧 |
-| Underground Pass | 🚧 |
-| Wanted! | 🚧 |
-| Watchtower | 🚧 |
-| Waterfall Quest | 🚧 |
-| Witch's House | 🚧 |
-| Zogre Flesh Eaters | 🚧 |
+| Shilo Village | 📜 |
+| The Slug Menace | 📜 |
+| A Soul's Bane | 📜 |
+| Spirits of the Elid | 📜 |
+| Swan Song | 📜 |
+| Tai Bwo Wannai Trio | 📜 |
+| A Tail of Two Cats | 📜 |
+| Tears of Guthix | 📜 |
+| Temple of Ikov | 📜 |
+| Throne of Miscellania | 📜 |
+| The Tourist Trap | 📜 |
+| Tree Gnome Village | 📜 |
+| Tribal Totem | 📜 |
+| Troll Romance | 📜 |
+| Troll Stronghold | 📜 |
+| Underground Pass | 📜 |
+| Wanted! | 📜 |
+| Watchtower | 📜 |
+| Waterfall Quest | 📜 |
+| Witch's House | 📜 |
+| Zogre Flesh Eaters | 📜 |
 
 </details>
 
@@ -257,24 +257,24 @@ Statuses are provisional: a quest, feature or activity may have code without a f
 | :--- | :---: |
 | Barrows | ✅ |
 | Castle Wars | ✅ |
-| Duel Arena | 🚧 |
-| TzHaar Fight Caves | 🚧 |
-| Mage Training Arena | 🚧 |
-| Tai Bwo Wannai Cleanup | 🚧 |
-| Falador Party Room | 🚧 |
-| Pest Control | ⛔ |
-| TzHaar Fight Pits | ⛔ |
-| Pyramid Plunder | ⛔ |
-| Rogues' Den | ⛔ |
-| Trouble Brewing | ⛔ |
-| Temple Trekking | ⛔ |
-| Blast Furnace | ⛔ |
-| Fishing Trawler | ⛔ |
-| Rat Pits | ⛔ |
-| Stronghold of Security | ⛔ |
-| Warriors' Guild | ⛔ |
-| Brimhaven Agility Arena | ⛔ |
-| Gnome Restaurant | ⛔ |
+| Duel Arena | 📜 |
+| TzHaar Fight Caves | 📜 |
+| Mage Training Arena | 📜 |
+| Tai Bwo Wannai Cleanup | 📜 |
+| Falador Party Room | 📜 |
+| Pest Control | 📜 |
+| TzHaar Fight Pits | 📜 |
+| Pyramid Plunder | 📜 |
+| Rogues' Den | 📜 |
+| Trouble Brewing | 📜 |
+| Temple Trekking | 📜 |
+| Blast Furnace | 📜 |
+| Fishing Trawler | 📜 |
+| Rat Pits | 📜 |
+| Stronghold of Security | 📜 |
+| Warriors' Guild | 📜 |
+| Brimhaven Agility Arena | 📜 |
+| Gnome Restaurant | 📜 |
 
 </details>
 
@@ -283,24 +283,24 @@ Statuses are provisional: a quest, feature or activity may have code without a f
 
 | Name | Status |
 | :--- | :---: |
-| Melee / Ranged / Magic combat | 🚧 |
-| PvP / Wilderness combat | 🚧 |
-| Prayer & special attacks | 🚧 |
-| NPC combat and drops | 🚧 |
-| Player trading | 🚧 |
-| Banking & equipment | 🚧 |
-| Shops & prices | 🚧 |
-| Treasure Trails / clue scrolls | 🚧 |
-| Random events | 🚧 |
-| Slayer masters & tasks | 🚧 |
-| NPC dialogue & world interactions | 🚧 |
-| Quest progression & rewards | 🚧 |
-| Movement, teleports & travel | 🚧 |
-| 2006 Christmas rescue | 🚧 |
-| Fairy rings | ⛔ |
-| Player-owned houses (POH) | ⛔ |
-| 2006 skill tutors | ⛔ |
-| Capes of Accomplishment | ⛔ |
+| Melee / Ranged / Magic combat | 📜 |
+| PvP / Wilderness combat | 📜 |
+| Prayer & special attacks | 📜 |
+| NPC combat and drops | 📜 |
+| Player trading | 📜 |
+| Banking & equipment | 📜 |
+| Shops & prices | 📜 |
+| Treasure Trails / clue scrolls | 📜 |
+| Random events | 📜 |
+| Slayer masters & tasks | 📜 |
+| NPC dialogue & world interactions | 📜 |
+| Quest progression & rewards | 📜 |
+| Movement, teleports & travel | 📜 |
+| 2006 Christmas rescue | 📜 |
+| Fairy rings | 📜 |
+| Player-owned houses (POH) | 📜 |
+| 2006 skill tutors | 📜 |
+| Capes of Accomplishment | 📜 |
 | Modern bank tabs (released 2008) | ➖ |
 | God Wars Dungeon (released 2007) | ➖ |
 | Modern Ironman modes | ➖ |
