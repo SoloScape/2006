@@ -7,8 +7,10 @@ import com.rs2.model.player.InventoryManager;
 import com.rs2.model.player.Player;
 
 public final class BarrowsRepairHandler {
-    // Bob, Dunstan, Tindel Marchant and the Void Knight Squire (April 2006).
-    private static final int[] repairNpcIds = {519, 1082, 1799, 1766};
+    // Bob, Dunstan, Tindel Marchant, and the Void Knight repair Squire.
+    // Revision-443 cache ID 3795 corresponds to historical/OSRS ID 1766;
+    // NPC 1766 in this cache is a Cow calf and must never accept repairs.
+    private static final int[] repairNpcIds = {519, 1082, 1799, 3795};
     public static final int ARMOUR_STAND_OBJECT_ID = 6802;
     private final int repairedItemId;
     private final int baseDegradedItemId;
