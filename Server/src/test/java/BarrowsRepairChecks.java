@@ -96,10 +96,20 @@ public final class BarrowsRepairChecks {
     private static void audit443SquireSpawnsAndArmourStand() throws Exception {
         ObjectDefinition.loadRevision443();
         ObjectDefinition stand = ObjectDefinition.forId(6802);
+        System.out.println("443 object 6802 is named: " + (stand == null ? "<missing>" : stand.name));
+        for (ObjectDefinition candidate : ObjectDefinition.definitionsById) {
+            if (candidate == null || candidate.name == null) continue;
+            String name = candidate.name.toLowerCase();
+            if ((name.contains("armour") && name.contains("stand"))
+                    || name.contains("repair stand")) {
+                System.out.println("443 armour stand candidate id="
+                        + candidate.getObjectId() + " name=" + candidate.name);
+            }
+        }
         require(stand != null && stand.name != null
                         && stand.name.toLowerCase().contains("armour"),
-                "Native revision-443 object 6802 is not the armour stand");
-        System.out.println("443 armour stand 6802: " + stand.name);
+                "Native revision-443 object 6802 is not the armour stand; found: "
+                        + (stand == null ? "<missing>" : stand.name));
 
         byte[] spawns = Files.readAllBytes(Paths.get("data/npcs/Npc spawn.dat"));
         int count = unsignedShort(spawns, 1);
