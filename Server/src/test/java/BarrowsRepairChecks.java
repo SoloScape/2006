@@ -62,8 +62,10 @@ public final class BarrowsRepairChecks {
         require("Tindel Marchant".equalsIgnoreCase(NpcDefinition.forId(1799).getName()),
                 "NPC 1799 must be Tindel Marchant");
 
-        require(NpcDefinition.forId(1766).getName().toLowerCase().contains("squire"),
-                "NPC 1766 must be the Void Knights' Squire");
+        String squireName = NpcDefinition.forId(1766).getName();
+        System.out.println("Void Knight repair NPC 1766 cache name: " + squireName);
+        require(squireName.toLowerCase().contains("squire"),
+                "NPC 1766 expected Squire but cache returned: " + squireName);
 
         Player player = player();
         ItemStack damaged = new ItemStack(DEGRADED[0] + 4, 1, -1);
