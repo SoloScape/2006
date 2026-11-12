@@ -35,11 +35,25 @@ public final class CastleWarsCentreTowerMapAudit {
                 if (x >= 2386 && x <= 2414 && y >= 3088 && y <= 3120) {
                     ObjectDefinition def = ObjectDefinition.forId(objectId);
                     String name = def == null ? "?" : def.getName();
-                    if (plane != 0 || name.toLowerCase().contains("stair")
-                            || name.toLowerCase().contains("ladder")
-                            || name.toLowerCase().contains("tower")) {
+                    if (plane != 0 || x >= 2393 && x <= 2406
+                            && y >= 3097 && y <= 3110) {
                         System.out.println("CENTRE-OBJ "+x+" "+y+" "+plane
                                 +" id="+objectId+" type="+(info >> 2)+" orient="+(info & 3)+" name="+name);
+                    }
+                }
+            }
+        }
+        MapDataReader terrain = new MapDataReader(region.terrain);
+        int[][][] tileSettings = new int[4][64][64];
+        for (int plane = 0; plane < 4; ++plane) {
+            for (int lx = 0; lx < 64; ++lx) {
+                for (int ly = 0; ly < 64; ++ly) {
+                    while (true) {
+                        int opcode = terrain.readUnsignedByte();
+                        if (opcode == 0) break;
+                        if (opcode == 1) {terrain.skipByte(1); break;}
+                        if (opcode <= 49) {terrain.skipByte(1); continue;}
+                        if (opcode <= 81) tileSettings[plane][lx][ly] = opcode - 49;
                     }
                 }
             }
@@ -58,6 +72,15 @@ public final class CastleWarsCentreTowerMapAudit {
                             : w!=0 ? 'c' : p!=0 ? 'p' : '.');
                 }
                 System.out.println("CENTRE-MAP "+plane+" y="+y+" "+row.toString());
+                if (plane == 1) {
+                    StringBuilder settings = new StringBuilder();
+                    for (int x = 2387; x <= 2413; ++x) {
+                        int f = tileSettings[plane][x - 2368][y - 3072];
+                        settings.append((f & 2) != 0 ? 'B' : (f & 1) != 0 ? 'X'
+                                : f == 0 ? '.' : 'f');
+                    }
+                    System.out.println("CENTRE-FLAGS "+plane+" y="+y+" "+settings);
+                }
             }
         }
         System.out.println("CENTRE-RAW-REGION-AUDIT-PASSED");
