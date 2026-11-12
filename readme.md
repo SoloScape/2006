@@ -73,8 +73,6 @@ The goal is the **18 December 2006 / revision 443** experience. Open a category 
 ⛔ Partially Working
 📜 Needs Audit
 
-📜 means the item needs an audit, whether code exists or not. A ✅ status reflects the roadmap's current assessment, not independent verification.
-
 <details>
 <summary><strong>Skills & combat</strong></summary>
 
