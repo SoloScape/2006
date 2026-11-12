@@ -10,14 +10,14 @@ import java.util.Arrays;
 
 /**
  * Exhaustive 128-roll check of the historical Barrows door monster table,
- * undefeated-brother selection, and chest/door duplication prevention.
+ * undefeated-brother selection, authentic 2006 tunnel-door duplicates,
+ * and independent chest/sarcophagus duplicate guards.
  */
 public final class BarrowsTunnelEncounterChecks {
     public static void main(String[] args) throws Exception {
         ServerSettings.clientBuild = 443;
         NpcDefinition.loadDefinitions();
-        int[] allBrothers = BarrowsTunnelEncounter.eligibleBrothers(
-                new boolean[6], new boolean[6]);
+        int[] allBrothers = BarrowsTunnelEncounter.eligibleBrothers(new boolean[6]);
         require(allBrothers.length == 6, "All six undefeated brothers should be eligible");
         require(Arrays.equals(allBrothers, new int[] {2030, 2029, 2028, 2027, 2026, 2025}),
                 "Brother order no longer agrees with BarrowsManager");
@@ -50,28 +50,32 @@ public final class BarrowsTunnelEncounterChecks {
         }
 
         boolean[] killed = {true, false, true, true, false, true};
-        boolean[] active = {false, false, false, false, true, false};
-        int[] eligible = BarrowsTunnelEncounter.eligibleBrothers(killed, active);
-        require(Arrays.equals(eligible, new int[] {2029}),
-                "Only the unbeaten, unsummoned brother should remain eligible");
-        require(BarrowsTunnelEncounter.npcForRoll(0, 0, 0, eligible) == 2029,
-                "Ambush roll chose an ineligible brother");
-        require(BarrowsTunnelEncounter.eligibleBrothers(
-                new boolean[6], new boolean[] {true, true, true, true, true, true}).length == 0,
-                "Already-active brothers must not be duplicated");
+        int[] eligible = BarrowsTunnelEncounter.eligibleBrothers(killed);
+        require(Arrays.equals(eligible, new int[] {2029, 2026}),
+                "All unbeaten brothers should be eligible, regardless of living copies");
+        require(BarrowsTunnelEncounter.npcForRoll(0, 0, 0, eligible) == 2029
+                        && BarrowsTunnelEncounter.npcForRoll(0, 0, 1, eligible) == 2026,
+                "Ambush roll selected a defeated brother or excluded another unbeaten brother");
+
+        // Deliberately reproduce the historical bug: even if all six brothers
+        // already have living copies nearby, no *undefeated* one is removed.
+        int[] withLivingCopies = BarrowsTunnelEncounter.eligibleBrothers(new boolean[6]);
+        require(Arrays.equals(withLivingCopies, allBrothers),
+                "Existing live brothers must not suppress another 2006 tunnel ambush");
 
         int[] none = BarrowsTunnelEncounter.eligibleBrothers(
-                new boolean[] {true, true, true, true, true, true}, new boolean[6]);
+                new boolean[] {true, true, true, true, true, true});
         for (int roll = 0; roll < 12; roll++) {
             int id = BarrowsTunnelEncounter.npcForRoll(roll, roll % 2, 0, none);
             require(id == 2036 || id == 2037, "No-brother fallback must summon a skeleton");
         }
-        verifyActiveBrotherDetection();
+        verifyActiveBrotherDetectionAndHistoricalDuplicateEligibility();
 
-        System.out.println("Barrows weighted door rolls, undefeated brothers, and duplicate-prevention checks passed.");
+        System.out.println("Barrows weighted door rolls, live 2006 tunnel brother duplicates, "
+                + "defeated-brother exclusion and independent chest guards passed.");
     }
 
-    private static void verifyActiveBrotherDetection() throws Exception {
+    private static void verifyActiveBrotherDetectionAndHistoricalDuplicateEligibility() throws Exception {
         Player owner = new Player(null);
         owner.isBot = true;
         owner.setIndex(19);
@@ -88,15 +92,28 @@ public final class BarrowsTunnelEncounterChecks {
 
             boolean[] others = (boolean[]) method.invoke(null, new Player(null));
             for (boolean value : others) require(!value, "Other player's brother leaked into pool");
-            int[] remaining = BarrowsTunnelEncounter.eligibleBrothers(new boolean[6], mask);
-            require(remaining.length == 5 && remaining[0] == 2029,
-                    "Already active brother offered for another ambush");
+            // Even with a live copy of Verac in the World NPC registry, a
+            // door roll must still be allowed to summon another Verac.
+            Method doorPool = BarrowsManager.class.getDeclaredMethod(
+                    "eligibleTunnelBrothers", Player.class);
+            doorPool.setAccessible(true);
+            int[] remaining = (int[]) doorPool.invoke(null, owner);
+            require(remaining.length == 6 && remaining[0] == 2030,
+                    "Live Verac incorrectly excluded from 2006 door ambush pool");
+            require(BarrowsTunnelEncounter.npcForRoll(0, 0, 0, remaining) == 2030,
+                    "2006 door encounter could not choose the already-live Verac");
+
+            owner.setBarrowsBrotherKilled(0, true);
+            int[] afterKill = (int[]) doorPool.invoke(null, owner);
+            require(afterKill.length == 5 && afterKill[0] == 2029,
+                    "Killed Verac should be excluded even if a live duplicate remains");
+            owner.setBarrowsBrotherKilled(0, false);
 
             Method spawnBrother = BarrowsManager.class.getDeclaredMethod(
                     "spawnBarrowsBrother", Player.class, int.class);
             spawnBrother.setAccessible(true);
             require((Boolean) spawnBrother.invoke(null, owner, 2030),
-                    "Existing brother should count as already spawned at chest");
+                    "Chest/sarcophagus must still recognise an already-spawned brother");
             require(World.getNpcs()[42] == brother,
                     "Chest lookup unexpectedly replaced a live tunnel brother");
             brother.setActive(false);
