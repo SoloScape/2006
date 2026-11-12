@@ -50,7 +50,8 @@ public final class BotPvpCombatHandler {
         int value;
         boolean castleWarsCombat = CastleWarsManager.isInGame(player);
         boolean castleWarsCrossLevelCombat = castleWarsCombat
-                && CastleWarsManager.isCastleWallCrossLevelPair(player, player2);
+                && (CastleWarsManager.isCastleWallCrossLevelPair(player, player2)
+                    || CastleWarsManager.isMiddleIslandTowerCrossLevelPair(player, player2));
         if (castleWarsCombat) {
             player.botCombatState = null;
             player.botCombatEscapeActive = false;

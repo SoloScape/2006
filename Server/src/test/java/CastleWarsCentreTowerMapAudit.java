@@ -1,6 +1,8 @@
 import com.rs2.ServerSettings;
 import com.rs2.cache.js5.WorldMaps;
 import com.rs2.model.objects.ObjectDefinition;
+import com.rs2.model.Position;
+import com.rs2.model.gameplay.castlewars.CastleWarsManager;
 import com.rs2.util.path.MapDataReader;
 import com.rs2.util.path.WalkingCollisionMap;
 import com.rs2.util.path.ProjectileCollisionMap;
@@ -58,6 +60,22 @@ public final class CastleWarsCentreTowerMapAudit {
                 }
             }
         }
+        // The real 443 plane-1 bridge flags, after clipping translation,
+        // define exactly which plane-0 tiles are the two tower roofs.
+        int towerTiles = 0;
+        for (int y = 3098; y <= 3109; ++y) {
+            for (int x = 2394; x <= 2405; ++x) {
+                boolean bridge = (tileSettings[1][x - 2368][y - 3072] & 2) != 0;
+                boolean actualTop = CastleWarsManager.isMiddleIslandTowerTop(
+                        new Position(x, y, 0));
+                if (bridge != actualTop) {
+                    throw new AssertionError("443 tower flag differs from combat footprint at "
+                            + x + "," + y + ": map=" + bridge + ", combat=" + actualTop);
+                }
+                if (bridge) ++towerTiles;
+            }
+        }
+        if (towerTiles < 25) throw new AssertionError("No 443 tower tops discovered");
         for (int plane = 0; plane <= 2; ++plane) {
             System.out.println("CENTRE-PLANE "+plane);
             for (int y = 3117; y >= 3090; --y) {

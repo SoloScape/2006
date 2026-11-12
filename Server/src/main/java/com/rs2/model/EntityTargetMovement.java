@@ -122,6 +122,20 @@ public class EntityTargetMovement {
             PathFinder.findPath(player, ((Position)value).getX(), ((Position)value).getY(), true, 0, 0);
             return;
         }
+        if (this.entity.isPlayer() && entity.isPlayer()) {
+            Player attacker = (Player)this.entity;
+            Player target = (Player)entity;
+            // An Attack click can set a movement target before the combat
+            // target is installed. Do not route a ranger or mage off the
+            // tower in that short interval.
+            if (CastleWarsManager.isMiddleIslandTowerCrossLevelPair(attacker, target)
+                    && isUsingCastleWarsRangedOrMagic(attacker)
+                    && this.entity.isWithinReach(entity,
+                            Math.max(8, this.entity.getAttackRange()))
+                    && CastleWarsManager.hasCastleWarsProjectileLineOfSight(attacker, target)) {
+                return;
+            }
+        }
         if (this.entity.isPlayer() && this.entity.getCombatTarget() == null) {
             Player player = (Player)this.entity;
             if (entity.isPlayer() && this.entity.getInteractionTarget() == null) {
@@ -270,7 +284,9 @@ public class EntityTargetMovement {
 
     private static boolean isUsingCastleWarsRangedOrMagic(Player player) {
         if (player.getQueuedCombatSpell() != null
-                || (player.isAutocastEnabled() && player.getAutocastSpell() != null)) {
+                || (player.isAutocastEnabled() && player.getAutocastSpell() != null)
+                || (player.botEnabled && (player.botActiveCombatStyle == 1
+                        || player.botActiveCombatStyle == 2))) {
             return true;
         }
         if (player.getWeaponProfile() == null

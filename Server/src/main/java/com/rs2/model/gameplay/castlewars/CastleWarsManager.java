@@ -2306,14 +2306,31 @@ public final class CastleWarsManager {
     }
 
     /**
-     * The central island's two firing towers are raised to map plane 1.
-     * Only these upper walkways, and nearby exposed ground on plane 0,
-     * may exchange ranged/magic attacks across floors.
+     * The actual revision-443 middle-island tower tops are bridge tiles.
+     * The terrain on plane 1 has flag 2, so both the raised walkways and
+     * the lower battlefield are represented as map PLANE 0 for combat.
+     * These footprints were decoded from m37_48, not guessed from the
+     * central island coordinate. Do not include the river bridges at
+     * y=3103/3104, which have the same terrain bridge flag.
      */
     public static boolean isMiddleIslandTowerTop(Position pos) {
-        return pos != null && pos.getPlane() == 1
-                && pos.getX() >= 2391 && pos.getX() <= 2408
-                && pos.getY() >= 3094 && pos.getY() <= 3112;
+        if (pos == null || pos.getPlane() != 0) return false;
+        int x = pos.getX();
+        switch (pos.getY()) {
+            // South-west tower (southern raised walkway in the 443 map).
+            case 3098: return x >= 2400 && x <= 2402;
+            case 3099: return x >= 2400 && x <= 2403;
+            case 3100: return x >= 2400 && x <= 2404;
+            case 3101: return x == 2400 || x >= 2402 && x <= 2405;
+            case 3102: return x == 2400 || x >= 2403 && x <= 2404;
+            // North-east tower (northern raised walkway in the 443 map).
+            case 3105: return x == 2395 || x == 2396 || x == 2399;
+            case 3106: return x >= 2394 && x <= 2397 || x == 2399;
+            case 3107: return x >= 2395 && x <= 2399;
+            case 3108: return x >= 2396 && x <= 2399;
+            case 3109: return x >= 2397 && x <= 2399;
+            default: return false;
+        }
     }
 
     public static boolean isMiddleIslandTowerCrossLevelPair(Player first, Player second) {
@@ -2324,11 +2341,12 @@ public final class CastleWarsManager {
                 : isMiddleIslandTowerTop(b) ? b : null;
         Position ground = upper == a ? b : a;
         if (upper == null || ground.getPlane() != 0
+                || isMiddleIslandTowerTop(ground)
                 || ground.getX() < 2385 || ground.getX() > 2414
                 || ground.getY() < 3089 || ground.getY() > 3120
                 || getCastleTeamAtPosition(ground) != null) return false;
         int distance = GameUtil.getDistance(upper, ground);
-        // No direct hits through the floor or distant cross-floor attacks.
+        // Exclude vertical overlap, melee shortcuts and distant cross-level shots.
         return distance >= 2 && distance <= 15;
     }
 
@@ -2341,9 +2359,9 @@ public final class CastleWarsManager {
     }
 
     /**
-     * Project a cross-floor shot onto the ground collision plane. The first
-     * three tiles can be a tower parapet; all other scenery must still pass
-     * both projectile and walking line-of-sight tests in both directions.
+     * The tower floor is already mapped to plane 0. Begin the projectile from
+     * the first unobstructed tile beyond the tower's own rim, while checking
+     * all of the remaining courtyard path for walls and other cover.
      */
     private static boolean hasMiddleIslandTowerFiringLane(Player first, Player second) {
         if (!isMiddleIslandTowerCrossLevelPair(first, second)) return false;
@@ -2356,6 +2374,7 @@ public final class CastleWarsManager {
             int x = upper.getX() + dx * step;
             int y = upper.getY() + dy * step;
             if (GameUtil.getDistance(new Position(x, y, 0), ground) < 1) break;
+            if (isMiddleIslandTowerTop(new Position(x, y, 0))) continue;
             if ((WalkingCollisionMap.getTileFlags(x, y, 0) & 0x1280100) != 0
                     || (com.rs2.util.path.ProjectileCollisionMap
                             .getTileFlags(x, y, 0) & 0x1280100) != 0) continue;
@@ -2371,7 +2390,7 @@ public final class CastleWarsManager {
     public static boolean hasBotCombatLineOfSight(Player attacker, Player target) {
         if (attacker == null || target == null) return false;
         if (attacker.getPosition().getPlane() != target.getPosition().getPlane()) {
-            return hasMiddleIslandTowerFiringLane(attacker, target);
+            return false;
         }
         if (attacker.botEnabled && attacker.botPrimaryCombatStyle != 0
                 && isCastleWallCrossLevelPair(attacker, target)) {
@@ -2384,6 +2403,9 @@ public final class CastleWarsManager {
         Position from = attacker.getPosition();
         Position to = target.getPosition();
         if (from.getPlane() != to.getPlane()) {
+            return false;
+        }
+        if (isMiddleIslandTowerCrossLevelPair(attacker, target)) {
             return hasMiddleIslandTowerFiringLane(attacker, target);
         }
         if (areOpponents(attacker, target)) {

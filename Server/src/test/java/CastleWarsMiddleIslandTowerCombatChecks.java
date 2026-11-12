@@ -15,8 +15,8 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
- * Central island tower is a real plane-1-to-plane-0 firing position,
- * unlike the castle battlements where both actors are on plane 0.
+ * The actual 443 centre-island tower tops and ground are both on plane 0.
+ * Plane-1 bridge flags move the raised walkway collision down to plane 0.
  */
 public final class CastleWarsMiddleIslandTowerCombatChecks {
     @SuppressWarnings("unchecked")
@@ -61,8 +61,12 @@ public final class CastleWarsMiddleIslandTowerCombatChecks {
             teams.put(upper, CastleWarsManager.Team.SARADOMIN);
             teams.put(ground, CastleWarsManager.Team.ZAMORAK);
 
-            upper.setPosition(new Position(2400, 3103, 1));
-            ground.setPosition(new Position(2408, 3103, 0));
+            upper.setPosition(new Position(2397, 3107, 0));
+            ground.setPosition(new Position(2397, 3099, 0));
+            require(!CastleWarsManager.isMiddleIslandTowerTop(new Position(2400, 3103, 0)),
+                    "The crossing between towers is not a firing platform");
+            require(!CastleWarsManager.isMiddleIslandTowerTop(new Position(2397, 3107, 1)),
+                    "Plane 1 is decorative bridge geometry, not the actual tower collision");
             upper.setQueuedCombatSpell(SpellDefinition.WIND_STRIKE);
             ground.setQueuedCombatSpell(SpellDefinition.WIND_STRIKE);
             require(CastleWarsManager.isMiddleIslandTowerTop(upper.getPosition()),
@@ -98,13 +102,13 @@ public final class CastleWarsMiddleIslandTowerCombatChecks {
                     "Melee must never reach across middle island levels");
 
             // The nearest clipped parapet should not stop ranged/magic.
-            blockProjectile.invoke(null, 2401, 3103, 0, 0x100);
-            blockWalk.invoke(null, 2401, 3103, 0, 0x100);
+            blockProjectile.invoke(null, 2397, 3106, 0, 0x100);
+            blockWalk.invoke(null, 2397, 3106, 0, 0x100);
             require(CastleWarsManager.hasCastleWarsProjectileLineOfSight(upper, ground),
                     "Tower lip blocks every shot");
             // An actual second wall farther along must block both ways.
-            blockProjectile.invoke(null, 2405, 3103, 0, 0x100);
-            blockWalk.invoke(null, 2405, 3103, 0, 0x100);
+            blockProjectile.invoke(null, 2397, 3102, 0, 0x100);
+            blockWalk.invoke(null, 2397, 3102, 0, 0x100);
             require(!CastleWarsManager.hasCastleWarsProjectileLineOfSight(upper, ground)
                             && !CastleWarsManager.hasCastleWarsProjectileLineOfSight(ground, upper),
                     "Middle island tower can shoot through a courtyard building");
@@ -114,18 +118,28 @@ public final class CastleWarsMiddleIslandTowerCombatChecks {
             ground.setPosition(new Position(2420, 3078, 0));
             require(!CastleWarsManager.isMiddleIslandTowerCrossLevelPair(upper, ground),
                     "Tower exception reaches a different castle");
-            ground.setPosition(new Position(2408, 3103, 2));
+            ground.setPosition(new Position(2397, 3099, 2));
             require(!CastleWarsManager.isMiddleIslandTowerCrossLevelPair(upper, ground),
                     "Tower exception reaches an arbitrary different floor");
-            ground.setPosition(new Position(2408, 3103, 1));
+            ground.setPosition(new Position(2397, 3099, 1));
             require(!CastleWarsManager.isMiddleIslandTowerCrossLevelPair(upper, ground),
-                    "Tower exception leaks into same-floor combat");
-            ground.setPosition(new Position(2408, 3103, 0));
+                    "Tower exception leaks to a different map plane");
+            ground.setPosition(new Position(2397, 3099, 0));
+            require(CastleWarsManager.isMiddleIslandTowerCrossLevelPair(upper, ground),
+                    "Real same-plane tower exception not restored");
             teams.put(ground, CastleWarsManager.Team.SARADOMIN);
             require(!CastleWarsManager.isMiddleIslandTowerCrossLevelPair(upper, ground),
                     "Tower exception permits friendly fire");
             teams.put(ground, CastleWarsManager.Team.ZAMORAK);
-            upper.setPosition(new Position(2500, 3103, 1));
+            // The second real tower must allow attacks in both directions.
+            upper.setPosition(new Position(2402, 3100, 0));
+            ground.setPosition(new Position(2402, 3108, 0));
+            require(CastleWarsManager.isMiddleIslandTowerCrossLevelPair(upper, ground),
+                    "Second central tower not identified");
+            require(EntityTargetMovement.canReachTarget(upper, ground, 10, CombatType.RANGED)
+                            && EntityTargetMovement.canReachTarget(ground, upper, 10, CombatType.MAGIC),
+                    "Second central tower cannot exchange ranged and magic attacks");
+            upper.setPosition(new Position(2500, 3103, 0));
             require(!CastleWarsManager.isMiddleIslandTowerCrossLevelPair(upper, ground),
                     "Tower exception leaks outside Castle Wars");
         } finally {
