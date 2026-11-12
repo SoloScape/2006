@@ -9,7 +9,6 @@ import com.rs2.util.path.ProjectileCollisionMap;
 public final class CastleWarsCentreTowerMapAudit {
     public static void main(String[] args) throws Exception {
         ServerSettings.clientBuild = 443;
-        ServerSettings.cacheVersion = 443;
         ObjectDefinition.loadRevision443();
         WorldMaps.Square region = null;
         for (WorldMaps.Square s : WorldMaps.load()) {
