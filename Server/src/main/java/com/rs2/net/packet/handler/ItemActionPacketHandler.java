@@ -36,6 +36,7 @@ import com.rs2.model.ground.GroundItemManager;
 import com.rs2.model.item.ItemDefinition;
 import com.rs2.model.item.ItemService;
 import com.rs2.model.item.ItemStack;
+import com.rs2.model.item.BarrowsEquipmentDurability;
 import com.rs2.model.item.action.BarrowsRepairHandler;
 import com.rs2.model.item.action.BirdNestSearchHandler;
 import com.rs2.model.item.action.CasketRewardHandler;
@@ -1482,13 +1483,13 @@ implements PacketHandler {
             player.getEquipmentManager().refreshCarriedValue();
             return;
         }
-        BarrowsRepairHandler barrowsRepairHandler = BarrowsRepairHandler.forItem(itemStack);
-        if (itemStack.getDefinition().hasDestroyOption() || barrowsRepairHandler != null && itemStack.getDefinition().isUntradeable()) {
+        int brokenBarrowsId = BarrowsEquipmentDurability.fullyDegradedItemId(itemStack.getId());
+        if (itemStack.getDefinition().hasDestroyOption() || brokenBarrowsId != -1) {
             String destroyMessage = "Dropping this item will make you lose it forever.";
             if (itemStack.getId() == 10507 || itemStack.getId() == 10508) {
                 destroyMessage = "Diango in Draynor Village can replace this Christmas reward.";
             }
-            if (barrowsRepairHandler != null) {
+            if (brokenBarrowsId != -1) {
                 destroyMessage = "Dropping this item will make it degrade to 0.";
             }
             String[][] destroyDialogRows = new String[][]{{"Are you sure you want to drop this item?", "14174"}, {"Yes.", "14175"}, {"No.", "14176"}, {"", "14177"}, {destroyMessage, "14182"}, {"", "14183"}, {itemStack.getDefinition().getName(), "14184"}};
