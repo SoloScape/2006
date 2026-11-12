@@ -59,9 +59,9 @@ The [server guide](Server/README.md) describes the implementation in more detail
 ## Roadmap
 
 <!-- roadmap-progress:start -->
-**Overall completion: 4.3%** · **8 / 185** counted roadmap items marked ✅
+**Overall completion: 4.3%** · **8 / 186** counted roadmap items marked ✅
 
-![Roadmap completion: 4.3% — 8 of 185 items](docs/roadmap-progress.svg)
+![Roadmap completion: 4.3% — 8 of 186 items](docs/roadmap-progress.svg)
 <!-- roadmap-progress:end -->
 
 Progress counts ✅ entries across all roadmap categories, including optional plugins. The percentage and bar refresh automatically after roadmap changes on `main` via GitHub Actions. This tracks README statuses, not independently verified gameplay.
@@ -284,7 +284,6 @@ The goal is the **18 December 2006 / revision 443** experience. Open a category 
 
 | Name | Status |
 | :--- | :---: |
-| Melee / Ranged / Magic combat | 📜 |
 | PvP / Wilderness combat | 📜 |
 | Prayer & special attacks | 📜 |
 | NPC combat and drops | 📜 |
@@ -297,7 +296,6 @@ The goal is the **18 December 2006 / revision 443** experience. Open a category 
 | NPC dialogue & world interactions | 📜 |
 | Quest progression & rewards | 📜 |
 | Movement, teleports & travel | 📜 |
-| 2006 Christmas rescue | 📜 |
 | Fairy rings | 📜 |
 | Player-owned houses (POH) | 📜 |
 | 2006 skill tutors | 📜 |
@@ -310,6 +308,9 @@ The goal is the **18 December 2006 / revision 443** experience. Open a category 
 
 | Name | Status |
 | :--- | :---: |
+| Easter Event | 📜 |
+| Halloween Event | 📜 |
+| Christmas Event | 📜 |
 | Grand Exchange (released 2007) | ✅ |
 
 </details>
