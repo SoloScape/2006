@@ -761,6 +761,11 @@ extends Entity {
         return World.getPlayers()[this.ownerPlayerIndex];
     }
 
+    /** Distinguishes an unowned static monster from an orphaned owned spawn. */
+    public final boolean hasAssignedOwnerPlayer() {
+        return this.ownerPlayerIndex > 0;
+    }
+
     public final void setOwnerPlayerIndex(int index) {
         this.ownerPlayerIndex = index;
     }
