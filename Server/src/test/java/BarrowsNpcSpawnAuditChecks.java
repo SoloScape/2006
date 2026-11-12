@@ -1,6 +1,9 @@
 import com.rs2.ServerSettings;
 import com.rs2.model.Position;
 import com.rs2.model.gameplay.barrows.BarrowsNpcSpawnPlacement;
+import com.rs2.model.gameplay.barrows.BarrowsCryptCombatSounds;
+import com.rs2.net.packet.AudioIds443;
+import com.rs2.model.skill.magic.SpellDefinition;
 import com.rs2.model.npc.Npc;
 import com.rs2.model.npc.NpcDefinition;
 import com.rs2.model.objects.ObjectDefinition;
@@ -85,11 +88,73 @@ public final class BarrowsNpcSpawnAuditChecks {
                 + " blockedFootprintTiles=" + blockedTiles);
         verifyDoorApproaches();
         verifySyntheticBlockedAndWallCases();
+        verifyCryptCombatSounds();
         System.out.println("BARROWS AUDIT total=" + inBarrows
                 + " blocked=" + blocked + " zeroHitpoints=" + zeroHp
                 + " npc2031-2037=" + java.util.Arrays.toString(counts));
         if (inBarrows != 32) throw new AssertionError("Expected 32 fixed Barrows tunnel NPCs");
     }
+    /**
+     * Attack and victim-hit packets use Npc.getAttackSoundId() and
+     * Npc.getHitSoundId(). Confirm none are silently dropped by the
+     * revision-443 legacy-to-JS5 audio translation.
+     */
+    private static void verifyCryptCombatSounds() {
+        final int[][] expected = {
+            {132, 135, 137}, // 2031: bloodworm (provisional spider-like audio)
+            {17, 16, 15},   // 2032: crypt rat
+            {17, 16, 15},   // 2033: larger crypt rat
+            {132, 135, 137},// 2034: crypt spider
+            {132, 135, 137},// 2035: crypt spider
+            {108, 110, 109},// 2036: skeleton
+            {108, 110, 109} // 2037: skeleton
+        };
+        for (int id = 2031; id <= 2037; id++) {
+            Npc npc = new Npc(id);
+            int[] wanted = expected[id - 2031];
+            int[] actual = {
+                npc.getAttackSoundId(), npc.getHitSoundId(), npc.getDeathSoundId()
+            };
+            for (int phase = 0; phase < actual.length; phase++) {
+                if (actual[phase] != wanted[phase]) {
+                    throw new AssertionError("Crypt NPC " + id
+                            + " missing attack/hit/death audio for phase " + phase
+                            + ": " + actual[phase]);
+                }
+                if (AudioIds443.sound(actual[phase]) < 0) {
+                    throw new AssertionError("Crypt NPC " + id
+                            + " uses an unmapped revision-443 sound " + actual[phase]);
+                }
+            }
+        }
+        // Ahrim's MagicCombatAttack uses the spell's cast audio instead of
+        // an NPC melee sound. Preserve the four real spell cast effects.
+        SpellDefinition[] ahrimSpells = {
+            SpellDefinition.FIRE_WAVE, SpellDefinition.CONFUSE,
+            SpellDefinition.WEAKEN, SpellDefinition.CURSE
+        };
+        for (SpellDefinition spell : ahrimSpells) {
+            if (AudioIds443.sound(spell.getCastSoundId()) < 0)
+                throw new AssertionError("Unmapped Ahrim spell audio: " + spell);
+        }
+        for (int id = 2025; id <= 2030; id++) {
+            Npc brother = new Npc(id);
+            if (AudioIds443.sound(brother.getHitSoundId()) < 0
+                    || AudioIds443.sound(brother.getDeathSoundId()) < 0)
+                throw new AssertionError("Missing brother hit/death sound: " + id);
+            if (id != 2025 && AudioIds443.sound(brother.getAttackSoundId()) < 0)
+                throw new AssertionError("Missing brother attack sound: " + id);
+        }
+        // Existing cache sounds must be preserved and unrelated NPCs must not
+        // gain synthesized combat audio.
+        Npc normalRat = new Npc(86);
+        if (normalRat.getAttackSoundId() != 17 || normalRat.getHitSoundId() != 16)
+            throw new AssertionError("Crypt fallback changed non-Barrows NPC sounds");
+        if (BarrowsCryptCombatSounds.attack(9999, -1) != -1)
+            throw new AssertionError("Crypt fallback leaked to unrelated NPCs");
+        System.out.println("BARROWS AUDIO all six brothers and seven crypt NPCs mapped to 443 assets");
+    }
+
     private static void verifyPlacement(Position origin, int npcSize) {
         Position chosen = BarrowsNpcSpawnPlacement.findSafeSpawn(origin, origin, npcSize);
         if (chosen == null) throw new AssertionError("No reachable spawn near " + origin

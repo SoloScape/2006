@@ -117,3 +117,10 @@ The push-triggered `.github/workflows/verify-barrows-morytania.yml` compiles the
 - The previous route-start-only cancellation is removed so stalled movement cannot leave the client replaying animation `831` indefinitely.
 - `Barrows2006RestorationChecks` simulates the observer leaving during digging and verifies the animation finishes without a route, then the patrol resumes and does not repeatedly clear unrelated animations.
 - The 4-tick pose limit is a gameplay quality-of-life reconstruction, not a recovered 2006 exact frame timing.
+
+## 12 November 2026: missing crypt combat sound effects
+
+- Verified that the original binary NPC definitions set no attack/hit/death audio for all seven tunnel enemies (IDs 2031–2037). The combat engine already sends these sounds to the attacking/defending player, but silently skips `-1` NPC IDs.
+- Added a narrowly scoped fallback for these tunnel NPCs using the existing 443-mapped sounds from comparable rats, spiders and skeletons. Attack, hit and death sounds are resolved through `Npc` getters; other NPC definitions remain unchanged. Bloodworm/crypt-creature choices are **provisional substitutes**, not recovered original Jagex 2006 IDs.
+- Five brothers retain their existing 443-mapped attack sounds; Ahrim retains his four spell-defined cast sounds. All brothers retain existing hit/death sounds.
+- `BarrowsNpcSpawnAuditChecks` verifies mappings for 7 tunnel NPCs, 6 brothers and Ahrim's four spells so future edits cannot silently remove these sounds. Client volume settings and in-game audio still require listening tests.

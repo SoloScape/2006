@@ -13,6 +13,7 @@ import com.rs2.model.combat.CombatType;
 import com.rs2.model.combat.hit.HitType;
 import com.rs2.model.gameplay.abyss.AbyssManager;
 import com.rs2.model.gameplay.barrows.BarrowsOldManPatrol;
+import com.rs2.model.gameplay.barrows.BarrowsCryptCombatSounds;
 import com.rs2.model.gameplay.partyroom.PartyRoomManager;
 import com.rs2.model.ground.GroundItem;
 import com.rs2.model.ground.GroundItemManager;
@@ -861,15 +862,15 @@ extends Entity {
     }
 
     public final int getAttackSoundId() {
-        return this.definition.getAttackSoundId();
+        return BarrowsCryptCombatSounds.attack(this.npcId, this.definition.getAttackSoundId());
     }
 
     public final int getHitSoundId() {
-        return this.definition.getHitSoundId();
+        return BarrowsCryptCombatSounds.hit(this.npcId, this.definition.getHitSoundId());
     }
 
     public final int getDeathSoundId() {
-        return this.definition.getDeathSoundId();
+        return BarrowsCryptCombatSounds.death(this.npcId, this.definition.getDeathSoundId());
     }
 
     @Override
