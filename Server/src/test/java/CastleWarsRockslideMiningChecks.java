@@ -14,7 +14,9 @@ public final class CastleWarsRockslideMiningChecks {
     @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
         Player player = new Player(null);
+        player.isBot = true; // Standalone regression has no network session.
         player.setIndex(1);
+        Player previous = World.players[1];
         World.players[1] = player;
         Field teamsField = CastleWarsManager.class.getDeclaredField("gamePlayers");
         teamsField.setAccessible(true);
@@ -90,7 +92,7 @@ public final class CastleWarsRockslideMiningChecks {
             System.out.println("Castle Wars rockslide mining timing and cancellation checks passed");
         } finally {
             teams.remove(player);
-            World.players[1] = null;
+            World.players[1] = previous;
             player.setIndex(-1);
         }
     }
