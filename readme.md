@@ -257,16 +257,22 @@ SoloScape aims to recreate the **18 December 2006 (revision 443)** experience. T
 
 </details>
 
-### Bosses & major encounters
+<details>
+<summary><strong>Bosses & major encounters — expand tracker</strong></summary>
 
-| Content | Status | Content | Status |
-| --- | :---: | --- | :---: |
-| King Black Dragon | 🚧 | Kalphite Queen | 🚧 |
-| Barrows brothers | 🚧 | TzTok-Jad (Fight Caves) | 🚧 |
-| Dagannoth Kings | ⛔ | Chaos Elemental | ⛔ |
-| Giant Mole / Wyson rewards | ⛔ |  |  |
+| Name | Status |
+| --- | :---: |
+| King Black Dragon | 🚧 |
+| Kalphite Queen | 🚧 |
+| Barrows brothers | 🚧 |
+| TzTok-Jad (Fight Caves) | 🚧 |
+| Dagannoth Kings | ⛔ |
+| Chaos Elemental | ⛔ |
+| Giant Mole / Wyson rewards | ⛔ |
 
 Bosses marked 🚧 have related combat, reward, or encounter code in the repository, **not verified end-to-end boss mechanics**. The remaining bosses need an implementation and/or live-play audit.
+
+</details>
 
 ### Quests
 
