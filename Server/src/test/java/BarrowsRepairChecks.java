@@ -45,6 +45,7 @@ public final class BarrowsRepairChecks {
         QuestDefinition.loadDefinitions();
         ItemDefinition.loadDefinitions();
         checkRepairers();
+        printStrangeOldManCandidates();
         audit443SquireSpawnsAndArmourStand();
         checkPricesAcrossEveryPiece();
         checkLegacyMetadata();
@@ -170,6 +171,22 @@ public final class BarrowsRepairChecks {
                     + " options=" + java.util.Arrays.toString(new String[] {
                             npc.getAction(0), npc.getAction(1), npc.getAction(2),
                             npc.getAction(3), npc.getAction(4)}));
+        }
+    }
+
+    /** Diagnostic to resolve cache ID shifts before spawning original NPC. */
+    private static void printStrangeOldManCandidates() {
+        for (int id = 0; id < 4300; id++) {
+            NpcDefinition npc = NpcDefinition.forId(id);
+            if (npc == null || npc.getName() == null) continue;
+            if (npc.getName().toLowerCase().contains("strange old man")
+                    || id == 1671 || id == 1696 || id == 1695) {
+                System.out.println("BARROWS-2006-NPC-CANDIDATE id=" + id
+                        + " name=" + npc.getName()
+                        + " actions=" + java.util.Arrays.toString(new String[]{
+                            npc.getAction(0), npc.getAction(1), npc.getAction(2),
+                            npc.getAction(3), npc.getAction(4)}));
+            }
         }
     }
 
