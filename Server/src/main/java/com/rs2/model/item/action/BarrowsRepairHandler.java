@@ -11,7 +11,8 @@ public final class BarrowsRepairHandler {
     // Revision-443 cache ID 3795 corresponds to historical/OSRS ID 1766;
     // NPC 1766 in this cache is a Cow calf and must never accept repairs.
     private static final int[] repairNpcIds = {519, 1082, 1799, 3795};
-    public static final int ARMOUR_STAND_OBJECT_ID = 6802;
+    // Original revision-443 cache object; OSRS/317 uses object 6802 instead.
+    public static final int ARMOUR_STAND_OBJECT_ID = 13715;
     private final int repairedItemId;
     private final int baseDegradedItemId;
     private final int fullRepairCost;
@@ -44,7 +45,7 @@ public final class BarrowsRepairHandler {
     }
 
     /**
-     * 2006 POH workshop armour stand (object 6802). A validated, reachable
+     * 2006 POH workshop armour stand (revision-443 object 13715). A validated, reachable
      * real object is supplied by ItemOnObjectTask; no standalone POH system is
      * assumed. Using a friend's stand does not require 55 Construction.
      */
