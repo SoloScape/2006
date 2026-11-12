@@ -1,5 +1,8 @@
 import com.rs2.ServerSettings;
 import com.rs2.model.World;
+import com.rs2.model.Position;
+import com.rs2.model.gameplay.barrows.BarrowsTunnelRoom;
+import com.rs2.model.gameplay.barrows.BarrowsTunnelPopulation;
 import com.rs2.model.gameplay.barrows.BarrowsManager;
 import com.rs2.model.gameplay.barrows.BarrowsTunnelEncounter;
 import com.rs2.model.npc.Npc;
@@ -70,6 +73,7 @@ public final class BarrowsTunnelEncounterChecks {
             require(id == 2036 || id == 2037, "No-brother fallback must summon a skeleton");
         }
         verifyActiveBrotherDetectionAndHistoricalDuplicateEligibility();
+        verify2006RoomPopulationAndExpiry();
 
         System.out.println("Barrows weighted door rolls, live 2006 tunnel brother duplicates, "
                 + "defeated-brother exclusion and independent chest guards passed.");
@@ -123,6 +127,45 @@ public final class BarrowsTunnelEncounterChecks {
             World.getNpcs()[42] = null;
             World.getPlayers()[19] = null;
         }
+    }
+
+    private static void verify2006RoomPopulationAndExpiry() throws Exception {
+        java.lang.reflect.Field roomsField = BarrowsManager.class.getDeclaredField("tunnelRooms");
+        roomsField.setAccessible(true);
+        BarrowsTunnelRoom[] rooms = (BarrowsTunnelRoom[]) roomsField.get(null);
+        Position northWest = new Position(3534, 9710, 0);
+        require(BarrowsTunnelPopulation.nearestRoomId(northWest, rooms) == 1,
+                "North-west tunnel must be room 1");
+        require(BarrowsTunnelPopulation.nearestRoomId(new Position(3534, 9710, 3), rooms) == -1,
+                "Crypt monsters must not count toward tunnel-room limit");
+        require(BarrowsTunnelPopulation.DOOR_SUMMON_LIFETIME_TICKS > 0,
+                "Temporary door NPCs must expire even while fighting");
+        Npc[] npcs = new Npc[13];
+        for (int i = 0; i < 11; i++) {
+            Npc npc = new Npc(2031);
+            npc.setActive(true);
+            npc.setPosition(new Position(3530 + (i % 5), 9707 + (i / 5), 0));
+            npcs[i] = npc;
+        }
+        require(BarrowsTunnelPopulation.countLivingEnemies(northWest, rooms, npcs) == 11,
+                "Must count eleven permanent or temporary living NPCs");
+        require(BarrowsTunnelPopulation.atCapacity(northWest, rooms, npcs),
+                "Door ambush spawned in a room already containing eleven enemies");
+        npcs[0].setActive(false);
+        require(!BarrowsTunnelPopulation.atCapacity(northWest, rooms, npcs),
+                "Inactive room NPCs still prevented a new encounter");
+        Npc otherRoomNpc = new Npc(2031);
+        otherRoomNpc.setActive(true);
+        otherRoomNpc.setPosition(new Position(3568, 9711, 0));
+        npcs[12] = otherRoomNpc;
+        require(BarrowsTunnelPopulation.countLivingEnemies(northWest, rooms, npcs) == 10,
+                "Monsters in another room must not count toward this room's limit");
+        Npc unrelated = new Npc(1);
+        unrelated.setActive(true);
+        unrelated.setPosition(new Position(3532, 9710, 0));
+        npcs[11] = unrelated;
+        require(BarrowsTunnelPopulation.countLivingEnemies(northWest, rooms, npcs) == 10,
+                "Non-Barrows NPCs must not count toward the room's enemy limit");
     }
 
     private static void require(boolean ok, String message) {
