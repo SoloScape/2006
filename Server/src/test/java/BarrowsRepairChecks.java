@@ -36,7 +36,7 @@ public final class BarrowsRepairChecks {
     };
     // Each brother's array is helm, weapon, body, legs.
     private static final int[] FULL_COSTS = {60000, 100000, 90000, 80000};
-    private static final int[] REPAIR_NPCS = {519, 1082, 1799, 3795};
+    private static final int[] REPAIR_NPCS = {519, 1082, 1799, 3797};
 
     public static void main(String[] args) throws Exception {
         ServerSettings.clientBuild = 443;
@@ -68,8 +68,14 @@ public final class BarrowsRepairChecks {
 
         require("Cow calf".equalsIgnoreCase(NpcDefinition.forId(1766).getName()),
                 "Revision-443 NPC 1766 changed; update repairer mapping before proceeding");
-        require("Squire".equalsIgnoreCase(NpcDefinition.forId(3795).getName()),
-                "Revision-443 Void Knight repair Squire (3795) is missing");
+        require("Squire".equalsIgnoreCase(NpcDefinition.forId(3797).getName())
+                        && "Talk-to".equals(NpcDefinition.forId(3797).getAction(0)),
+                "Native Void Knight repair smith 3797 needs a Talk-to action");
+        require(NpcDefinition.forId(3795).getAction(0) == null,
+                "Old candidate Squire 3795 changed; verify the NPC mapping again");
+        require(!BarrowsRepairHandler.handleItemOnNpc(player(), 3795,
+                        new ItemStack(DEGRADED[0] + 4)),
+                "Inaccessible NPC 3795 must not be a repair option");
         require(!BarrowsRepairHandler.handleItemOnNpc(player(), 1766, new ItemStack(DEGRADED[0] + 4)),
                 "Cow calf must not offer Barrows repairs");
 
@@ -127,7 +133,7 @@ public final class BarrowsRepairChecks {
                     + " x=" + x + " y=" + y + " plane=" + plane);
             if (id == 3795) repairSquireCount++;
         }
-        System.out.println("Native 443 repair Squire 3795 static spawn count: "
+        System.out.println("Native 443 obsolete Squire 3795 static spawn count: "
                 + repairSquireCount);
         com.rs2.model.objects.WorldObjectLookup.loadWorldObjects();
         for (int x = 2640; x <= 2680; x++) {
