@@ -1,6 +1,7 @@
 import com.rs2.ConfigFile;
 import com.rs2.ServerSettings;
 import com.rs2.model.Position;
+import com.rs2.model.World;
 import com.rs2.model.gameplay.castlewars.CastleWarsManager;
 import com.rs2.model.gameplay.castlewars.CastleWarsManager.Team;
 import com.rs2.model.player.Player;
@@ -32,6 +33,11 @@ public final class CastleWarsPreMergeRulesChecks {
                 (Map<Player,Team>)field(CastleWarsManager.class, "gamePlayers").get(null);
         Player person = new Player(null);
         Player rival = new Player(null);
+        Player[] online = World.getPlayers();
+        Player previous75 = online[75], previous76 = online[76];
+        person.setIndex(75); rival.setIndex(76);
+        person.setEncodedIndex(32768 + 75); rival.setEncodedIndex(32768 + 76);
+        online[75] = person; online[76] = rival;
         person.setPosition(new Position(2400, 3100, 0));
         rival.setPosition(new Position(2400, 3108, 0));
         try {
@@ -81,6 +87,8 @@ public final class CastleWarsPreMergeRulesChecks {
 
             // Default five-player era rule and explicit configurable dev mode.
             ServerSettings.castleWarsMinPlayersPerTeam = 5;
+            person.setPosition(new Position(2377, 9485, 0));
+            rival.setPosition(new Position(2421, 9524, 0));
             waiting.put(person, Team.SARADOMIN);
             waiting.put(rival, Team.ZAMORAK);
             require(!CastleWarsManager.hasMinimumPlayersToStart(),
@@ -139,6 +147,8 @@ public final class CastleWarsPreMergeRulesChecks {
             ServerSettings.freeToPlayWorld = oldF2p;
             ServerSettings.membershipRequirementMode = oldMembership;
             ServerSettings.castleWarsMinPlayersPerTeam = oldMinimum;
+            online[75] = previous75; online[76] = previous76;
+            person.setIndex(-1); rival.setIndex(-1);
         }
         System.out.println("Castle Wars 2006 membership, 5v5, teleport, losses and JSON checks passed");
     }

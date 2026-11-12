@@ -888,7 +888,10 @@ public final class CastleWarsManager {
         }
         if (!hasMinimumPlayersToStartInternal()) {
             requester.getPacketSender().sendGameMessage(
-                    "Castle Wars needs at least one waiting player on each team.");
+                    "Castle Wars needs at least "
+                            + Math.max(1, Math.min(MINIMUM_PLAYERS_PER_TEAM,
+                                    ServerSettings.castleWarsMinPlayersPerTeam))
+                            + " waiting players on each team.");
             return false;
         }
 
