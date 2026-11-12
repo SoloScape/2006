@@ -551,6 +551,11 @@ public final class BarrowsManager {
         int brotherIndex = remaining.length == 0 ? 0 : GameUtil.randomInt(remaining.length);
         int npcId = BarrowsTunnelEncounter.npcForRoll(
                 roll, GameUtil.randomInt(2), brotherIndex, remaining);
+        // Door summons were capped per room in 2006 (Tip.It, 12 July 2006).
+        // The exact 2006 cap is unknown; the preserved later value is 11.
+        if (BarrowsTunnelPopulation.atCapacity(arrivalTile, tunnelRooms, World.getNpcs())) {
+            return;
+        }
         Npc npc = new Npc(npcId);
 
         // The player step across a door is queued, not yet applied. Avoid the
@@ -565,6 +570,9 @@ public final class BarrowsManager {
             return;
         }
         GameplayHelper.spawnOwnedNpcAtPosition(player, safe, npc, true, false);
+        // Unlike fixed room monsters, 2006 door encounters eventually vanished
+        // even when the player stayed nearby or continued fighting them.
+        npc.setRemovalDelayTicks(BarrowsTunnelPopulation.DOOR_SUMMON_LIFETIME_TICKS);
         if (BarrowsTunnelEncounter.brotherIndexForNpcId(npcId) >= 0) {
             player.getPacketSender().sendEntityHintIcon(1, npc.getIndex());
         }
