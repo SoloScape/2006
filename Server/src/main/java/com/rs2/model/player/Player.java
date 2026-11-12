@@ -386,7 +386,9 @@ extends Entity {
     private long banExpires;
     private boolean[] barrowsKilledBrothers;
     private int barrowsKillCount;
-    private int barrowsTargetBrotherIndex;
+    // A new Barrows run starts with one of six random hidden brothers.
+    // Saved characters override this during CharacterFileManager.loadPlayer.
+    private int barrowsTargetBrotherIndex = GameUtil.randomInclusive(5);
     private boolean brimhavenOpen;
     private Position teleotherDestination;
     private ItemStack pendingDestroyItem;
