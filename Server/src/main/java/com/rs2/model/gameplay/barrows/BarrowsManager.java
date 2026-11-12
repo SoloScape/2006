@@ -1178,6 +1178,9 @@ public final class BarrowsManager {
     }
 
     public static void recordNpcKill(Player player, Npc npc) {
+        // Brothers are never static world spawns. Only the owner may claim one.
+        if (npc != null && npc.getNpcId() >= 2025 && npc.getNpcId() <= 2030
+                && !npc.hasAssignedOwnerPlayer()) return;
         if (player == null || npc == null || !player.isInBarrows()
                 || !isInBarrowsTunnels(player) && player.getPosition().getPlane() != 3
                 || !npc.getPosition().isWithinViewport(player.getPosition())
