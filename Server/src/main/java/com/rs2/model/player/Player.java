@@ -3578,6 +3578,9 @@ extends Entity {
             player2.applyTeleportPosition(TeleportManager.RESPAWN_TELEPORT_POSITION);
         }
         boolean relocatedFromCastleWars = CastleWarsManager.relocatePlayerOnLogin(this);
+        // Restore the private Barrows chest morph before InitialVarps sends
+        // 452/453; do not emit game frames ahead of the initial map packet.
+        BarrowsManager.restoreChestConfigOnLogin(this);
         // The revision-443 initial map region must use the final reconnect/lobby coordinates.
         if (ServerSettings.clientBuild == 443) {
             // RegionPacket (121, var-short) must be the first game frame.
