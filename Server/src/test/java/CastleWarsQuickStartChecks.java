@@ -1,3 +1,4 @@
+import com.rs2.ServerSettings;
 import com.rs2.model.Position;
 import com.rs2.model.World;
 import com.rs2.model.gameplay.castlewars.CastleWarsManager;
@@ -13,6 +14,8 @@ import java.util.Map;
 public final class CastleWarsQuickStartChecks {
     @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
+        int oldMinimum = ServerSettings.castleWarsMinPlayersPerTeam;
+        ServerSettings.castleWarsMinPlayersPerTeam = 1; // Explicit dev-mode quick-start.
         ObjectDefinition.loadRevision443();
         WalkingCollisionMap.loadCollisionMaps();
         ProjectileCollisionMap.loadCollisionMaps();
@@ -92,6 +95,7 @@ public final class CastleWarsQuickStartChecks {
                     "An active game's timer must remain unchanged");
             System.out.println("Castle Wars ::cwstart quick-start checks passed");
         } finally {
+            ServerSettings.castleWarsMinPlayersPerTeam = oldMinimum;
             waiting.remove(saradomin);
             waiting.remove(zamorak);
             playing.remove(saradomin);

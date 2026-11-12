@@ -1,0 +1,59 @@
+name: Verify Castle Wars Pre-Merge Suite
+
+on:
+  push:
+    branches:
+      - castlewars-hotfixes
+    paths:
+      - 'Server/src/main/java/**'
+      - 'Server/src/test/java/**'
+      - '.github/workflows/verify-castlewars-premerge.yml'
+  pull_request:
+    paths:
+      - 'Server/src/main/java/**'
+      - 'Server/src/test/java/**'
+      - '.github/workflows/verify-castlewars-premerge.yml'
+  workflow_dispatch:
+
+jobs:
+  castlewars:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+      - name: Compile all Castle Wars regression classes against the full server
+        working-directory: Server
+        run: |
+          set -euo pipefail
+          mkdir -p build-castlewars-premerge
+          find src/main/java -name '*.java' | sort > /tmp/castlewars-main-sources.txt
+          javac -encoding UTF-8 -cp 'lib/*' -d build-castlewars-premerge @/tmp/castlewars-main-sources.txt
+          find src/test/java -name 'CastleWars*Checks.java' | sort > /tmp/castlewars-checks.txt
+          echo 'src/test/java/CastleWarsCentreTowerMapAudit.java' >> /tmp/castlewars-checks.txt
+          javac -encoding UTF-8 -cp 'build-castlewars-premerge:lib/*' -d build-castlewars-premerge @/tmp/castlewars-checks.txt
+      - name: Execute all Castle Wars regression mains (including actual 443 tower map)
+        working-directory: Server
+        run: |
+          set -euo pipefail
+          count=0
+          while IFS= read -r test; do
+            if ! grep -Eq 'public static void main\(String\[\]' "$test"; then
+              continue
+            fi
+            class="${test#src/test/java/}"
+            class="${class%.java}"
+            class="${class//\//.}"
+            echo "::group::${class}"
+            timeout 90s java -cp 'build-castlewars-premerge:lib/*' "$class"
+            echo "::endgroup::"
+            count=$((count+1))
+          done < /tmp/castlewars-checks.txt
+          echo "Ran $count Castle Wars regression mains."
+          if [ "$count" -lt 30 ]; then
+            echo "Castle Wars suite unexpectedly incomplete" >&2
+            exit 1
+          fi

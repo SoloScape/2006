@@ -714,8 +714,6 @@ public final class CastleWarsManager {
     }
 
     public static boolean handleLobbyPortal(Player player, int objectId) {
-        initialize();
-
         Team requestedTeam;
         if (objectId == SARADOMIN_PORTAL_ID) {
             requestedTeam = Team.SARADOMIN;
@@ -729,11 +727,12 @@ public final class CastleWarsManager {
 
         // Castle Wars was members-only in 2006. A members account on a
         // free world must also be denied, not just an unpaid account.
-        if (ServerSettings.freeToPlayWorld || !player.isMember()) {
+        if (!canEnterMembersCastleWars(player)) {
             player.getPacketSender().sendGameMessage(
                     "Castle Wars is only available to members on members worlds.");
             return true;
         }
+        initialize();
 
         if (hasRestrictedTeamColourEquipment(player)) {
             player.getPacketSender().sendGameMessage("You can't wear anything in the head or cape slots in Castle Wars.");
@@ -786,6 +785,11 @@ public final class CastleWarsManager {
         player.getPacketSender().sendGameMessage("You join the " + getTeamName(team) + " team.");
         updateWaitingRoomInterface(player, System.currentTimeMillis());
         return true;
+    }
+
+    /** Historical Castle Wars access: both a P2P world and member account are required. */
+    public static boolean canEnterMembersCastleWars(Player player) {
+        return player != null && !ServerSettings.freeToPlayWorld && player.isMember();
     }
 
     public static Team getWaitingTeam(Player player) {

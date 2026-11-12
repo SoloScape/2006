@@ -115,10 +115,13 @@ public final class CastleWarsTicketAndBucketChecks {
             CharacterFileRecord record = new CharacterFileRecord();
             record.username = "CastleWarsTest";
             record.reservedSaveInt3 = 7;
+            record.castleWarsLosses = 4;
             CharacterJsonCodec.save(file, record);
             CharacterFileRecord loaded = CharacterJsonCodec.read(file, record.username);
             require(loaded.reservedSaveInt3 == 7,
                     "Unclaimed tickets did not survive a JSON save/load");
+            require(loaded.castleWarsLosses == 4,
+                    "Castle Wars losses collided with pending tickets on JSON save/load");
         } finally {
             Files.deleteIfExists(file.toPath());
             Files.deleteIfExists(new File(file.getPath() + ".bak").toPath());
@@ -204,7 +207,7 @@ public final class CastleWarsTicketAndBucketChecks {
         Constructor<?> constructor = stateType.getDeclaredConstructor(Team.class, Position.class, int.class);
         constructor.setAccessible(true);
         Object state = constructor.newInstance(Team.SARADOMIN, barricadePos,
-                CastleWarsEngineeringManager.BARRICADE_OBJECT_SARADOMIN);
+                CastleWarsEngineeringManager.BARRICADE_OBJECT_UNLIT);
         field(stateType, "burning").setBoolean(state, true);
         String key = barricadePos.getX() + ":" + barricadePos.getY() + ":" + barricadePos.getPlane();
         Object previous = barricades.put(key, state);
