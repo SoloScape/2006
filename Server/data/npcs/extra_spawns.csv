@@ -5,3 +5,6 @@ npc_id,name,x,y,plane,walk
 # Void Knights' armour-repair smith: revision-443 Squire 3797 (old ID 1766).
 # Placement by the 2006 Outpost smithy; verify exact tile against a 443 map capture.
 3797,Squire (Void Knights smith),2652,2660,0,0
+# Original May 2005 Strange Old Man; 443 native NPC ID 2024 (1671 is undefined).
+# Spawn near the Barrows mounds; exact tile requires a 2006 map capture.
+2024,Strange Old Man,3566,3290,0,1
