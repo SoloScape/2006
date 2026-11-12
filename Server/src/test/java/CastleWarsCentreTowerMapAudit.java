@@ -2,6 +2,13 @@ import com.rs2.ServerSettings;
 import com.rs2.cache.js5.WorldMaps;
 import com.rs2.model.objects.ObjectDefinition;
 import com.rs2.model.Position;
+import com.rs2.model.World;
+import com.rs2.model.EntityTargetMovement;
+import com.rs2.model.player.Player;
+import com.rs2.model.combat.CombatType;
+import com.rs2.model.skill.magic.SpellDefinition;
+import java.lang.reflect.Field;
+import java.util.Map;
 import com.rs2.model.gameplay.castlewars.CastleWarsManager;
 import com.rs2.util.path.MapDataReader;
 import com.rs2.util.path.WalkingCollisionMap;
@@ -75,7 +82,8 @@ public final class CastleWarsCentreTowerMapAudit {
                 if (bridge) ++towerTiles;
             }
         }
-        if (towerTiles < 25) throw new AssertionError("No 443 tower tops discovered");
+        if (towerTiles != 40) throw new AssertionError("Expected 40 actual 443 raised tower tiles, got " + towerTiles);
+        verifyCombatOnReal443Map();
         for (int plane = 0; plane <= 2; ++plane) {
             System.out.println("CENTRE-PLANE "+plane);
             for (int y = 3117; y >= 3090; --y) {
@@ -102,5 +110,84 @@ public final class CastleWarsCentreTowerMapAudit {
             }
         }
         System.out.println("CENTRE-RAW-REGION-AUDIT-PASSED");
+    }
+
+    /**
+     * Unlike the isolated synthetic reach test, this loads the real 443
+     * collision maps and searches for actual exposed firing lanes from
+     * BOTH towers. A false-positive square between the towers cannot pass.
+     */
+    @SuppressWarnings("unchecked")
+    private static void verifyCombatOnReal443Map() throws Exception {
+        Field field = CastleWarsManager.class.getDeclaredField("gamePlayers");
+        field.setAccessible(true);
+        Map<Player, CastleWarsManager.Team> teams =
+                (Map<Player, CastleWarsManager.Team>)field.get(null);
+        Player upper = new Player(null);
+        Player ground = new Player(null);
+        upper.isBot = true; ground.isBot = true;
+        upper.botEnabled = true; ground.botEnabled = true;
+        upper.botPrimaryCombatStyle = 2; ground.botPrimaryCombatStyle = 2;
+        upper.botActiveCombatStyle = 2; ground.botActiveCombatStyle = 2;
+        upper.setQueuedCombatSpell(SpellDefinition.WIND_STRIKE);
+        ground.setQueuedCombatSpell(SpellDefinition.WIND_STRIKE);
+        upper.setSize(1); ground.setSize(1);
+        upper.setIndex(75); ground.setIndex(76);
+        upper.setEncodedIndex(32768+75); ground.setEncodedIndex(32768+76);
+        Player oldUpper = World.players[75], oldGround = World.players[76];
+        World.players[75] = upper; World.players[76] = ground;
+        teams.put(upper, CastleWarsManager.Team.SARADOMIN);
+        teams.put(ground, CastleWarsManager.Team.ZAMORAK);
+        int[] valid = new int[2];
+        String[] examples = new String[2];
+        try {
+            for (int y = 3098; y <= 3109; ++y) {
+                for (int x = 2394; x <= 2405; ++x) {
+                    Position tower = new Position(x, y, 0);
+                    if (!CastleWarsManager.isMiddleIslandTowerTop(tower)) continue;
+                    if ((WalkingCollisionMap.getTileFlags(x,y,0) & 0x1280100) != 0) continue;
+                    int whichTower = y <= 3102 ? 0 : 1;
+                    upper.setPosition(tower);
+                    for (int by = 3093; by <= 3115; ++by) {
+                        for (int bx = 2390; bx <= 2409; ++bx) {
+                            Position groundTile = new Position(bx,by,0);
+                            if (CastleWarsManager.isMiddleIslandTowerTop(groundTile)
+                                    || (WalkingCollisionMap.getTileFlags(bx,by,0)
+                                            & 0x1280100) != 0) continue;
+                            ground.setPosition(groundTile);
+                            if (!CastleWarsManager.isMiddleIslandTowerCrossLevelPair(upper, ground)
+                                    || !CastleWarsManager.hasCastleWarsProjectileLineOfSight(upper, ground)
+                                    || !CastleWarsManager.hasCastleWarsProjectileLineOfSight(ground, upper))
+                                continue;
+                            for (CombatType type : new CombatType[]{CombatType.MAGIC, CombatType.RANGED}) {
+                                if (!EntityTargetMovement.canReachTarget(upper,ground,10,type)
+                                        || !EntityTargetMovement.canReachTarget(ground,upper,10,type)) {
+                                    throw new AssertionError("Real 443 tower lane fails typed attack "
+                                            + tower+" -> "+groundTile+" style="+type);
+                                }
+                            }
+                            if (!EntityTargetMovement.canReachTarget(upper,ground,10)
+                                    || !EntityTargetMovement.canReachTarget(ground,upper,10)) {
+                                throw new AssertionError("Real 443 mage chases off tower "
+                                        + tower+" -> "+groundTile);
+                            }
+                            ++valid[whichTower];
+                            if (examples[whichTower] == null) examples[whichTower] =
+                                    tower+" -> "+groundTile;
+                        }
+                    }
+                }
+            }
+            System.out.println("REAL-443-TOWER-SHOTS south="+valid[0]+" north="+valid[1]
+                    + " firstSouth="+examples[0]+" firstNorth="+examples[1]);
+            if (valid[0] < 10 || valid[1] < 10) {
+                throw new AssertionError("443 map has no practical projectile lanes for one "
+                        + "or both middle-island towers");
+            }
+        } finally {
+            teams.remove(upper);teams.remove(ground);
+            World.players[75]=oldUpper;World.players[76]=oldGround;
+            upper.setIndex(-1);ground.setIndex(-1);
+        }
     }
 }
