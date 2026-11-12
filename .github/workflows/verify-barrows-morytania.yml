@@ -37,8 +37,13 @@ on:
       - 'Server/src/test/java/VeracsDefilerCombatChecks.java'
       - 'Server/src/test/java/BarrowsEquipmentDurabilityChecks.java'
       - 'Server/src/test/java/BarrowsRepairChecks.java'
+      - 'Server/src/test/java/BarrowsItemLossChecks.java'
+      - 'Server/src/test/java/BarrowsPrayerDrainChecks.java'
       - 'Server/src/test/java/com/rs2/model/gameplay/barrows/BarrowsChestRewardChecks.java'
       - '.github/workflows/verify-barrows-morytania.yml'
+  pull_request:
+    branches:
+      - Feature/Barrows
   workflow_dispatch:
 
 jobs:
@@ -104,6 +109,14 @@ jobs:
           javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
             src/test/java/BarrowsRepairChecks.java
           java -cp 'barrows-test-classes:lib/*' BarrowsRepairChecks
+      - name: Verify pristine and worn Barrows gear break on death and prayer faces
+        working-directory: Server
+        run: |
+          javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
+            src/test/java/BarrowsItemLossChecks.java \
+            src/test/java/BarrowsPrayerDrainChecks.java
+          java -cp 'barrows-test-classes:lib/*' BarrowsItemLossChecks
+          java -cp 'barrows-test-classes:lib/*' BarrowsPrayerDrainChecks
       - name: Verify 2006 Barrows chest loot delivery and one-time rewards
         working-directory: Server
         run: |
