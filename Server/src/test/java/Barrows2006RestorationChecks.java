@@ -379,6 +379,58 @@ public final class Barrows2006RestorationChecks {
                 "Old Man does not speak to a player carrying a spade");
         require(unpreparedVisitor.getDialogueManager().getDialogueStep() == 1,
                 "With-spade dialogue should proceed to the four 2006 conversation variants");
+        checkOldManConversationFlow(unpreparedVisitor);
+    }
+
+    private static void checkOldManConversationFlow(Player visitor) {
+        // Test the surviving branches explicitly rather than relying on
+        // random selections. Later quests and 2014 mound-spade text are not
+        // evidence for the original 2006 conversations.
+        DialogueManager dialogue = visitor.getDialogueManager();
+
+        require(DialogueManager.continueDialogue(visitor, 2024, 10, 0),
+                "Strange Old Man secret choices missing");
+        require(DialogueManager.continueDialogue(visitor, 2024, 11, 1),
+                "Accepting the secret failed");
+        require(!dialogue.isDialogueInactive(),
+                "Accepting secret closed before the Old Man's answer");
+        require(DialogueManager.continueDialogue(visitor, 2024, 12, 0),
+                "Secret answer missing");
+        require(dialogue.isDialogueInactive(), "Secret branch did not finish");
+
+        require(DialogueManager.continueDialogue(visitor, 2024, 10, 0),
+                "Secret choices could not be reopened");
+        require(DialogueManager.continueDialogue(visitor, 2024, 11, 2),
+                "Declining secret failed");
+        require(dialogue.isDialogueInactive(),
+                "Declining the secret must finish the dialogue");
+
+        require(DialogueManager.continueDialogue(visitor, 2024, 20, 0),
+                "Knock-knock player response missing");
+        require(DialogueManager.continueDialogue(visitor, 2024, 21, 0),
+                "Knock-knock punchline missing");
+        require(!dialogue.isDialogueInactive(),
+                "Knock-knock joke ended before player's reaction");
+        require(DialogueManager.continueDialogue(visitor, 2024, 22, 0),
+                "Knock-knock final reaction missing");
+        require(dialogue.isDialogueInactive(), "Knock-knock branch did not finish");
+
+        require(DialogueManager.continueDialogue(visitor, 2024, 40, 0),
+                "Scream branch options missing");
+        require(DialogueManager.continueDialogue(visitor, 2024, 41, 1),
+                "Asking about the scream failed");
+        require(!dialogue.isDialogueInactive(),
+                "Scream branch closed instead of replying");
+        require(DialogueManager.continueDialogue(visitor, 2024, 42, 0),
+                "Old Man did not scream again");
+        require(dialogue.getDialogueStep() == 39,
+                "After screaming, the dialogue must return to its choices");
+        require(DialogueManager.continueDialogue(visitor, 2024, 40, 0),
+                "Repeated scream options were unavailable");
+        require(DialogueManager.continueDialogue(visitor, 2024, 41, 2),
+                "Leaving the screaming Old Man failed");
+        require(dialogue.isDialogueInactive(),
+                "Declining to continue the scream must finish the dialogue");
     }
 
     private static int u16(byte[] data, int off) {
