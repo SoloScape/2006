@@ -59,9 +59,9 @@ The [server guide](Server/README.md) describes the implementation in more detail
 ## Roadmap
 
 <!-- roadmap-progress:start -->
-**Overall completion: 8.3%** · **16 / 193** counted roadmap items marked ✅
+**Overall completion: 4.3%** · **8 / 185** counted roadmap items marked ✅
 
-![Roadmap completion: 8.3% — 16 of 193 items](docs/roadmap-progress.svg)
+![Roadmap completion: 4.3% — 8 of 185 items](docs/roadmap-progress.svg)
 <!-- roadmap-progress:end -->
 
 Progress counts ✅ entries across all roadmap categories, including optional plugins. The percentage and bar refresh automatically after roadmap changes on `main` via GitHub Actions. This tracks README statuses, not independently verified gameplay.
@@ -314,21 +314,7 @@ The goal is the **18 December 2006 / revision 443** experience. Open a category 
 
 </details>
 
-<details>
-<summary><strong>Client, tools & supporting systems</strong></summary>
 
-| Name | Status |
-| :--- | :---: |
-| Java 8 setup and Windows launchers | ✅ |
-| Client / server revision 443 support | ✅ |
-| Character JSON saves & migration | ✅ |
-| Optional SQLite save backend | ✅ |
-| World simulation & bot AI | ✅ |
-| Web / mobile client streaming | ✅ |
-| Client developer tools / MCP | ✅ |
-| Automated content audits & checks | ✅ |
-
-</details>
 
 ## Browser & phone play
 
