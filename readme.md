@@ -68,7 +68,10 @@ Progress counts ✅ entries across all roadmap categories, including optional pl
 
 The goal is the **18 December 2006 / revision 443** experience. Open a category below to see its items and their current tracker statuses.
 
-**Status key:** ✅ Complete (Accurate as possible) · 📜 Needs Audit · ➖ Outside the December 2006 scope
+**Status key:** 
+✅ Complete (Accurate as possible)
+⛔ Partially Working
+📜 Needs Audit
 
 📜 means the item needs an audit, whether code exists or not. A ✅ status reflects the roadmap's current assessment, not independent verification.
 
