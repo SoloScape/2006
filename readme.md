@@ -306,7 +306,7 @@ The above lists track identified quest scripts and late-2006 gaps; they are **no
 
 | Content | Status | Content | Status |
 | --- | :---: | --- | :---: |
-| Barrows | 🚧 | Castle Wars | 🚧 |
+| Barrows | ✅ | Castle Wars | ✅ |
 | Duel Arena | 🚧 | TzHaar Fight Caves | 🚧 |
 | Mage Training Arena | 🚧 | Tai Bwo Wannai Cleanup | 🚧 |
 | Falador Party Room | 🚧 | Pest Control | ⛔ |
