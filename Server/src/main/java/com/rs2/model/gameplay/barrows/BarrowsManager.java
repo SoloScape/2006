@@ -600,6 +600,7 @@ public final class BarrowsManager {
      * Enabled aggressive block sorting
      */
     public static boolean handleFirstObjectAction(Player player, int objectId) {
+        if (isBarrowsCryptObject(objectId) && !canAccessBarrows(player)) return true;
         switch (objectId) {
             case 10284: {
                 if (player.barrowsChestOpened) {
@@ -640,11 +641,8 @@ public final class BarrowsManager {
                     Player player4 = player;
                     player4.packetSender.sendConfig(453, value2);
                     player.configStates[453] = value2;
-                    value2 = player.getInteractionTargetX();
-                    int interactionTargetY = player.getInteractionTargetY();
-                    int objectOrientation = SkillActionHelper.getObjectOrientation(objectId, value2, interactionTargetY, player.getPosition().getPlane());
-                    int objectType = SkillActionHelper.getObjectType(objectId, value2, interactionTargetY, player.getPosition().getPlane());
-                    ObjectManager.getInstance().addDynamicObject(new DynamicObject(6775, value2, interactionTargetY, player.getPosition().getPlane(), objectOrientation, objectType, objectId, 500), true);
+                    // Config 453 opens the chest for this player only. Never
+                    // mutate the shared world object or collision map.
                     if (player.getBarrowsKilledBrothers()[player.getBarrowsTargetBrotherIndex()]) return true;
                     if (!BarrowsManager.spawnBarrowsBrother(player,
                             brotherSarcophagusNpcIds[player.getBarrowsTargetBrotherIndex()][1])) {
@@ -748,6 +746,9 @@ public final class BarrowsManager {
     }
 
     public static boolean digIntoCrypt(Player player) {
+        // Barrows is a 2006 members-only activity; avoid rejecting a Dig
+        // action elsewhere on the map.
+        if (isOnSurfaceMound(player) && !canAccessBarrows(player)) return true;
         if (player.isInArea(3553, 3561, 3294, 3301)) {
             player.moveTo(new Position(3578, 9706, 3));
             player.packetSender.sendGameMessage("You've broken into a crypt!");
@@ -1108,6 +1109,32 @@ public final class BarrowsManager {
     public static boolean isInBarrowsTunnels(Player player) {
         return player != null && player.getPosition().getPlane() == 0
                 && player.isInBarrows();
+    }
+
+    /** Only objects within the crypt/tunnel activity use the members check. */
+    public static boolean isBarrowsCryptObject(int id) {
+        return id == 10284 || id == 6774 || id == 6775
+                || (id >= 6771 && id <= 6773)
+                || (id >= 6821 && id <= 6823)
+                || (id >= 6702 && id <= 6707);
+    }
+
+    public static boolean canAccessBarrows(Player player) {
+        if (player != null && !ServerSettings.freeToPlayWorld && player.isMember()) return true;
+        if (player != null) {
+            player.packetSender.sendGameMessage("You need a members account and a members world to enter the Barrows.");
+        }
+        return false;
+    }
+
+    private static boolean isOnSurfaceMound(Player player) {
+        if (player == null || player.getPosition().getPlane() != 0) return false;
+        return player.isInArea(3553, 3561, 3294, 3301)
+                || player.isInArea(3550, 3557, 3278, 3287)
+                || player.isInArea(3561, 3568, 3285, 3292)
+                || player.isInArea(3570, 3579, 3293, 3302)
+                || player.isInArea(3571, 3582, 3278, 3285)
+                || player.isInArea(3562, 3569, 3273, 3279);
     }
 
     public static void resetBarrowsState(Player player) {
