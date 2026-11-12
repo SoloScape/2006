@@ -47,6 +47,7 @@ public final class Barrows2006RestorationChecks {
             checkCombatWearStopsAfterLeaving();
             checkNative2006NpcAndSpawnData();
             checkStrangeOldManPatrolRouting();
+            checkStrangeOldManDigAnimationClearsBeforeWalking();
             System.out.println("Barrows restoration: fresh-run randomisation, independent "
                     + "two-player combat/credit/chest, members entry, post-combat wear, "
                     + "original NPCs and native spade removal passed.");
@@ -441,6 +442,50 @@ public final class Barrows2006RestorationChecks {
                     "Barrows patrol cannot approach mound " + i);
             scout.setPosition(new Position(endX, endY, 0));
             scout.getMovementQueue().clear();
+        }
+    }
+
+    private static void checkStrangeOldManDigAnimationClearsBeforeWalking() {
+        Player previous = World.getPlayers()[55];
+        Player observer = player(55, 3566, 3290, 0);
+        observer.isBot = false;
+        World.getPlayers()[55] = observer;
+        try {
+            Npc oldMan = new Npc(2024);
+            oldMan.setSize(1);
+            oldMan.setPosition(new Position(3566, 3290, 0));
+            oldMan.setSpawnPosition(new Position(3566, 3290, 0));
+
+            require(BarrowsOldManPatrol.process(oldMan), "Old Man patrol not enabled");
+            require(!oldMan.getMovementQueue().getSteps().isEmpty(),
+                    "Old Man did not queue an on-foot first-mound route");
+            com.rs2.model.MovementStep last =
+                    (com.rs2.model.MovementStep) oldMan.getMovementQueue().getSteps().getLast();
+            // Simulate the walking queue reaching the intended exact tile.
+            oldMan.setPosition(new Position(last.getX(), last.getY(), 0));
+            oldMan.getMovementQueue().clear();
+            oldMan.getMovementQueue().removeFirstStep();
+            oldMan.getUpdateState().reset();
+            BarrowsOldManPatrol.process(oldMan);
+            require(oldMan.getUpdateState().isAnimationUpdateRequired()
+                            && oldMan.getUpdateState().getAnimationId() == 831,
+                    "Old Man did not dig upon reaching a mound");
+
+            boolean clearedBeforeWalking = false;
+            for (int tick = 0; tick < 40; tick++) {
+                oldMan.getUpdateState().reset();
+                BarrowsOldManPatrol.process(oldMan);
+                if (oldMan.getUpdateState().isAnimationUpdateRequired()
+                        && oldMan.getUpdateState().getAnimationId() == -1) {
+                    clearedBeforeWalking =
+                            !oldMan.getMovementQueue().getSteps().isEmpty();
+                    break;
+                }
+            }
+            require(clearedBeforeWalking,
+                    "Digging action animation was not cancelled before the next walk");
+        } finally {
+            World.getPlayers()[55] = previous;
         }
     }
 

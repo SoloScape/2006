@@ -10,16 +10,14 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
- * A single Strange Old Man visits each of the six surface mounds rather than
- * wandering within the default five-tile NPC spawn radius.
- *
- * The mound centres come from BarrowsManager's 443 surface digging areas.
- * The ordering, pauses and animation timing are reconstructed behaviour, not
- * claimed to be an exact 2006 Jagex patrol recording.
+ * One Strange Old Man walks to the six surface mounds, with short digging
+ * pauses. The route and timing are reconstructed, not verified 2006 footage.
  */
 public final class BarrowsOldManPatrol {
     public static final int NPC_ID = 2024;
     private static final int DIG_ANIMATION = 831;
+    private static final int MAX_MOUND_DISTANCE = 3;
+    private static final int BLOCKED_TILE = 0x1280100;
     private static final int[][] MOUND_CENTRES = {
         {3557, 3298}, // northwest
         {3553, 3283}, // southwest
@@ -29,13 +27,15 @@ public final class BarrowsOldManPatrol {
         {3565, 3290}  // centre
     };
 
-    // Weak keys ensure a despawned/replaced NPC does not retain patrol state.
     private static final Map<Npc, PatrolState> STATES =
             Collections.synchronizedMap(new WeakHashMap<Npc, PatrolState>());
 
     private static final class PatrolState {
         int nextMound;
+        int destinationX;
+        int destinationY;
         boolean travelling;
+        boolean digging;
         int pauseTicks;
     }
 
@@ -55,19 +55,31 @@ public final class BarrowsOldManPatrol {
                 && position.getY() >= 3270 && position.getY() <= 3306;
     }
 
+    private static int distance(Position a, int x, int y) {
+        return Math.max(Math.abs(a.getX() - x), Math.abs(a.getY() - y));
+    }
+
+    private static void beginDigging(Npc npc, PatrolState state) {
+        npc.getUpdateState().setAnimation(DIG_ANIMATION);
+        state.digging = true;
+        state.travelling = false;
+        state.nextMound = (state.nextMound + 1) % moundCount();
+        state.pauseTicks = 8 + GameUtil.randomInt(12);
+    }
+
     /**
-     * @return true when this NPC is the surface Strange Old Man and its
-     *         movement should not fall back to the generic roaming handler.
+     * @return true when this is our surface Old Man and generic roaming
+     * should not be used.
      */
     public static boolean process(Npc npc) {
         if (npc == null || npc.getNpcId() != NPC_ID
                 || !isBarrowsSurface(npc.getSpawnPosition())) return false;
 
-        // Do not move remote NPCs when the area has no real players.
         if (!World.hasNearbyNonBotPlayer(npc)
                 || npc.isMovementLocked() || npc.isStunned()) return true;
 
-        // A collision-checked route is already being followed.
+        // PathFinder creates actual walking steps. Do not replace them,
+        // replay an animation, or advance the patrol while a route is active.
         if (!npc.getMovementQueue().getSteps().isEmpty()) return true;
 
         PatrolState state = STATES.get(npc);
@@ -78,20 +90,15 @@ public final class BarrowsOldManPatrol {
 
         if (state.travelling) {
             state.travelling = false;
-            Position destination = moundTarget(state.nextMound);
-            int distance = Math.max(
-                    Math.abs(npc.getPosition().getX() - destination.getX()),
-                    Math.abs(npc.getPosition().getY() - destination.getY()));
-            if (distance <= 10) {
-                // Even when the mound's centre is obstructed, the pathfinder
-                // can choose the nearest walkable tile around it.
-                npc.getUpdateState().setAnimation(DIG_ANIMATION);
-                state.nextMound = (state.nextMound + 1) % moundCount();
-                state.pauseTicks = 8 + GameUtil.randomInt(12);
+            Position mound = moundTarget(state.nextMound);
+            // A collision or an interrupted route must never count as a
+            // visit merely because it stopped up to ten tiles from a mound.
+            if (distance(npc.getPosition(), state.destinationX, state.destinationY) <= 1
+                    && distance(npc.getPosition(), mound.getX(), mound.getY())
+                            <= MAX_MOUND_DISTANCE) {
+                beginDigging(npc, state);
             } else {
-                // Interaction or a dynamic obstacle interrupted this route.
-                // Try the same mound again, rather than falsely marking a visit.
-                state.pauseTicks = 4;
+                state.pauseTicks = 4; // retry the same mound on foot
             }
             return true;
         }
@@ -101,16 +108,43 @@ public final class BarrowsOldManPatrol {
             return true;
         }
 
-        Position destination = moundTarget(state.nextMound);
-        if (PathFinder.findPath(npc, destination.getX(), destination.getY(),
-                true, 1, 1)
-                && !npc.getMovementQueue().getSteps().isEmpty()) {
-            state.travelling = true;
-        } else {
-            // A blocked mound must not trap the NPC in an endless retry loop.
-            state.nextMound = (state.nextMound + 1) % moundCount();
-            state.pauseTicks = 8;
+        // 831 is an action animation. The native client can keep rendering it
+        // over walking until explicitly cancelled, making an otherwise normal
+        // server-side walk look like a freeze followed by a positional jump.
+        if (state.digging) {
+            npc.getUpdateState().setAnimation(-1);
+            state.digging = false;
         }
+
+        Position mound = moundTarget(state.nextMound);
+        // These mound centres can be blocked by scenery. Route to an exact
+        // reachable tile at most three tiles from the centre, rather than
+        // PathFinder's broad ten-tile approximate destination.
+        for (int radius = 0; radius <= MAX_MOUND_DISTANCE; radius++) {
+            for (int dy = -radius; dy <= radius; dy++) {
+                for (int dx = -radius; dx <= radius; dx++) {
+                    if (Math.max(Math.abs(dx), Math.abs(dy)) != radius) continue;
+                    int x = mound.getX() + dx;
+                    int y = mound.getY() + dy;
+                    if ((com.rs2.util.path.WalkingCollisionMap.getTileFlags(x, y, 0)
+                            & BLOCKED_TILE) != 0) continue;
+                    if (!PathFinder.findPath(npc, x, y, false, 1, 1)) continue;
+                    if (npc.getMovementQueue().getSteps().isEmpty()) {
+                        // Already standing at an exact reachable destination.
+                        beginDigging(npc, state);
+                    } else {
+                        state.destinationX = x;
+                        state.destinationY = y;
+                        state.travelling = true;
+                    }
+                    return true;
+                }
+            }
+        }
+
+        // No safe path currently exists. Remain where we are; never use
+        // moveTo/teleport as a fallback for a failed walk.
+        state.pauseTicks = 8;
         return true;
     }
 }

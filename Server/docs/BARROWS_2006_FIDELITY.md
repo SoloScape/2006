@@ -103,3 +103,10 @@ The push-triggered `.github/workflows/verify-barrows-morytania.yml` compiles the
 - The Old Man uses a six-stop collision-aware `PathFinder` route derived from `BarrowsManager`'s six mound locations, with short digging-animation pauses at reached stops instead of the generic five-tile spawn-radius roaming.
 - `Barrows2006RestorationChecks` checks repeated NPC loading after the Old Man moves and checks the six paths over the native 443 collision map.
 - **Historical caution:** the specific patrol order, wait times and digging animation selection are reconstructions. They should be compared with 2006 capture footage before being described as exact original NPC behaviour.
+
+## 12 November 2026 Strange Old Man animation and route follow-up
+
+- The dig animation (`831`) is explicitly cancelled with animation `-1` before the next walk, so the 443 client does not hold the action pose during subsequent movement.
+- Patrol stops are now reached with exact collision-aware paths to a walkable tile within three tiles of each mound, not the old ten-tile approximate path fallback; failed routes are retried on foot, never teleported or counted as completed.
+- Added a regression that simulates reaching a mound and verifies the dig animation is cleared when the next walking route starts.
+- In-client visual QA remains necessary for the specific dig animation and viewpoint-dependent NPC disappearance/reappearance.
