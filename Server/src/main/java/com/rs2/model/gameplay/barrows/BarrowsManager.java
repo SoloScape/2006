@@ -516,8 +516,9 @@ public final class BarrowsManager {
 
     private static boolean[] activeTunnelBrothers(Player player) {
         boolean[] active = new boolean[BarrowsTunnelEncounter.BROTHER_NPC_IDS.length];
-        // ownedNpc only tracks the most recently spawned monster, so looking
-        // at it alone could summon duplicates of a still-living brother.
+        // Keep this ownership scan for chest/sarcophagus interactions only.
+        // Tunnel door encounters intentionally allow already-live brothers
+        // to spawn again, matching the documented 2006 duplicate bug.
         for (Npc npc : World.getNpcs()) {
             if (npc == null || !npc.isActive() || npc.isDead()) continue;
             int index = BarrowsTunnelEncounter.brotherIndexForNpcId(npc.getNpcId());
@@ -531,13 +532,21 @@ public final class BarrowsManager {
         return index >= 0 && activeTunnelBrothers(player)[index];
     }
 
+    /**
+     * 2006 behaviour: an undefeated brother remains eligible for a door
+     * ambush even if another copy is already alive nearby. This recreates
+     * the duplicate-tunnel-brother bug documented in March 2006 and only
+     * fixed by Jagex in November 2011. Defeated brothers stay excluded.
+     */
+    private static int[] eligibleTunnelBrothers(Player player) {
+        return BarrowsTunnelEncounter.eligibleBrothers(
+                player.getBarrowsKilledBrothers());
+    }
+
     private static void spawnRandomCryptNpc(Player player, Position arrivalTile) {
-        // The static rooms keep their original crypt spiders, giant rats and
-        // bloodworms. Doors instead roll only normal rats, bloodworms,
-        // skeletons and undefeated brothers, as in the historical guides.
-        boolean[] active = activeTunnelBrothers(player);
-        int[] remaining = BarrowsTunnelEncounter.eligibleBrothers(
-                player.getBarrowsKilledBrothers(), active);
+        // Keep static room spawns, original weighted door encounter odds and
+        // collision-safe placement. Do not exclude already-live brothers.
+        int[] remaining = eligibleTunnelBrothers(player);
         int roll = GameUtil.randomInt(BarrowsTunnelEncounter.ROLL_COUNT);
         int brotherIndex = remaining.length == 0 ? 0 : GameUtil.randomInt(remaining.length);
         int npcId = BarrowsTunnelEncounter.npcForRoll(
@@ -562,8 +571,9 @@ public final class BarrowsManager {
     }
 
     private static boolean spawnBarrowsBrother(Player player, int npcId) {
-        // A brother may already have ambushed the player at a tunnel door.
-        // Do not summon a second copy at the reward chest or sarcophagus.
+        // Chest/sarcophagus spawns remain separate from the historical
+        // tunnel-door duplicate bug; do not re-summon an encountered brother
+        // at the chest or in a crypt.
         if (hasActiveBarrowsBrother(player, npcId)) return true;
         Npc brother = new Npc(npcId);
         Position safe = BarrowsNpcSpawnPlacement.findSafeSpawn(
