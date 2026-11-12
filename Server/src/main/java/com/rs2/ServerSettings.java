@@ -82,6 +82,8 @@ public final class ServerSettings {
     public static int tradeBotCount = 50;
     public static int progressiveBotCount = 10;
     public static boolean freeToPlayWorld = true;
+    /** Five per team in pre-2013 Castle Wars; 1 is available for local testing/bots. */
+    public static int castleWarsMinPlayersPerTeam = 5;
     public static boolean wildernessSlayerEnabled;
     public static int botLoginIdLimit;
     public static boolean grandExchangeEnabled;

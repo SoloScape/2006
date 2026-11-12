@@ -255,7 +255,7 @@ public final class CastleWarsManager {
         6764  // Zamorak mjolnir
     };
 
-    public static final int MINIMUM_PLAYERS_PER_TEAM = 1;
+    public static final int MINIMUM_PLAYERS_PER_TEAM = 5;
     public static final int WAITING_DURATION_SECONDS = 5 * 60;
     public static final int GAME_DURATION_SECONDS = 20 * 60;
     // Provisional: the modern Wiki records two minutes; the exact Dec-2006 threshold is unverified.
@@ -727,6 +727,14 @@ public final class CastleWarsManager {
             return false;
         }
 
+        // Castle Wars was members-only in 2006. A members account on a
+        // free world must also be denied, not just an unpaid account.
+        if (ServerSettings.freeToPlayWorld || !player.isMember()) {
+            player.getPacketSender().sendGameMessage(
+                    "Castle Wars is only available to members on members worlds.");
+            return true;
+        }
+
         if (hasRestrictedTeamColourEquipment(player)) {
             player.getPacketSender().sendGameMessage("You can't wear anything in the head or cape slots in Castle Wars.");
             player.getPacketSender().sendGameMessage("Remove your headgear and cape before entering the portal.");
@@ -1111,7 +1119,7 @@ public final class CastleWarsManager {
     private static void showPlayerScoreboardStats(Player player) {
         int games = Math.max(0, player.reservedSaveInt1);
         int wins = Math.max(0, player.reservedSaveInt2);
-        int losses = Math.max(0, player.reservedSaveInt3);
+        int losses = Math.max(0, player.castleWarsLosses);
         player.getPacketSender().sendGameMessage(
                 "You've played " + games + " games of Castle Wars. - Won: "
                         + wins + " Lost: " + losses + ".");
@@ -1129,7 +1137,7 @@ public final class CastleWarsManager {
         if (won) {
             player.reservedSaveInt2 = incrementCounter(player.reservedSaveInt2);
         } else {
-            player.reservedSaveInt3 = incrementCounter(player.reservedSaveInt3);
+            player.castleWarsLosses = incrementCounter(player.castleWarsLosses);
         }
     }
 
@@ -3290,7 +3298,10 @@ public final class CastleWarsManager {
     /**
      * Persist uncollected match tickets in the existing versioned character
      * save slot (reservedSaveInt3). It is saved to JSON through the legacy
-     * serializer and restored on login, rather than stored in a transient map.
+     * serializer and restored on login. This slot is EXCLUSIVELY pending
+     * tickets. Player loss statistics use the separately persisted named
+     * field castleWarsLosses; the pre-fix slot cannot reliably be split
+     * into past losses and past pending tickets without a migration marker.
      * This slot is dedicated to Castle Wars ticket claims.
      *
      * @return true only when every ticket reached the player's inventory.
@@ -3588,8 +3599,12 @@ public final class CastleWarsManager {
     }
 
     private static boolean hasMinimumPlayersToStartInternal() {
-        return getWaitingPlayerCountInternal(Team.SARADOMIN) >= MINIMUM_PLAYERS_PER_TEAM
-                && getWaitingPlayerCountInternal(Team.ZAMORAK) >= MINIMUM_PLAYERS_PER_TEAM;
+        // Historical default is 5 per side; a configured value of 1 allows
+        // a small local test with bots, without changing production rules.
+        int required = Math.max(1, Math.min(MINIMUM_PLAYERS_PER_TEAM,
+                ServerSettings.castleWarsMinPlayersPerTeam));
+        return getWaitingPlayerCountInternal(Team.SARADOMIN) >= required
+                && getWaitingPlayerCountInternal(Team.ZAMORAK) >= required;
     }
 
     private static int getWaitingPlayerCountInternal(Team team) {

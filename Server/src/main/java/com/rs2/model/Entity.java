@@ -11,6 +11,7 @@ import com.rs2.model.Position;
 import com.rs2.model.animation.GraphicEffect;
 import com.rs2.model.area.MultiwayAreaDefinition;
 import com.rs2.model.combat.AttackXpMode;
+import com.rs2.model.gameplay.castlewars.CastleWarsManager;
 import com.rs2.model.combat.CombatAction;
 import com.rs2.model.combat.CombatTargetDelayTimer;
 import com.rs2.model.combat.CombatType;
@@ -827,7 +828,12 @@ public abstract class Entity {
 
     public final boolean isInTeleportRestrictedArea() {
         Entity entity = this;
-        return entity.isInArea(2587, 2619, 4760, 4785) || this.isInFightPits() || (entity = this).isInArea(2394, 2404, 5169, 5175) || this.isInFightCave() || this.isInDuelArena();
+        return entity.isInArea(2587, 2619, 4760, 4785) || this.isInFightPits()
+                || (entity = this).isInArea(2394, 2404, 5169, 5175)
+                || this.isInFightCave() || this.isInDuelArena()
+                // Prevent spellbook, jewellery and standard item teleports
+                // from escaping a live Castle Wars match. Allow lobby travel.
+                || (this.isPlayer() && CastleWarsManager.isInGame((Player)this));
     }
 
     public final boolean isMovementLocked() {

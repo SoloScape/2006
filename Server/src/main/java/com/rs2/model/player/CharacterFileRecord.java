@@ -179,7 +179,8 @@ public final class CharacterFileRecord {
     public int reservedSaveInt1 = 0;
     public long reservedSaveLong1 = 0L;
     public int reservedSaveInt2 = 0;
-    public int reservedSaveInt3 = 0;
+    public int reservedSaveInt3 = 0; // Pending Castle Wars tickets.
+    public int castleWarsLosses = 0;
     public int familyCrestGauntletItemId = 778;
     public int mageArenaFlamesOfZamorakCastsRemaining = 100;
     public int mageArenaSaradominStrikeCastsRemaining = 100;

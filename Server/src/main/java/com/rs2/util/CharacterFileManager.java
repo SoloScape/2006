@@ -125,6 +125,10 @@ public final class CharacterFileManager {
                             CharacterFileManager.readCharacterFileRecord(stagingPath, username, true);
                     if (record == null)
                         throw new IOException("Cannot parse temporary legacy character save");
+                    // The staging .dat uses the fixed legacy schema. This
+                    // additional named field must be copied from the live
+                    // player into JSON or every save would reset the loss count.
+                    record.castleWarsLosses = Math.max(0, player.castleWarsLosses);
                     CharacterJsonCodec.save(json, record);
                     // Do not keep stale .dat files alongside new canonical JSON saves.
                     File legacy = new File(characterDirectory, username + ".dat");
@@ -4493,6 +4497,7 @@ public final class CharacterFileManager {
         player.reservedSaveLong1 = record.reservedSaveLong1;
         player.reservedSaveInt2 = record.reservedSaveInt2;
         player.reservedSaveInt3 = record.reservedSaveInt3;
+        player.castleWarsLosses = Math.max(0, record.castleWarsLosses);
         player.familyCrestGauntletItemId = record.familyCrestGauntletItemId;
         player.mageArenaFlamesOfZamorakCastsRemaining = record.mageArenaFlamesOfZamorakCastsRemaining;
         player.mageArenaSaradominStrikeCastsRemaining = record.mageArenaSaradominStrikeCastsRemaining;

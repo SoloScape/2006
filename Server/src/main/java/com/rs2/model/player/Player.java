@@ -521,7 +521,8 @@ extends Entity {
     public boolean barrowsChestOpened;
     public int flourMillHopperGrainCount;
     public long reservedSaveLong1;
-    public int reservedSaveInt3;
+    public int reservedSaveInt3; // Castle Wars pending ticket claims only.
+    public int castleWarsLosses; // Separate named JSON statistic.
     public int reservedSaveInt2;
     public String reservedVersion11String;
     public long membershipExpiresMillis;
