@@ -274,59 +274,6 @@ Bosses marked 🚧 have related combat, reward, or encounter code in the reposit
 
 </details>
 
-### Quests
-
-<details>
-<summary><strong>Existing quest scripts (34 entries) — expand tracker</strong></summary>
-
-These quests have dedicated source files under `Server/src/main/java/com/rs2/model/quest/impl/`. Their 🚧 status means **a script exists**, not that every stage, requirement, reward, and dialogue is fully playable.
-
-| Content | Status | Content | Status |
-| --- | :---: | --- | :---: |
-| Black Knights' Fortress | 🚧 | Cook's Assistant | 🚧 |
-| Demon Slayer | 🚧 | Doric's Quest | 🚧 |
-| Dragon Slayer | 🚧 | Druidic Ritual | 🚧 |
-| Elemental Workshop | 🚧 | Ernest the Chicken | 🚧 |
-| Family Crest | 🚧 | Gertrude's Cat | 🚧 |
-| Goblin Diplomacy | 🚧 | Heroes' Quest | 🚧 |
-| Holy Grail | 🚧 | Imp Catcher | 🚧 |
-| Jungle Potion | 🚧 | Lost City | 🚧 |
-| Merlin's Crystal | 🚧 | Monkey Madness | 🚧 |
-| Pirate's Treasure | 🚧 | Priest in Peril | 🚧 |
-| Prince Ali Rescue | 🚧 | Romeo & Juliet | 🚧 |
-| Rune Mysteries | 🚧 | Scorpion Catcher | 🚧 |
-| Sheep Shearer | 🚧 | Shield of Arrav | 🚧 |
-| The Fremennik Trials | 🚧 | The Grand Tree | 🚧 |
-| The Knight's Sword | 🚧 | The Restless Ghost | 🚧 |
-| Tree Gnome Village | 🚧 | Vampire Slayer | 🚧 |
-| Witch's House | 🚧 | Witch's Potion | 🚧 |
-
-</details>
-
-<details>
-<summary><strong>Missing late-2006 quest coverage (12 entries) — expand tracker</strong></summary>
-
-The [historical audit](docs/AUDIT_2006-12-18.md) identified these target-date quests as missing from the **older quest dataset**. ⛔ means they are not yet marked complete; their present-day runtime status should be rechecked before claiming they are fully absent.
-
-| Content | Status | Content | Status |
-| --- | :---: | --- | :---: |
-| Royal Trouble | ⛔ | Death to the Dorgeshuun | ⛔ |
-| Fairy Tale II — Cure a Queen | ⛔ | Lunar Diplomacy | ⛔ |
-| The Eyes of Glouphrie | ⛔ | Darkness of Hallowvale | ⛔ |
-| The Slug Menace | ⛔ | Elemental Workshop II | ⛔ |
-| My Arm's Big Adventure | ⛔ | Enlightened Journey | ⛔ |
-| Eagles' Peak | ⛔ | Animal Magnetism | ⛔ |
-
-</details>
-
-The above lists track identified quest scripts and late-2006 gaps; they are **not an exhaustive list of all 116 official quests** available by 18 December 2006. A complete quest-by-quest acceptance pass is still needed. **Tutorial Island** is tracked below as a separate onboarding feature.
-
-### Full December 2006 quest list
-
-The following lists cover **all 116 official quests released by 18 December 2006** (18 free-to-play and 98 members-only), regardless of current SoloScape implementation. The membership split and date cutoff are based on [historical quest release dates](https://oldschool.runescape.wiki/w/Quests/Release_dates). Miniquests, Tutorial Island, and quests released in 2007 or later are excluded.
-
-**🚧 Quest status:** In progress / not fully verified. The marker **does not** confirm that a quest is playable or that a script exists; use the implementation tracker above and the historical audit to check known coverage.
-
 <details>
 <summary><strong>All free-to-play quests (18) — expand list</strong></summary>
 
