@@ -39,6 +39,7 @@ public final class Barrows2006RestorationChecks {
             checkFirstEverRun();
             checkTwoPlayerOwnershipAndKillCredit();
             checkTwoPlayerChestState();
+            checkReconnectRoundTrip();
             checkMembershipGate();
             checkCombatWearStopsAfterLeaving();
             checkNative2006NpcAndSpawnData();
@@ -162,6 +163,78 @@ public final class Barrows2006RestorationChecks {
                 "Player B's chest was not independently accessible");
         require(countDynamicBarrowsChests() == globalObjectsBefore,
                 "Two private chest opens created a shared dynamic chest");
+    }
+
+    /** Actual Player -> JSON character save -> new Player reload, not a
+     * fabricated copy of the fields. It verifies pre-loot and post-loot states.
+     */
+    private static void checkReconnectRoundTrip() throws Exception {
+        boolean sqlite = ServerSettings.sqlitePlayerSaveEnabled;
+        ServerSettings.sqlitePlayerSaveEnabled = false;
+        String username = "BarrQa" + Long.toHexString(System.nanoTime() & 0xffff);
+        java.io.File dir = new java.io.File("data/characters");
+        java.io.File save = new java.io.File(dir, username + ".json");
+        java.io.File backup = new java.io.File(dir, username + ".json.bak");
+        java.io.File dat = new java.io.File(dir, username + ".dat");
+        java.io.File staging = new java.io.File(dir,
+                ".json-staging/" + username + ".dat");
+        require(!save.exists() && !dat.exists(), "Refusing to replace an existing test character");
+        try {
+            Player original = new Player(null);
+            original.setUsername(username);
+            original.setPassword("barrows-test");
+            original.setPosition(new Position(3552, 9694, 0));
+            original.setBarrowsTargetBrotherIndex(4);
+            original.setBarrowsBrotherKilled(0, true);
+            original.setBarrowsBrotherKilled(2, true);
+            original.setBarrowsKillCount(4);
+            original.barrowsRewardPotential = 483;
+            original.barrowsDoorPuzzleSolved = true;
+            original.configStates[452] = 1 << 17 | 1 << 8 | 1 << 6;
+            original.barrowsChestOpened = false;
+
+            require(com.rs2.util.CharacterFileManager.savePlayer(original),
+                    "Failed to serialize a pre-loot Barrows character");
+            Player resumed = new Player(null);
+            resumed.setUsername(username);
+            com.rs2.util.CharacterFileManager.loadPlayerFromFile(
+                    "./data/characters/", resumed);
+            require(resumed.getBarrowsTargetBrotherIndex() == 4,
+                    "Login randomised an unfinished run's hidden brother");
+            require(resumed.isBarrowsBrotherKilled(0)
+                    && resumed.isBarrowsBrotherKilled(2)
+                    && resumed.getBarrowsKillCount() == 4
+                    && resumed.barrowsRewardPotential == 483,
+                    "Pre-loot kills/reward potential lost in real character reload");
+            require(resumed.barrowsDoorPuzzleSolved
+                    && resumed.configStates[452] == original.configStates[452],
+                    "Tunnel puzzle configuration lost on reconnect");
+            require(!resumed.barrowsChestOpened,
+                    "Pre-loot reconnect started chest collapse prematurely");
+
+            original.barrowsChestOpened = true;
+            original.configStates[453] = 1 << 16;
+            require(com.rs2.util.CharacterFileManager.savePlayer(original),
+                    "Failed to save the looted collapsing Barrows state");
+            Player looted = new Player(null);
+            looted.setUsername(username);
+            com.rs2.util.CharacterFileManager.loadPlayerFromFile(
+                    "./data/characters/", looted);
+            require(looted.barrowsChestOpened,
+                    "Looted chest state was lost across a real character save");
+            BarrowsManager.restoreChestConfigOnLogin(looted);
+            require((looted.configStates[453] & OPEN_BIT) != 0,
+                    "443 Barrows chest did not restore private open morph before InitialVarps");
+            require(looted.getBarrowsKillCount() == 4
+                    && looted.getBarrowsTargetBrotherIndex() == 4,
+                    "Looted reconnect unexpectedly rerolled the ongoing run");
+        } finally {
+            Files.deleteIfExists(save.toPath());
+            Files.deleteIfExists(backup.toPath());
+            Files.deleteIfExists(dat.toPath());
+            Files.deleteIfExists(staging.toPath());
+            ServerSettings.sqlitePlayerSaveEnabled = sqlite;
+        }
     }
 
     private static int countDynamicBarrowsChests() {
