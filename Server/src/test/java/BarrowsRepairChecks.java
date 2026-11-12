@@ -62,17 +62,12 @@ public final class BarrowsRepairChecks {
         require("Tindel Marchant".equalsIgnoreCase(NpcDefinition.forId(1799).getName()),
                 "NPC 1799 must be Tindel Marchant");
 
-        String squireName = NpcDefinition.forId(1766).getName();
-        System.out.println("Historical NPC 1766 is named in 443: " + squireName);
-        for (int id = 0; id < 9000; id++) {
-            NpcDefinition definition = NpcDefinition.forId(id);
-            if (definition != null && definition.getName() != null
-                    && definition.getName().toLowerCase().contains("squire")) {
-                System.out.println("443 cache Squire candidate: " + id + " " + definition.getName());
-            }
-        }
-        require(squireName.toLowerCase().contains("squire"),
-                "NPC 1766 expected Squire but cache returned: " + squireName);
+        require("Cow calf".equalsIgnoreCase(NpcDefinition.forId(1766).getName()),
+                "Revision-443 NPC 1766 changed; update repairer mapping before proceeding");
+        require("Squire".equalsIgnoreCase(NpcDefinition.forId(3795).getName()),
+                "Revision-443 Void Knight repair Squire (3795) is missing");
+        require(!BarrowsRepairHandler.handleItemOnNpc(player(), 1766, new ItemStack(DEGRADED[0] + 4)),
+                "Cow calf must not offer Barrows repairs");
 
         Player player = player();
         ItemStack damaged = new ItemStack(DEGRADED[0] + 4, 1, -1);
