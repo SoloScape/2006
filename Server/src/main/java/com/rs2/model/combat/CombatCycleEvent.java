@@ -235,6 +235,10 @@ extends CycleEvent {
         if (entity2.getMaxHitpoints() <= 0) {
             return AttackValidationResult.INVALID_TARGET;
         }
+        if (!com.rs2.model.gameplay.barrows.BarrowsManager
+                .canFightBarrowsNpc(entity, entity2)) {
+            return AttackValidationResult.INVALID_TARGET;
+        }
         if (entity2.isPlayer() && ((Player)entity2).logoutPacketSent) {
             return AttackValidationResult.INVALID_TARGET_LOCATION;
         }
