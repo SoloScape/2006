@@ -66,7 +66,24 @@ public final class BarrowsNpcDialogues {
         DialogueManager dialogue = player.getDialogueManager();
         switch (step) {
             case 1:
-                dialogue.showNpcOneLineDialogue("Dig, dig, dig!", 591);
+                if (!player.getInventoryManager().containsItem(952)) {
+                    dialogue.showNpcTwoLineDialogue(
+                            "Dig, dig, DIG! You can't dig",
+                            "without bringing a spade!", 591);
+                    dialogue.setNextDialogueStep(5);
+                } else {
+                    dialogue.showNpcOneLineDialogue("Dig, dig, dig!", 591);
+                }
+                return true;
+            case 5:
+                dialogue.showPlayerOneLineDialogue(
+                        "Where can I find a spade?", 591);
+                return true;
+            case 6:
+                dialogue.showNpcTwoLineDialogue(
+                        "A spade is what you need!",
+                        "Find one before digging here.", 591);
+                dialogue.finishDialogue();
                 return true;
             case 2:
                 // Four period-documented conversation branches. Never start
