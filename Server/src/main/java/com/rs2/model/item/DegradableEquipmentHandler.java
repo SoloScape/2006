@@ -57,6 +57,7 @@ public final class DegradableEquipmentHandler {
         }
         Entity target = player.getCombatTarget();
         if (target != null && !target.isDead()
+                && player.getPosition().getPlane() == target.getPosition().getPlane()
                 && GameUtil.getDistance(player.getPosition(), target.getPosition())
                     <= Math.max(1, player.getAttackRange())
                 && (!target.isNpc() || ((Npc) target).isActive())) {
