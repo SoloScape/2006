@@ -58,9 +58,13 @@ The [server guide](Server/README.md) describes the implementation in more detail
 
 ## Roadmap
 
+<!-- roadmap-progress:start -->
 **Overall completion: 8.4%** · **16 / 190** counted roadmap items marked ✅
 
-Progress counts ✅ entries across all roadmap categories, including optional plugins. Items marked ➖ are excluded. This is a snapshot of the README's current statuses, not a live gameplay audit.
+![Roadmap completion: 8.4% — 16 of 190 items](docs/roadmap-progress.svg)
+<!-- roadmap-progress:end -->
+
+Progress counts ✅ entries across all roadmap categories, including optional plugins; ➖ entries are excluded. The percentage and bar refresh automatically after roadmap changes on `main` via GitHub Actions. This tracks README statuses, not independently verified gameplay.
 
 The goal is the **18 December 2006 / revision 443** experience. Open a category below to see its items and their current tracker statuses.
 
