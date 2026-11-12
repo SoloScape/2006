@@ -1161,7 +1161,27 @@ public final class BarrowsManager {
     /*
      * Enabled aggressive block sorting
      */
+    /** Keep owned crypt/brother encounters limited to the player's own run.
+     * Static tunnel monsters remain public and can contribute potential.
+     * A visible NPC owned by a disconnected player must not become public.
+     */
+    public static boolean canFightBarrowsNpc(com.rs2.model.Entity attacker,
+                                             com.rs2.model.Entity target) {
+        if (attacker == null || target == null) return false;
+        Npc npc = target.isNpc() ? (Npc) target
+                : attacker.isNpc() ? (Npc) attacker : null;
+        if (npc == null || npc.getNpcId() < 2025 || npc.getNpcId() > 2037
+                || !npc.hasAssignedOwnerPlayer()) return true;
+        Player owner = npc.getOwnerPlayer();
+        if (owner == null) return false;
+        return attacker == owner || target == owner;
+    }
+
     public static void recordNpcKill(Player player, Npc npc) {
+        if (player == null || npc == null || !player.isInBarrows()
+                || !isInBarrowsTunnels(player) && player.getPosition().getPlane() != 3
+                || !npc.getPosition().isWithinViewport(player.getPosition())
+                || npc.hasAssignedOwnerPlayer() && npc.getOwnerPlayer() != player) return;
         Player player2;
         int index = 0;
         while (index < 6) {
