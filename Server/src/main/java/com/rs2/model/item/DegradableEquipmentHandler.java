@@ -65,6 +65,8 @@ public final class DegradableEquipmentHandler {
         Entity attacker = player.getSingleCombatTimer().getTarget();
         return attacker != null && !attacker.isDead()
                 && !player.getSingleCombatTimer().hasElapsed()
+                && player.getPosition().getPlane() == attacker.getPosition().getPlane()
+                && GameUtil.getDistance(player.getPosition(), attacker.getPosition()) <= 15
                 && (!attacker.isNpc() || ((Npc) attacker).isActive());
     }
 
