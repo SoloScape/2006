@@ -78,29 +78,29 @@ The goal is the **18 December 2006 / revision 443** experience. Open a category 
 
 | Name | Status |
 | :--- | :---: |
-| Woodcutting | 📜 |
-| Mining | 📜 |
-| Agility | 📜 |
-| Smithing | 📜 |
-| Herblore | 📜 |
-| Fishing | 📜 |
-| Thieving | 📜 |
-| Cooking | 📜 |
-| Crafting | 📜 |
-| Firemaking | 📜 |
-| Fletching | 📜 |
-| Runecrafting | 📜 |
-| Slayer | 📜 |
-| Farming | 📜 |
-| Construction | 📜 |
-| Hunter | 📜 |
-| Prayer | 📜 |
-| Magic | 📜 |
-| Ranged | 📜 |
 | Attack | 📜 |
 | Strength | 📜 |
 | Defence | 📜 |
 | Hitpoints | 📜 |
+| Ranged | 📜 |
+| Magic | 📜 |
+| Prayer | 📜 |
+| Woodcutting | 📜 |
+| Firemaking | 📜 |
+| Mining | 📜 |
+| Smithing | 📜 |
+| Fishing | 📜 |
+| Cooking | 📜 |
+| Crafting | 📜 |
+| Fletching | 📜 |
+| Runecrafting | 📜 |
+| Herblore | 📜 |
+| Agility | 📜 |
+| Thieving | 📜 |
+| Slayer | 📜 |
+| Farming | 📜 |
+| Construction | 📜 |
+| Hunter | 📜 |
 
 </details>
 
