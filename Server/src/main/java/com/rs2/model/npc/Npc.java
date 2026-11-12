@@ -151,6 +151,9 @@ extends Entity {
     }
 
     public final void process() {
+        // Clear a finished Barrows digging pose even during conversations,
+        // stalled paths or when no real player remains within roaming range.
+        BarrowsOldManPatrol.tickAnimation(this);
         Object value;
         processControlExit1: {
             Npc npc;

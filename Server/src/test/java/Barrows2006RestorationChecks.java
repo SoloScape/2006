@@ -47,7 +47,7 @@ public final class Barrows2006RestorationChecks {
             checkCombatWearStopsAfterLeaving();
             checkNative2006NpcAndSpawnData();
             checkStrangeOldManPatrolRouting();
-            checkStrangeOldManDigAnimationClearsBeforeWalking();
+            checkStrangeOldManDigAnimationTimesOut();
             System.out.println("Barrows restoration: fresh-run randomisation, independent "
                     + "two-player combat/credit/chest, members entry, post-combat wear, "
                     + "original NPCs and native spade removal passed.");
@@ -445,7 +445,7 @@ public final class Barrows2006RestorationChecks {
         }
     }
 
-    private static void checkStrangeOldManDigAnimationClearsBeforeWalking() {
+    private static void checkStrangeOldManDigAnimationTimesOut() {
         Player previous = World.getPlayers()[55];
         Player observer = player(55, 3566, 3290, 0);
         observer.isBot = false;
@@ -461,7 +461,6 @@ public final class Barrows2006RestorationChecks {
                     "Old Man did not queue an on-foot first-mound route");
             com.rs2.model.MovementStep last =
                     (com.rs2.model.MovementStep) oldMan.getMovementQueue().getSteps().getLast();
-            // Simulate the walking queue reaching the intended exact tile.
             oldMan.setPosition(new Position(last.getX(), last.getY(), 0));
             oldMan.getMovementQueue().clear();
             oldMan.getMovementQueue().removeFirstStep();
@@ -471,19 +470,45 @@ public final class Barrows2006RestorationChecks {
                             && oldMan.getUpdateState().getAnimationId() == 831,
                     "Old Man did not dig upon reaching a mound");
 
-            boolean clearedBeforeWalking = false;
-            for (int tick = 0; tick < 40; tick++) {
+            // Once the NPC is out of roaming distance, process() will refuse
+            // to move. The dig animation must still end on its own, without
+            // depending on the next route being planned or a player nearby.
+            observer.setPosition(new Position(3200, 3200, 0));
+            boolean cleared = false;
+            for (int tick = 0; tick < 6; tick++) {
                 oldMan.getUpdateState().reset();
+                BarrowsOldManPatrol.tickAnimation(oldMan);
                 BarrowsOldManPatrol.process(oldMan);
                 if (oldMan.getUpdateState().isAnimationUpdateRequired()
                         && oldMan.getUpdateState().getAnimationId() == -1) {
-                    clearedBeforeWalking =
-                            !oldMan.getMovementQueue().getSteps().isEmpty();
+                    require(tick < 4, "Old Man took too long to cancel digging");
+                    cleared = true;
                     break;
                 }
             }
-            require(clearedBeforeWalking,
-                    "Digging action animation was not cancelled before the next walk");
+            require(cleared, "Old Man kept digging without a nearby player");
+            require(oldMan.getMovementQueue().getSteps().isEmpty(),
+                    "Old Man advanced the patrol while the player was away");
+
+            observer.setPosition(new Position(3566, 3290, 0));
+            boolean startedWalking = false;
+            for (int tick = 0; tick < 40; tick++) {
+                oldMan.getUpdateState().reset();
+                BarrowsOldManPatrol.tickAnimation(oldMan);
+                BarrowsOldManPatrol.process(oldMan);
+                if (!oldMan.getMovementQueue().getSteps().isEmpty()) {
+                    startedWalking = true;
+                    break;
+                }
+            }
+            require(startedWalking, "Old Man never resumed walking after digging");
+
+            // Idle NPCs with no active dig state must not emit repeated
+            // cancellation packets that would disturb other animations.
+            oldMan.getUpdateState().reset();
+            BarrowsOldManPatrol.tickAnimation(oldMan);
+            require(!oldMan.getUpdateState().isAnimationUpdateRequired(),
+                    "Inactive dig watchdog sent an unexpected animation packet");
         } finally {
             World.getPlayers()[55] = previous;
         }

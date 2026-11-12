@@ -110,3 +110,10 @@ The push-triggered `.github/workflows/verify-barrows-morytania.yml` compiles the
 - Patrol stops are now reached with exact collision-aware paths to a walkable tile within three tiles of each mound, not the old ten-tile approximate path fallback; failed routes are retried on foot, never teleported or counted as completed.
 - Added a regression that simulates reaching a mound and verifies the dig animation is cleared when the next walking route starts.
 - In-client visual QA remains necessary for the specific dig animation and viewpoint-dependent NPC disappearance/reappearance.
+
+## 12 November 2026: time-box the Strange Old Man's dig pose
+
+- NPC 2024 now sends animation `-1` after four logic ticks (about 2.4 seconds) of digging, regardless of player proximity, blocked movement, conversations or delayed pathfinding. The animation timer runs at the start of `Npc.process()` rather than waiting for the next route.
+- The previous route-start-only cancellation is removed so stalled movement cannot leave the client replaying animation `831` indefinitely.
+- `Barrows2006RestorationChecks` simulates the observer leaving during digging and verifies the animation finishes without a route, then the patrol resumes and does not repeatedly clear unrelated animations.
+- The 4-tick pose limit is a gameplay quality-of-life reconstruction, not a recovered 2006 exact frame timing.

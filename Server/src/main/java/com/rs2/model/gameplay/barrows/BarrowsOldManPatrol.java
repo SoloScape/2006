@@ -16,6 +16,9 @@ import java.util.WeakHashMap;
 public final class BarrowsOldManPatrol {
     public static final int NPC_ID = 2024;
     private static final int DIG_ANIMATION = 831;
+    // The native client can loop 831 until a new animation update is sent.
+    // Bound the pose independently of route progress or nearby players.
+    private static final int DIG_ANIMATION_TICKS = 4;
     private static final int MAX_MOUND_DISTANCE = 3;
     private static final int BLOCKED_TILE = 0x1280100;
     private static final int[][] MOUND_CENTRES = {
@@ -36,6 +39,7 @@ public final class BarrowsOldManPatrol {
         int destinationY;
         boolean travelling;
         boolean digging;
+        int digAnimationTicks;
         int pauseTicks;
     }
 
@@ -62,9 +66,26 @@ public final class BarrowsOldManPatrol {
     private static void beginDigging(Npc npc, PatrolState state) {
         npc.getUpdateState().setAnimation(DIG_ANIMATION);
         state.digging = true;
+        state.digAnimationTicks = DIG_ANIMATION_TICKS;
         state.travelling = false;
         state.nextMound = (state.nextMound + 1) % moundCount();
         state.pauseTicks = 8 + GameUtil.randomInt(12);
+    }
+
+    /**
+     * Runs on every NPC logic tick, even when a conversation, movement lock,
+     * loss of nearby players or an interrupted route prevents patrol progress.
+     * The temporary digging animation must never be held indefinitely.
+     */
+    public static void tickAnimation(Npc npc) {
+        if (npc == null || npc.getNpcId() != NPC_ID) return;
+        PatrolState state = STATES.get(npc);
+        if (state == null || !state.digging) return;
+        if (--state.digAnimationTicks <= 0) {
+            npc.getUpdateState().setAnimation(-1);
+            state.digging = false;
+            state.digAnimationTicks = 0;
+        }
     }
 
     /**
@@ -108,13 +129,8 @@ public final class BarrowsOldManPatrol {
             return true;
         }
 
-        // 831 is an action animation. The native client can keep rendering it
-        // over walking until explicitly cancelled, making an otherwise normal
-        // server-side walk look like a freeze followed by a positional jump.
-        if (state.digging) {
-            npc.getUpdateState().setAnimation(-1);
-            state.digging = false;
-        }
+        // tickAnimation(), called before NPC interaction/route gates, has
+        // already released the digging pose while the NPC paused here.
 
         Position mound = moundTarget(state.nextMound);
         // These mound centres can be blocked by scenery. Route to an exact
