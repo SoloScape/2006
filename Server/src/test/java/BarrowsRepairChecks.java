@@ -144,6 +144,23 @@ public final class BarrowsRepairChecks {
         require((smithTileFlags & 0x1280100) == 0,
                 "Repair Squire spawn stands in a blocked 443 world tile (flags=0x"
                         + Integer.toHexString(smithTileFlags) + ")");
+        // The CSV must also be loaded by the real server startup path.
+        String serverSource = new String(Files.readAllBytes(Paths.get(
+                "src/main/java/com/rs2/Server.java")), java.nio.charset.StandardCharsets.UTF_8);
+        require(serverSource.contains("com.rs2.model.npc.ExtraNpcSpawns.load();"),
+                "Server startup never loads extra_spawns.csv");
+        com.rs2.model.npc.ExtraNpcSpawns.load();
+        boolean foundSmith = false;
+        for (com.rs2.model.npc.Npc npc : com.rs2.model.World.getNpcs()) {
+            if (npc == null || npc.getNpcId() != 3797) continue;
+            if (npc.getPosition().getX() == 2652
+                    && npc.getPosition().getY() == 2660
+                    && npc.getPosition().getPlane() == 0) {
+                foundSmith = true;
+                break;
+            }
+        }
+        require(foundSmith, "Extra NPC spawn loader did not create Squire 3797 at Outpost");
         for (int id = 3781; id <= 3802; id++) {
             NpcDefinition npc = NpcDefinition.forId(id);
             if (npc == null || npc.getName() == null
