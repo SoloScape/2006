@@ -19,7 +19,7 @@ This document distinguishes **implemented behavior**, **cache-verified identifie
 | Two-player private owned-NPC combat and kill credit while fixed tunnel spawns stay public | `CombatCycleEvent`, `BarrowsManager`, `Npc` | `Barrows2006RestorationChecks` |
 | Private chest config and clickable client-morphed appearance, never global chest/collision | `BarrowsManager`, `FirstObjectActionTask` | `Barrows2006RestorationChecks`; native 443 reconnect varps |
 | Members-world Barrows entry, spell-brother Weaken, and broken-0% direct drop | `BarrowsManager`, `AhrimCombatDefinition`, `ItemActionPacketHandler` | Native 443 build; `Barrows2006RestorationChecks` |
-| Original Strange Old Man, Squire Talk-to with their native NPC IDs; no later diary/quest rewards | `BarrowsNpcDialogues`, `DialogueManager`, `ExtraNpcSpawns` | `Barrows2006RestorationChecks`; period wording not completely verified |
+| Original Strange Old Man, Squire Talk-to with their native NPC IDs; no later diary/quest rewards | `BarrowsNpcDialogues`, `DialogueManager`, `ExtraNpcSpawns` | `Barrows2006RestorationChecks`; repeatable scream, secret and knock-knock dialogue paths tested; period wording not completely verified |
 | 9 January 2014 spade spawns removed, original crumbling-tome spawn retained | `data/world/Item spawn.dat` | `Barrows2006RestorationChecks`; 1261 → 1259 records |
 | All 14 original tome pages preserved as words and distinct boundaries on the native 443 book | `BarrowsTomeHandler` | `BarrowsTomeAuthenticityChecks`; rendering not pixel-identical |
 
@@ -28,7 +28,7 @@ This document distinguishes **implemented behavior**, **cache-verified identifie
 - **Armour repair stand:** `13715`, name confirmed in `ObjectDefinition.loadRevision443()`. Old 317/OSRS object `6802` is *not* that object in this cache.
 - **Void Knight smith Squire:** `3797` is the native Squire with Talk-to and no Trade option, corresponding to the old ID `1766`. Old ID `1766` is a **Cow calf** in this cache; `3795` has no Talk-to option or world spawn. New extra NPC placement `(2652,2660,0)` is on a walkable tile near the 443 Outpost, **not yet established as the exact original spawn location**.
 - **Squire repair offer:** item-on-NPC and Talk-to routes are implemented for `3797` and covered in regressions. The exact dialogue wording and precise NPC tile remain **not verified from a 2006 capture**. This is not yet identical to original text.
-- **Strange Old Man:** native `2024` is cache-verified as “Strange Old Man” with Talk-to; `1671` is undefined in revision 443. Additional spawn `(3566,3290,0)` has been collision-tested, but its exact historical tile is provisional. Short dialogue variants and occasional crumbling-tome gift are implemented; no post-2006 quest dialogue is added. Current dialogue is reconstructed using later preserved transcript material, **not a verified verbatim 2006 recording**.
+- **Strange Old Man:** native `2024` is cache-verified as “Strange Old Man” with Talk-to; `1671` is undefined in revision 443. Additional spawn `(3566,3290,0)` has been collision-tested, but its exact historical tile is provisional. Secret, knock-knock, book-giving and repeatable scream branches now have distinct, regression-tested dialogue continuations. Without a spade, the NPC still gives generic advice, but **does not** falsely claim the post-2006 spade spawns exist at each mound. The preserved conversation branches are from a later transcript ([Darkan, last edited November 2012](https://wiki.darkan.org/Transcript:Strange_Old_Man)), not a verified verbatim 2006 recording. Branch selection odds and precise tome-giving frequency remain provisional.
 - **World item spawns:** original crumbling tome `4707` at `(3571,3312,0)` preserved. Two spades at `(3571,3310,0)` and `(3572,3312,0)`, introduced on 9 January 2014, were removed without affecting other item IDs/amounts.
 - **Book:** original text preserved, but continuation pages on client group 49 are intentionally not necessarily 14 pages one-for-one.
 
@@ -85,6 +85,13 @@ Do not adjust these to speculative values without contemporary primary evidence 
 - *Revision-443 cache*: native NPC, item, object and interface definitions establish names/IDs and what the **specific 443 client is capable of**, not the chronological origin of every mechanic.
 - *Later preserved OSRS*: [Barrows chest reward mechanics](https://oldschool.runescape.wiki/w/Chest_%28Barrows%29), [Squire smith](https://oldschool.runescape.wiki/w/Squire_%28Void_Knights_smith%29), and the Old Man's surviving regular-dialogue variants provide implementation context, **not proof those exact constants/text existed unchanged in 2006**.
 - *Dated feature addition*: [Barrows spade additions on 9 January 2014](https://oldschool.runescape.wiki/w/Barrows) distinguish later access convenience from original content.
+
+## 12 November 2026 Old Man / repair-Squire dialogue follow-up
+
+- **Implemented:** The Strange Old Man's secret now allows an accept/decline choice and subsequent reply; the knock-knock joke includes the player's reaction; asking about the scream returns to another scream and the same leave/stay choices. `Barrows2006RestorationChecks` exercises those branch continuations and termination paths.
+- **Kept:** The existing spade-dependent first response and no-spade advice, with no promise of later-added spades at every mound. The original 2006 spade condition is not independently proven by the preserved 2012 transcript, so no stronger historical claim is made.
+- **Unchanged:** Both collision-safe, cache-native NPC spawn tiles; the Squire's working Barrows repair flow; repair rates; NPC IDs; reward/drop RNG; tunnel encounter weights; and maze generation. The old Squire's exact speech and any distinct axe/pickaxe repair feature lack sufficient 2006 evidence for a speculative implementation.
+- **Historical sources:** [Preserved Strange Old Man transcript](https://wiki.darkan.org/Transcript:Strange_Old_Man) (2012 snapshot; some wording postdates 2006) and [Void Knights' smith](https://oldschool.runescape.wiki/w/Squire_%28Void_Knights_smith%29) (released 18 April 2006). The original NPC dialogue and exact tiles remain unconfirmed for 2006.
 
 ## Testing
 
