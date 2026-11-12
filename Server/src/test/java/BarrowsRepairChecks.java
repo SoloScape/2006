@@ -129,6 +129,16 @@ public final class BarrowsRepairChecks {
         }
         System.out.println("Native 443 repair Squire 3795 static spawn count: "
                 + repairSquireCount);
+        for (int id = 3781; id <= 3802; id++) {
+            NpcDefinition npc = NpcDefinition.forId(id);
+            if (npc == null || npc.getName() == null
+                    || !npc.getName().toLowerCase().contains("squire")) continue;
+            System.out.println("443 Squire candidate id=" + id
+                    + " examine=" + npc.getDescription()
+                    + " options=" + java.util.Arrays.toString(new String[] {
+                            npc.getAction(0), npc.getAction(1), npc.getAction(2),
+                            npc.getAction(3), npc.getAction(4)}));
+        }
     }
 
     private static int unsignedShort(byte[] bytes, int offset) {
