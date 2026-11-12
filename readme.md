@@ -306,79 +306,137 @@ The above lists track identified quest scripts and late-2006 gaps; they are **no
 
 The following lists cover **all 116 official quests released by 18 December 2006** (18 free-to-play and 98 members-only), regardless of current SoloScape implementation. The membership split and date cutoff are based on [historical quest release dates](https://oldschool.runescape.wiki/w/Quests/Release_dates). Miniquests, Tutorial Island, and quests released in 2007 or later are excluded.
 
-**🚧 Members' quest marker:** Planned / under construction in this roadmap; it **does not** confirm that a script exists or the quest is playable. Use the script tracker above for known implementations and the historical audit for gaps.
+**🚧 Quest status:** In progress / not fully verified. The marker **does not** confirm that a quest is playable or that a script exists; use the implementation tracker above and the historical audit to check known coverage.
 
 <details>
 <summary><strong>All free-to-play quests (18) — expand list</strong></summary>
 
-| Quest | Quest |
-| --- | --- |
-| Black Knights' Fortress | Pirate's Treasure |
-| Cook's Assistant | Prince Ali Rescue |
-| Demon Slayer | The Restless Ghost |
-| Doric's Quest | Romeo & Juliet |
-| Dragon Slayer | Rune Mysteries |
-| Ernest the Chicken | Sheep Shearer |
-| Goblin Diplomacy | Shield of Arrav |
-| Imp Catcher | Vampire Slayer |
-| The Knight's Sword | Witch's Potion |
+| Quest | Status |
+| --- | :---: |
+| Black Knights' Fortress | 🚧 |
+| Cook's Assistant | 🚧 |
+| Demon Slayer | 🚧 |
+| Doric's Quest | 🚧 |
+| Dragon Slayer | 🚧 |
+| Ernest the Chicken | 🚧 |
+| Goblin Diplomacy | 🚧 |
+| Imp Catcher | 🚧 |
+| The Knight's Sword | 🚧 |
+| Pirate's Treasure | 🚧 |
+| Prince Ali Rescue | 🚧 |
+| The Restless Ghost | 🚧 |
+| Romeo & Juliet | 🚧 |
+| Rune Mysteries | 🚧 |
+| Sheep Shearer | 🚧 |
+| Shield of Arrav | 🚧 |
+| Vampire Slayer | 🚧 |
+| Witch's Potion | 🚧 |
 
 </details>
 
 <details>
 <summary><strong>All members' quests (98) 🚧 — expand list</strong></summary>
 
-| Quest | Quest |
-| --- | --- |
-| Animal Magnetism 🚧 | Lunar Diplomacy 🚧 |
-| Between a Rock... 🚧 | Making History 🚧 |
-| Big Chompy Bird Hunting 🚧 | Merlin's Crystal 🚧 |
-| Biohazard 🚧 | Monk's Friend 🚧 |
-| Cabin Fever 🚧 | Monkey Madness 🚧 |
-| Clock Tower 🚧 | Mountain Daughter 🚧 |
-| Creature of Fenkenstrain 🚧 | Mourning's End Part I 🚧 |
-| Darkness of Hallowvale 🚧 | Mourning's End Part II 🚧 |
-| Death Plateau 🚧 | Murder Mystery 🚧 |
-| Death to the Dorgeshuun 🚧 | My Arm's Big Adventure 🚧 |
-| Desert Treasure 🚧 | Nature Spirit 🚧 |
-| Devious Minds 🚧 | Observatory Quest 🚧 |
-| The Dig Site 🚧 | One Small Favour 🚧 |
-| Druidic Ritual 🚧 | Plague City 🚧 |
-| Dwarf Cannon 🚧 | Priest in Peril 🚧 |
-| Eadgar's Ruse 🚧 | Rag and Bone Man 🚧 |
-| Eagles' Peak 🚧 | Ratcatchers 🚧 |
-| Elemental Workshop 🚧 | Recipe for Disaster 🚧 |
-| Elemental Workshop II 🚧 | Recruitment Drive 🚧 |
-| Enakhra's Lament 🚧 | Regicide 🚧 |
-| Enlightened Journey 🚧 | Roving Elves 🚧 |
-| The Eyes of Glouphrie 🚧 | Royal Trouble 🚧 |
-| Fairy Tale I — Growing Pains 🚧 | Rum Deal 🚧 |
-| Fairy Tale II — Cure a Queen 🚧 | Scorpion Catcher 🚧 |
-| Family Crest 🚧 | Sea Slug 🚧 |
-| The Feud 🚧 | Shades of Mort'ton 🚧 |
-| Fight Arena 🚧 | Shadow of the Storm 🚧 |
-| Fishing Contest 🚧 | Sheep Herder 🚧 |
-| Forgettable Tale of a Drunken Dwarf 🚧 | Shilo Village 🚧 |
-| The Fremennik Trials 🚧 | The Slug Menace 🚧 |
-| Garden of Tranquillity 🚧 | A Soul's Bane 🚧 |
-| Gertrude's Cat 🚧 | Spirits of the Elid 🚧 |
-| Ghosts Ahoy 🚧 | Swan Song 🚧 |
-| The Giant Dwarf 🚧 | Tai Bwo Wannai Trio 🚧 |
-| The Golem 🚧 | A Tail of Two Cats 🚧 |
-| The Grand Tree 🚧 | Tears of Guthix 🚧 |
-| The Hand in the Sand 🚧 | Temple of Ikov 🚧 |
-| Haunted Mine 🚧 | Throne of Miscellania 🚧 |
-| Hazeel Cult 🚧 | The Tourist Trap 🚧 |
-| Heroes' Quest 🚧 | Tree Gnome Village 🚧 |
-| Holy Grail 🚧 | Tribal Totem 🚧 |
-| Horror from the Deep 🚧 | Troll Romance 🚧 |
-| Icthlarin's Little Helper 🚧 | Troll Stronghold 🚧 |
-| In Aid of the Myreque 🚧 | Underground Pass 🚧 |
-| In Search of the Myreque 🚧 | Wanted! 🚧 |
-| Jungle Potion 🚧 | Watchtower 🚧 |
-| Legends' Quest 🚧 | Waterfall Quest 🚧 |
-| Lost City 🚧 | Witch's House 🚧 |
-| The Lost Tribe 🚧 | Zogre Flesh Eaters 🚧 |
+| Quest | Status |
+| --- | :---: |
+| Animal Magnetism | 🚧 |
+| Between a Rock... | 🚧 |
+| Big Chompy Bird Hunting | 🚧 |
+| Biohazard | 🚧 |
+| Cabin Fever | 🚧 |
+| Clock Tower | 🚧 |
+| Creature of Fenkenstrain | 🚧 |
+| Darkness of Hallowvale | 🚧 |
+| Death Plateau | 🚧 |
+| Death to the Dorgeshuun | 🚧 |
+| Desert Treasure | 🚧 |
+| Devious Minds | 🚧 |
+| The Dig Site | 🚧 |
+| Druidic Ritual | 🚧 |
+| Dwarf Cannon | 🚧 |
+| Eadgar's Ruse | 🚧 |
+| Eagles' Peak | 🚧 |
+| Elemental Workshop | 🚧 |
+| Elemental Workshop II | 🚧 |
+| Enakhra's Lament | 🚧 |
+| Enlightened Journey | 🚧 |
+| The Eyes of Glouphrie | 🚧 |
+| Fairy Tale I — Growing Pains | 🚧 |
+| Fairy Tale II — Cure a Queen | 🚧 |
+| Family Crest | 🚧 |
+| The Feud | 🚧 |
+| Fight Arena | 🚧 |
+| Fishing Contest | 🚧 |
+| Forgettable Tale of a Drunken Dwarf | 🚧 |
+| The Fremennik Trials | 🚧 |
+| Garden of Tranquillity | 🚧 |
+| Gertrude's Cat | 🚧 |
+| Ghosts Ahoy | 🚧 |
+| The Giant Dwarf | 🚧 |
+| The Golem | 🚧 |
+| The Grand Tree | 🚧 |
+| The Hand in the Sand | 🚧 |
+| Haunted Mine | 🚧 |
+| Hazeel Cult | 🚧 |
+| Heroes' Quest | 🚧 |
+| Holy Grail | 🚧 |
+| Horror from the Deep | 🚧 |
+| Icthlarin's Little Helper | 🚧 |
+| In Aid of the Myreque | 🚧 |
+| In Search of the Myreque | 🚧 |
+| Jungle Potion | 🚧 |
+| Legends' Quest | 🚧 |
+| Lost City | 🚧 |
+| The Lost Tribe | 🚧 |
+| Lunar Diplomacy | 🚧 |
+| Making History | 🚧 |
+| Merlin's Crystal | 🚧 |
+| Monk's Friend | 🚧 |
+| Monkey Madness | 🚧 |
+| Mountain Daughter | 🚧 |
+| Mourning's End Part I | 🚧 |
+| Mourning's End Part II | 🚧 |
+| Murder Mystery | 🚧 |
+| My Arm's Big Adventure | 🚧 |
+| Nature Spirit | 🚧 |
+| Observatory Quest | 🚧 |
+| One Small Favour | 🚧 |
+| Plague City | 🚧 |
+| Priest in Peril | 🚧 |
+| Rag and Bone Man | 🚧 |
+| Ratcatchers | 🚧 |
+| Recipe for Disaster | 🚧 |
+| Recruitment Drive | 🚧 |
+| Regicide | 🚧 |
+| Roving Elves | 🚧 |
+| Royal Trouble | 🚧 |
+| Rum Deal | 🚧 |
+| Scorpion Catcher | 🚧 |
+| Sea Slug | 🚧 |
+| Shades of Mort'ton | 🚧 |
+| Shadow of the Storm | 🚧 |
+| Sheep Herder | 🚧 |
+| Shilo Village | 🚧 |
+| The Slug Menace | 🚧 |
+| A Soul's Bane | 🚧 |
+| Spirits of the Elid | 🚧 |
+| Swan Song | 🚧 |
+| Tai Bwo Wannai Trio | 🚧 |
+| A Tail of Two Cats | 🚧 |
+| Tears of Guthix | 🚧 |
+| Temple of Ikov | 🚧 |
+| Throne of Miscellania | 🚧 |
+| The Tourist Trap | 🚧 |
+| Tree Gnome Village | 🚧 |
+| Tribal Totem | 🚧 |
+| Troll Romance | 🚧 |
+| Troll Stronghold | 🚧 |
+| Underground Pass | 🚧 |
+| Wanted! | 🚧 |
+| Watchtower | 🚧 |
+| Waterfall Quest | 🚧 |
+| Witch's House | 🚧 |
+| Zogre Flesh Eaters | 🚧 |
 
 </details>
 
