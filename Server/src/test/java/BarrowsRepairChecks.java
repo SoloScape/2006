@@ -95,8 +95,8 @@ public final class BarrowsRepairChecks {
      */
     private static void audit443SquireSpawnsAndArmourStand() throws Exception {
         ObjectDefinition.loadRevision443();
-        ObjectDefinition stand = ObjectDefinition.forId(6802);
-        System.out.println("443 object 6802 is named: " + (stand == null ? "<missing>" : stand.name));
+        ObjectDefinition stand = ObjectDefinition.forId(13715);
+        System.out.println("443 armour repair stand 13715: " + (stand == null ? "<missing>" : stand.name));
         for (ObjectDefinition candidate : ObjectDefinition.definitionsById) {
             if (candidate == null || candidate.name == null) continue;
             String name = candidate.name.toLowerCase();
@@ -106,10 +106,12 @@ public final class BarrowsRepairChecks {
                         + candidate.getObjectId() + " name=" + candidate.name);
             }
         }
-        require(stand != null && stand.name != null
-                        && stand.name.toLowerCase().contains("armour"),
-                "Native revision-443 object 6802 is not the armour stand; found: "
+        require(stand != null && "Armour repair stand".equals(stand.name),
+                "Native revision-443 armour stand is not 13715; found: "
                         + (stand == null ? "<missing>" : stand.name));
+        require(!BarrowsRepairHandler.handleItemOnArmourStand(
+                        player(), DEGRADED[0], 6802),
+                "The old 317 armour stand ID must not be active in revision 443");
 
         byte[] spawns = Files.readAllBytes(Paths.get("data/npcs/Npc spawn.dat"));
         int count = unsignedShort(spawns, 1);
@@ -218,8 +220,8 @@ public final class BarrowsRepairChecks {
     }
 
     private static void checkArmourStandRepair() {
-        require(BarrowsRepairHandler.ARMOUR_STAND_OBJECT_ID == 6802,
-                "Original 2006 POH armour stand object must be 6802");
+        require(BarrowsRepairHandler.ARMOUR_STAND_OBJECT_ID == 13715,
+                "Revision-443 POH armour repair stand must be object 13715");
         for (int i = 0; i < REPAIRED.length; i++) {
             ItemStack damaged = BarrowsEquipmentDurability.consumeCombatTicks(
                     new ItemStack(REPAIRED[i]), 45000);
@@ -244,9 +246,9 @@ public final class BarrowsRepairChecks {
         p.getInventoryManager().getContainer().setItem(0, damaged);
         p.getInventoryManager().getContainer().setItem(1, new ItemStack(995, 30000));
         p.setSelectedItemSlot(0);
-        require(!BarrowsRepairHandler.handleItemOnArmourStand(p, damaged.getId(), 6803),
+        require(!BarrowsRepairHandler.handleItemOnArmourStand(p, damaged.getId(), 6802),
                 "Other objects must not offer stand repair");
-        require(BarrowsRepairHandler.handleItemOnArmourStand(p, damaged.getId(), 6802),
+        require(BarrowsRepairHandler.handleItemOnArmourStand(p, damaged.getId(), 13715),
                 "The armour stand did not handle worn Barrows equipment");
         require(p.getInventoryManager().containsItem(REPAIRED[0]),
                 "Armour stand did not restore the repaired helm");
@@ -257,7 +259,7 @@ public final class BarrowsRepairChecks {
         ItemStack broken = new ItemStack(DEGRADED[1] + 4);
         broke.getInventoryManager().getContainer().setItem(0, broken);
         broke.setSelectedItemSlot(0);
-        require(BarrowsRepairHandler.handleItemOnArmourStand(broke, broken.getId(), 6802),
+        require(BarrowsRepairHandler.handleItemOnArmourStand(broke, broken.getId(), 13715),
                 "Broken gear item-on-stand interaction was not consumed");
         require(broke.getInventoryManager().containsItem(broken.getId()),
                 "Failed armour-stand payment lost worn gear");
