@@ -129,6 +129,21 @@ public final class BarrowsRepairChecks {
         }
         System.out.println("Native 443 repair Squire 3795 static spawn count: "
                 + repairSquireCount);
+        com.rs2.model.objects.WorldObjectLookup.loadWorldObjects();
+        for (int x = 2640; x <= 2680; x++) {
+            for (int y = 2640; y <= 2680; y++) {
+                com.rs2.model.objects.LoadedWorldObject worldObject =
+                        com.rs2.model.objects.WorldObjectLookup.findObjectAt(x, y, 0);
+                if (worldObject == null) continue;
+                ObjectDefinition definition = ObjectDefinition.forId(
+                        worldObject.getWorldObject().getObjectId());
+                if (definition == null || definition.name == null) continue;
+                if (definition.name.toLowerCase().contains("anvil")) {
+                    System.out.println("443 Void Knight Outpost anvil: "
+                            + x + "," + y + " object=" + definition.getObjectId());
+                }
+            }
+        }
         for (int id = 3781; id <= 3802; id++) {
             NpcDefinition npc = NpcDefinition.forId(id);
             if (npc == null || npc.getName() == null
