@@ -11,6 +11,7 @@ import com.rs2.model.interaction.InteractionDispatcher;
 import com.rs2.model.item.ItemDefinition;
 import com.rs2.model.item.ItemService;
 import com.rs2.model.item.ItemStack;
+import com.rs2.model.item.action.BarrowsRepairHandler;
 import com.rs2.model.objects.DynamicObject;
 import com.rs2.model.objects.ObjectDefinition;
 import com.rs2.model.objects.ObjectManager;
@@ -96,6 +97,10 @@ extends TickTask {
             return;
         }
         if (this.player.getQuestManager().handleItemOnObject(this.itemId, this.objectId)) {
+            this.stop();
+            return;
+        }
+        if (BarrowsRepairHandler.handleItemOnArmourStand(this.player, this.itemId, this.objectId)) {
             this.stop();
             return;
         }
