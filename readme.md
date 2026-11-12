@@ -486,15 +486,6 @@ These systems have supporting code or launchers; 🚧 does not imply the associa
 
 </details>
 
-### Other development priorities
-
-- **Historical accuracy:** Isolate later RuneScape systems, secure progression commands, and audit post-2006 items, drops, spawns, and death mechanics.
-- **Revision 443 data:** Finish the target-era NPC/quest population, Hunter/Construction support, skill persistence, and cache/definition validation.
-- **Content completion:** Extend quests, Lunar magic, random events, activities, Slayer, Treasure Trails, and other late-2006 systems.
-- **Quality and parity:** Fix period-specific combat, Prayer, weapon and food behavior; finish interaction coverage and add live client/server acceptance tests.
-
-These are priorities, **not release commitments**. The [historical audit](docs/AUDIT_2006-12-18.md) and [ordered fix plan](docs/fix-order.md) provide the detailed backlog; because they document an earlier code snapshot, recheck each finding before treating it as unresolved. The [Current Working Features](#current-working-features) section lists systems already present in the repository.
-
 ## Troubleshooting
 
 <details>
