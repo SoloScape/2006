@@ -9,6 +9,10 @@ import com.rs2.util.GameUtil;
 
 public final class BarrowsPrayerDrainTask
 extends TickTask {
+    // Current preserved interval/magnitude; exact 2006 timing requires a period capture.
+    public static final int DRAIN_INTERVAL_TICKS = 30;
+    public static final int BASE_DRAIN_POINTS = 8;
+    public static final int FACE_ANIMATION_ID = 2085;
     private final Player player;
 
     // Item-model pairs are ordered Ahrim, Dharok, Guthan, Karil, Torag, Verac.
@@ -36,7 +40,7 @@ extends TickTask {
     }
 
     public BarrowsPrayerDrainTask(int value2, Player player) {
-        super(30);
+        super(DRAIN_INTERVAL_TICKS);
         this.player = player;
     }
 
@@ -54,13 +58,13 @@ extends TickTask {
                 if (modelId != -1) {
                     int interfaceId = BarrowsManager.prayerDrainModelInterfaceIds[GameUtil.randomInt(6)];
                     this.player.packetSender.sendInterfaceModel(interfaceId, 100, modelId);
-                    this.player.packetSender.sendInterfaceAnimation(interfaceId, 2085);
+                    this.player.packetSender.sendInterfaceAnimation(interfaceId, FACE_ANIMATION_ID);
                     World.getTaskScheduler().schedule(
                             new BarrowsPrayerDrainResetTask(this, 3, this.player, interfaceId));
                 }
             }
             int[] levels = this.player.getSkillManager().getCurrentLevels();
-            levels[5] = Math.max(0, levels[5] - (defeated + 8));
+            levels[5] = Math.max(0, levels[5] - (defeated + BASE_DRAIN_POINTS));
             this.player.getSkillManager().refreshSkill(5);
             return;
         }
