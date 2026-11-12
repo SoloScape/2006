@@ -2305,10 +2305,73 @@ public final class CastleWarsManager {
         return GameUtil.getDistance(wallPosition, battlefieldPosition) <= 15;
     }
 
+    /**
+     * The central island's two firing towers are raised to map plane 1.
+     * Only these upper walkways, and nearby exposed ground on plane 0,
+     * may exchange ranged/magic attacks across floors.
+     */
+    public static boolean isMiddleIslandTowerTop(Position pos) {
+        return pos != null && pos.getPlane() == 1
+                && pos.getX() >= 2391 && pos.getX() <= 2408
+                && pos.getY() >= 3094 && pos.getY() <= 3112;
+    }
+
+    public static boolean isMiddleIslandTowerCrossLevelPair(Player first, Player second) {
+        if (first == null || second == null || !isInGame(first)
+                || !isInGame(second) || !areOpponents(first, second)) return false;
+        Position a = first.getPosition(), b = second.getPosition();
+        Position upper = isMiddleIslandTowerTop(a) ? a
+                : isMiddleIslandTowerTop(b) ? b : null;
+        Position ground = upper == a ? b : a;
+        if (upper == null || ground.getPlane() != 0
+                || ground.getX() < 2385 || ground.getX() > 2414
+                || ground.getY() < 3089 || ground.getY() > 3120
+                || getCastleTeamAtPosition(ground) != null) return false;
+        int distance = GameUtil.getDistance(upper, ground);
+        // No direct hits through the floor or distant cross-floor attacks.
+        return distance >= 2 && distance <= 15;
+    }
+
+    /** Keep the two opponents visible for normal combat target packets. */
+    public static boolean canSeeMiddleIslandTowerCombatant(Player viewer, Player other) {
+        if (!isMiddleIslandTowerCrossLevelPair(viewer, other)) return false;
+        Position delta = GameUtil.getDelta(viewer.getPosition(), other.getPosition());
+        return delta.getX() >= -15 && delta.getX() <= 14
+                && delta.getY() >= -15 && delta.getY() <= 14;
+    }
+
+    /**
+     * Project a cross-floor shot onto the ground collision plane. The first
+     * three tiles can be a tower parapet; all other scenery must still pass
+     * both projectile and walking line-of-sight tests in both directions.
+     */
+    private static boolean hasMiddleIslandTowerFiringLane(Player first, Player second) {
+        if (!isMiddleIslandTowerCrossLevelPair(first, second)) return false;
+        Position a = first.getPosition(), b = second.getPosition();
+        Position upper = isMiddleIslandTowerTop(a) ? a : b;
+        Position ground = upper == a ? b : a;
+        int dx = Integer.compare(ground.getX(), upper.getX());
+        int dy = Integer.compare(ground.getY(), upper.getY());
+        for (int step = 0; step <= 3; ++step) {
+            int x = upper.getX() + dx * step;
+            int y = upper.getY() + dy * step;
+            if (GameUtil.getDistance(new Position(x, y, 0), ground) < 1) break;
+            if ((WalkingCollisionMap.getTileFlags(x, y, 0) & 0x1280100) != 0
+                    || (com.rs2.util.path.ProjectileCollisionMap
+                            .getTileFlags(x, y, 0) & 0x1280100) != 0) continue;
+            Position edge = new Position(x, y, 0);
+            if (GameUtil.hasClearPath(edge, ground, false)
+                    && GameUtil.hasClearPath(ground, edge, false)
+                    && GameUtil.hasClearPath(edge, ground, true)
+                    && GameUtil.hasClearPath(ground, edge, true)) return true;
+        }
+        return false;
+    }
+
     public static boolean hasBotCombatLineOfSight(Player attacker, Player target) {
-        if (attacker == null || target == null
-                || attacker.getPosition().getPlane() != target.getPosition().getPlane()) {
-            return false;
+        if (attacker == null || target == null) return false;
+        if (attacker.getPosition().getPlane() != target.getPosition().getPlane()) {
+            return hasMiddleIslandTowerFiringLane(attacker, target);
         }
         if (attacker.botEnabled && attacker.botPrimaryCombatStyle != 0
                 && isCastleWallCrossLevelPair(attacker, target)) {
@@ -2321,7 +2384,7 @@ public final class CastleWarsManager {
         Position from = attacker.getPosition();
         Position to = target.getPosition();
         if (from.getPlane() != to.getPlane()) {
-            return false;
+            return hasMiddleIslandTowerFiringLane(attacker, target);
         }
         if (areOpponents(attacker, target)) {
             if (isInTeamSpawnArea(attacker, getGameTeam(attacker))
@@ -2512,14 +2575,16 @@ public final class CastleWarsManager {
         return attacker != null
                 && attacker.botEnabled
                 && attacker.botPrimaryCombatStyle != 0
-                && isCastleWallCrossLevelPair(attacker, target);
+                && (isCastleWallCrossLevelPair(attacker, target)
+                        || isMiddleIslandTowerCrossLevelPair(attacker, target));
     }
 
     public static boolean canBotAttackAcrossCastleLevels(Player attacker, Player target) {
         return attacker != null
                 && attacker.botEnabled
                 && attacker.botActiveCombatStyle != 0
-                && isCastleWallCrossLevelPair(attacker, target);
+                && (isCastleWallCrossLevelPair(attacker, target)
+                        || isMiddleIslandTowerCrossLevelPair(attacker, target));
     }
 
     public static boolean canAttackAcrossCastleLevels(Player attacker, Player target,
@@ -2527,7 +2592,8 @@ public final class CastleWarsManager {
         return attacker != null
                 && target != null
                 && (combatType == CombatType.RANGED || combatType == CombatType.MAGIC)
-                && isCastleWallCrossLevelPair(attacker, target);
+                && (isCastleWallCrossLevelPair(attacker, target)
+                        || isMiddleIslandTowerCrossLevelPair(attacker, target));
     }
 
     public static boolean canBotAttackAcrossCastleLevels(Player attacker, Player target,

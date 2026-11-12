@@ -6,6 +6,7 @@ import com.rs2.model.GameplayHelper;
 import com.rs2.model.Position;
 import com.rs2.model.World;
 import com.rs2.model.c.ProjectileDefinition;
+import com.rs2.model.gameplay.castlewars.CastleWarsManager;
 import com.rs2.model.combat.ProjectileTiming;
 import com.rs2.model.item.ItemStack;
 import com.rs2.model.npc.Npc;
@@ -33,6 +34,8 @@ public class WoodcuttingHandler {
     private ProjectileDefinition projectileDefinition;
     private Position sourcePosition;
     private int sourceSize;
+    private Entity projectileSourceActor;
+    private Entity projectileTargetActor;
 
     public static void startWoodcutting(Player player, int value8, int value22, int value32, boolean enabled2) {
         Object value4;
@@ -194,6 +197,8 @@ public class WoodcuttingHandler {
 
     public WoodcuttingHandler(Entity entity, Entity entity2, Position position, ProjectileDefinition projectileDefinition) {
         this(entity.getPosition(), entity.getSize(), position, entity2.isPlayer() ? -entity2.getIndex() - 1 : entity2.getIndex() + 1, projectileDefinition);
+        this.projectileSourceActor = entity;
+        this.projectileTargetActor = entity2;
     }
 
     public WoodcuttingHandler(Entity entity, Entity entity2, ProjectileDefinition projectileDefinition) {
@@ -224,7 +229,15 @@ public class WoodcuttingHandler {
         int index = 0;
         while (index < length) {
             Player player = playerArray[index];
-            if (player != null && this.sourcePosition.isWithinViewport(player.getPosition())) {
+            boolean towerShot = player != null
+                    && this.projectileSourceActor != null && this.projectileTargetActor != null
+                    && this.projectileSourceActor.isPlayer()
+                    && this.projectileTargetActor.isPlayer()
+                    && (player == this.projectileSourceActor || player == this.projectileTargetActor)
+                    && CastleWarsManager.canSeeMiddleIslandTowerCombatant(
+                            (Player)this.projectileSourceActor, (Player)this.projectileTargetActor);
+            if (player != null && (this.sourcePosition.isWithinViewport(player.getPosition())
+                    || towerShot)) {
                 player.packetSender.sendProjectile(this.sourcePosition, this.sourceSize, this.targetIndex, this.deltaX, this.deltaY, this.projectileDefinition.getProjectileId(), projectileTiming.getStartDelay(), this.endDelay, projectileTiming.getStartHeight(), projectileTiming.getEndHeight(), projectileTiming.getSlope());
             }
             ++index;

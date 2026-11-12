@@ -229,7 +229,10 @@ extends CycleEvent {
             return AttackValidationResult.INVALID_TARGET;
         }
         if (entity2.isPlayer() && !((Player)entity2).isRegistered()
-                || !entity2.getPosition().isWithinViewport(entity.getPosition())) {
+                || !entity2.getPosition().isWithinViewport(entity.getPosition())
+                    && !(entity.isPlayer() && entity2.isPlayer()
+                        && CastleWarsManager.canSeeMiddleIslandTowerCombatant(
+                                (Player)entity, (Player)entity2))) {
             return AttackValidationResult.INVALID_TARGET;
         }
         if (entity2.getMaxHitpoints() <= 0) {

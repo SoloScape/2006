@@ -126,7 +126,8 @@ public final class ModernPlayerUpdateTask {
         }
     }
     private static boolean isWithinViewport(Player viewer, Player other) {
-        return other.getPosition().isWithinViewport(viewer.getPosition());
+        return other.getPosition().isWithinViewport(viewer.getPosition())
+                || CastleWarsManager.canSeeMiddleIslandTowerCombatant(viewer, other);
     }
     private static void writeLocalMovement(Player player, PacketWriter packet,
                                            boolean appearance, boolean regionRebuilt) {

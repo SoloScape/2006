@@ -259,7 +259,8 @@ public class PlayerUpdateTask {
         if (viewer == null || other == null) {
             return false;
         }
-        return other.getPosition().isWithinViewport(viewer.getPosition());
+        return other.getPosition().isWithinViewport(viewer.getPosition())
+                || CastleWarsManager.canSeeMiddleIslandTowerCombatant(viewer, other);
     }
 
     public static void writeUpdateBlock(Player player, PacketWriter packetWriter, boolean enabled3, boolean enabled22, Player player22) {

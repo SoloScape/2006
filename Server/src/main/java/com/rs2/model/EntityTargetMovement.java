@@ -89,7 +89,11 @@ public class EntityTargetMovement {
     public void processTargetMovement() {
         Object value;
         Entity entity = this.entity.getMovementTarget();
-        if (entity == null || entity.isDead() || this.entity.isDead() || !entity.getPosition().isWithinDistance(this.entity.getPosition(), 20)) {
+        if (entity == null || entity.isDead() || this.entity.isDead()
+                || (!entity.getPosition().isWithinDistance(this.entity.getPosition(), 20)
+                    && !(this.entity.isPlayer() && entity.isPlayer()
+                        && CastleWarsManager.isMiddleIslandTowerCrossLevelPair(
+                                (Player)this.entity, (Player)entity)))) {
             boolean enabled = false;
             if (this.entity.isNpc() && ((Npc)(value = (Npc)this.entity)).getForcedCombatTarget() != null) {
                 enabled = true;
@@ -224,6 +228,11 @@ public class EntityTargetMovement {
             // but movement also calls this overload. Without this check a
             // human ranger/mage keeps trying to path through the wall even
             // though the projectile itself is allowed to hit a battlement.
+            if (CastleWarsManager.isMiddleIslandTowerCrossLevelPair(attacker, target)) {
+                return isUsingCastleWarsRangedOrMagic(attacker)
+                        && entity.isWithinReach(entity2, value2)
+                        && CastleWarsManager.hasCastleWarsProjectileLineOfSight(attacker, target);
+            }
             if (CastleWarsManager.canBotAttackAcrossCastleLevels(attacker, target)
                     || CastleWarsManager.isCastleWallCrossLevelPair(attacker, target)
                     && isUsingCastleWarsRangedOrMagic(attacker)) {
@@ -278,6 +287,14 @@ public class EntityTargetMovement {
 
     public static boolean canReachTarget(Entity entity, Entity entity2, int value2,
                                          CombatType combatType) {
+        if (entity.isPlayer() && entity2.isPlayer()
+                && CastleWarsManager.isMiddleIslandTowerCrossLevelPair(
+                        (Player)entity, (Player)entity2)) {
+            return (combatType == CombatType.MAGIC || combatType == CombatType.RANGED)
+                    && entity.isWithinReach(entity2, value2)
+                    && CastleWarsManager.hasCastleWarsProjectileLineOfSight(
+                            (Player)entity, (Player)entity2);
+        }
         if (entity.isPlayer() && entity2.isPlayer()
                 && CastleWarsManager.isCastleWallCrossLevelPair(
                         (Player)entity, (Player)entity2)) {
