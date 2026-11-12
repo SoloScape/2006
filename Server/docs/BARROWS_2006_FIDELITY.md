@@ -15,12 +15,21 @@ This document distinguishes **implemented behavior**, **cache-verified identifie
 | Per-room cap and auto-expiry of temporary door-summoned enemies | `BarrowsTunnelPopulation`, `BarrowsManager` | `BarrowsTunnelEncounterChecks` |
 | Void Knights' repair Squire native mapping | `BarrowsRepairHandler`, `data/npcs/extra_spawns.csv` | `BarrowsRepairChecks`; exact NPC spawn tile still provisional |
 | Armour stand repair discounts when a native object exists and is reachable | `BarrowsRepairHandler`, `ItemOnObjectTask` | `BarrowsRepairChecks` |
+| Fresh-account hidden brother randomisation with unfinished-run save retention | `Player`, `CharacterFileManager` | `Barrows2006RestorationChecks` real JSON save/reload |
+| Two-player private owned-NPC combat and kill credit while fixed tunnel spawns stay public | `CombatCycleEvent`, `BarrowsManager`, `Npc` | `Barrows2006RestorationChecks` |
+| Private chest config and clickable client-morphed appearance, never global chest/collision | `BarrowsManager`, `FirstObjectActionTask` | `Barrows2006RestorationChecks`; native 443 reconnect varps |
+| Members-world Barrows entry, spell-brother Weaken, and broken-0% direct drop | `BarrowsManager`, `AhrimCombatDefinition`, `ItemActionPacketHandler` | Native 443 build; `Barrows2006RestorationChecks` |
+| Original Strange Old Man, Squire Talk-to with their native NPC IDs; no later diary/quest rewards | `BarrowsNpcDialogues`, `DialogueManager`, `ExtraNpcSpawns` | `Barrows2006RestorationChecks`; period wording not completely verified |
+| 9 January 2014 spade spawns removed, original crumbling-tome spawn retained | `data/world/Item spawn.dat` | `Barrows2006RestorationChecks`; 1261 → 1259 records |
+| All 14 original tome pages preserved as words and distinct boundaries on the native 443 book | `BarrowsTomeHandler` | `BarrowsTomeAuthenticityChecks`; rendering not pixel-identical |
 
 ## Native revision-443 cache identifiers
 
 - **Armour repair stand:** `13715`, name confirmed in `ObjectDefinition.loadRevision443()`. Old 317/OSRS object `6802` is *not* that object in this cache.
 - **Void Knight smith Squire:** `3797` is the native Squire with Talk-to and no Trade option, corresponding to the old ID `1766`. Old ID `1766` is a **Cow calf** in this cache; `3795` has no Talk-to option or world spawn. New extra NPC placement `(2652,2660,0)` is on a walkable tile near the 443 Outpost, **not yet established as the exact original spawn location**.
-- **Squire repair offer:** test item-on-NPC and actual repair dialogue with `3797` in game. A cache NPC name and action alone cannot prove scene/dialogue identity.
+- **Squire repair offer:** item-on-NPC and Talk-to routes are implemented for `3797` and covered in regressions. The exact dialogue wording and precise NPC tile remain **not verified from a 2006 capture**. This is not yet identical to original text.
+- **Strange Old Man:** native `2024` is cache-verified as “Strange Old Man” with Talk-to; `1671` is undefined in revision 443. Additional spawn `(3566,3290,0)` has been collision-tested, but its exact historical tile is provisional. Short dialogue variants and occasional crumbling-tome gift are implemented; no post-2006 quest dialogue is added. Current dialogue is reconstructed using later preserved transcript material, **not a verified verbatim 2006 recording**.
+- **World item spawns:** original crumbling tome `4707` at `(3571,3312,0)` preserved. Two spades at `(3571,3310,0)` and `(3572,3312,0)`, introduced on 9 January 2014, were removed without affecting other item IDs/amounts.
 - **Book:** original text preserved, but continuation pages on client group 49 are intentionally not necessarily 14 pages one-for-one.
 
 ## Numerical fidelity — provisional, not authenticated against Jagex's 2006 source
@@ -54,10 +63,28 @@ Do not adjust these to speculative values without contemporary primary evidence 
 ## Remaining cross-feature and audiovisual work
 
 1. **POH Construction and Workshop furniture** are absent from the repository. The stand repair handler works for an existing `13715` object, but nobody can construct a house/workshop/stand normally. Building this properly requires a separate Construction/house instancing, hotspot, materials, save/load and visitor system. Do not put a random non-POH stand into the overworld and call that a 2006 recreation.
-2. **Squire placement/interaction**: inspect an authentic 443 Outpost map or in-game capture for the exact smith tile and test item-on-NPC and NPC dialogue.
-3. **2006 probability audit**: find period loot datasets or Jagex code for chest/door/route odds before claiming them 1:1; later OSRS values are placeholders.
-4. **2006 client screenshot/packet capture**: compare six brother face models, low-detail Prayer graphics, animations, pathing, puzzle text, chest camera/audio, rockfall effects and the book's page breaks.
-5. **End-to-end QA matrix**: verify full inventory, exit/re-enter before chest, all 0–6 brother kills, double chest clicks, death/teleport mid-run, disconnected player, room-population churn and NPC ownership.
+2. **Historical NPC precision**: the smith Squire and Strange Old Man spawn on collision-safe 443 tiles, and their interactions function, but exact original 2006 coordinates and word-for-word dialogue require a dated period map or transcript/recording. Do not label reconstructed dialogue proven verbatim.
+3. **2006 probability audit**: the current chest rolls (1/392 → 1/102 per equipment roll), 1012-point threshold table, encounter weights and dungeon route generation are exhaustively code-tested, but 2006-specific original source probabilities are still absent. Current OSRS data alone is **not** adequate provenance for exact 2006 values; retain the tested preserved behaviour rather than changing constants speculatively.
+4. **Client audiovisual fidelity**: the exact original 443 game effects for six face models, low-detail Prayer handling, emergence animation, rockfall sounds and hit timing, book page-layout pixels, and camera-shake magnitude still require **dated 2006 client captures**. Packet-level camera-shake tests and a new `BarrowsTomeAuthenticityChecks` test prove native 443 compatibility and complete text—not exact historical pixels/audio. The native book group 49 has 11 text rows per side and may need a client widget patch for exact fourteen-page layout.
+5. **End-to-end live-client QA**: the `Barrows2006RestorationChecks` now exercises two separate players' ownership, chest open/reopen, access, fresh characters, real JSON pre-loot/post-loot reconnect, native NPC spawns, and chest morph lookup. However, genuine concurrent-network multiplayer combat and an original 2006 client playtest remain needed for animation, pathing, door collision, packet sequencing and graphics. All 0–6 brother kills and death/teleport disconnect combinations should additionally be played manually.
+
+## 12 November 2026 audit remediation
+
+- The first-run hidden brother no longer defaults to Verac: a new `Player` randomly chooses one of the six. Loading a saved unfinished run overrides it with the saved choice.
+- Barrows-owned NPCs use owner-aware combat validation and progress attribution while the pre-existing fixed monsters remain public. Their visible right-click options are not globally hidden; historical 2006 visibility rules are distinct from kill ownership.
+- Chest opening uses private varp 453 instead of global `DynamicObject`; the player-specific client ID `6775` now resolves to a real unmodified chest `6774` or `10284` and the open state restores before the 443 login varps are sent.
+- The old Squire (native `3797`) and Strange Old Man (native `2024`) have dialogue; the latter can provide a crumbling tome. The two later 2014 spades were removed from the binary spawn table. Exact period speech is explicitly marked reconstructed.
+- Ahrim can use `SpellDefinition.WEAKEN` in addition to Fire Wave, Confuse and Curse. Surface mounds and crypt objects enforce members-world access.
+- Post-combat equipment wear requires a live attacker/target on the same plane, and recent incoming threats must remain nearby. Already-broken 0% pieces avoid the misleading drop-degradation warning.
+- The regression suite tests both players, real saved/reloaded characters, the new NPCs and their 443 IDs, dated item spawns, private chest morph lookup, and all original tome words and page starts.
+- **Period evidence boundary:** later OSRS drop tables, 2013 cache snapshots or reconstructed dialogue are not equivalent to recovered original 2006 server constants. Do not silently mark unknowns as “verified”.
+
+### Source classes and evidence-quality caveat
+
+- *Contemporary 2006*: Tip.It July report on door-monster despawning/room caps and August guide on tunnel collapse; contemporary sources document behaviours but rarely their internal RNG, sound IDs or tick counts.
+- *Revision-443 cache*: native NPC, item, object and interface definitions establish names/IDs and what the **specific 443 client is capable of**, not the chronological origin of every mechanic.
+- *Later preserved OSRS*: [Barrows chest reward mechanics](https://oldschool.runescape.wiki/w/Chest_%28Barrows%29), [Squire smith](https://oldschool.runescape.wiki/w/Squire_%28Void_Knights_smith%29), and the Old Man's surviving regular-dialogue variants provide implementation context, **not proof those exact constants/text existed unchanged in 2006**.
+- *Dated feature addition*: [Barrows spade additions on 9 January 2014](https://oldschool.runescape.wiki/w/Barrows) distinguish later access convenience from original content.
 
 ## Testing
 
