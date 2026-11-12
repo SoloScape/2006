@@ -22,12 +22,14 @@ on:
       - 'Server/src/main/java/com/rs2/model/dialogue/DialogueManager.java'
       - 'Server/src/main/java/com/rs2/model/ground/GroundItem.java'
       - 'Server/src/main/java/com/rs2/model/ground/GroundItemManager.java'
+      - 'Server/src/main/java/com/rs2/net/packet/PacketSender.java'
       - 'Server/src/main/java/com/rs2/net/packet/handler/ItemActionPacketHandler.java'
       - 'Server/src/main/java/com/rs2/net/packet/handler/ButtonClickPacketHandler.java'
       - 'Server/src/test/java/MorytaniaBarrowsInteractionChecks.java'
       - 'Server/src/test/java/Barrows443PuzzleInterfaceChecks.java'
       - 'Server/src/test/java/BarrowsHistoricalPuzzleChecks.java'
       - 'Server/src/test/java/BarrowsPostLootEscapeChecks.java'
+      - 'Server/src/test/java/com/rs2/net/packet/Barrows443CameraShakePacketChecks.java'
       - 'Server/src/test/java/BarrowsNpcSpawnAuditChecks.java'
       - 'Server/src/test/java/BarrowsTunnelEncounterChecks.java'
       - 'Server/src/test/java/BarrowsBrotherSpecialCombatChecks.java'
@@ -120,3 +122,9 @@ jobs:
           javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
             src/test/java/BarrowsPostLootEscapeChecks.java
           java -cp 'barrows-test-classes:lib/*' BarrowsPostLootEscapeChecks
+      - name: Verify native revision-443 Barrows camera shake packet
+        working-directory: Server
+        run: |
+          javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
+            src/test/java/com/rs2/net/packet/Barrows443CameraShakePacketChecks.java
+          java -cp 'barrows-test-classes:lib/*' com.rs2.net.packet.Barrows443CameraShakePacketChecks
