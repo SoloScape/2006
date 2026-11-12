@@ -236,6 +236,12 @@ extends TickTask {
         }
         WorldObject worldObject = SkillActionHelper.findWorldObjectById(this.objectId, this.objectX, this.objectY, this.objectPlane);
         if (worldObject == null) {
+            // A player-specific Barrows morph can have a client ID of 6775
+            // while the unchanged physical chest remains 6774/10284.
+            worldObject = BarrowsManager.findBaseChestForMorphedInteraction(
+                    this.player, this.objectId, this.objectX, this.objectY, this.objectPlane);
+        }
+        if (worldObject == null) {
             if (GameplayTrace.enabled() && !this.loggedMissingWorldObject) {
                 this.loggedMissingWorldObject = true;
                 GameplayTrace.log("first-object wait missing-world-object seq=" + this.actionSequence + " player=" + GameplayTrace.describe(this.player) + " objectId=" + this.objectId + " x=" + this.objectX + " y=" + this.objectY + " plane=" + this.objectPlane);
