@@ -60,7 +60,7 @@ The [server guide](Server/README.md) describes the implementation in more detail
 
 The goal is the **18 December 2006 / revision 443** experience. Open a category below to see its items and their current tracker statuses.
 
-**Status key:** ✅ Marked complete · 🚧 In progress · ⛔ Not signed off as complete · ➖ Outside the December 2006 scope
+**Status key:** ✅ Complete (Accurate as possible) · 🚧 Code Exists · ⛔ No Code Exists · ➖ Outside the December 2006 scope
 
 Statuses are provisional: a quest, feature or activity may have code without a fully tested gameplay loop. Items marked ⛔ may still have partial implementations.
 
