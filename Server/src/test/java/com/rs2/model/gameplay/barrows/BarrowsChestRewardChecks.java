@@ -35,6 +35,7 @@ public final class BarrowsChestRewardChecks {
                 "The later chest rewards screen must not be mapped in revision 443");
         require(InterfaceBridge.translate(19555) == InterfaceBridge.UNMAPPED,
                 "The later chest reward container must not be mapped in revision 443");
+        assertKnownPreservedLootTable();
         assertEmptyChest();
         assertInventoryDelivery();
         assertFullInventoryGroundDelivery();
@@ -44,6 +45,69 @@ public final class BarrowsChestRewardChecks {
 
         System.out.println("Barrows 2006 chest: no reward window, inventory delivery, "
                 + "full/partial overflow ownership, stacked preservation and duplicate-click guard passed.");
+    }
+
+    /**
+     * Exhaustively verify the full-potential reward table and unique chances.
+     * These are preserved OSRS-era values, not a claim that exact 2006 rates
+     * have been independently recovered from contemporary evidence.
+     */
+    private static void assertKnownPreservedLootTable() {
+        int[] expectedIds = {995, 558, 562, 560, 565, 4740, 985, 1149};
+        int[] expectedThresholds = {1, 381, 506, 631, 756, 881, 1006, 1012};
+        int[] expectedCounts = {380, 125, 125, 125, 125, 125, 6, 1};
+        BarrowsRewardTable table = new BarrowsRewardTable();
+        require(table.size() == expectedIds.length, "Unexpected Barrows reward category");
+        for (int i = 0; i < table.size(); i++) {
+            BarrowsRewardEntry entry = (BarrowsRewardEntry) table.get(i);
+            require(entry.itemId == expectedIds[i]
+                    && entry.rollThreshold == expectedThresholds[i],
+                    "Reward category " + i + " changed its original item/threshold");
+        }
+        int[] actualCounts = new int[table.size()];
+        for (int roll = 1; roll <= 1012; roll++) {
+            int selected = -1;
+            for (int i = 0; i < table.size(); i++) {
+                BarrowsRewardEntry entry = (BarrowsRewardEntry) table.get(i);
+                if (entry.rollThreshold <= roll) selected = i;
+            }
+            require(selected >= 0, "Valid full-potential roll had no loot entry");
+            actualCounts[selected]++;
+        }
+        for (int i = 0; i < table.size(); i++) {
+            require(actualCounts[i] == expectedCounts[i],
+                    "Loot category " + i + " weight was " + actualCounts[i]
+                            + " instead of " + expectedCounts[i]);
+        }
+
+        double saved = ServerSettings.barrowsRewardRate;
+        try {
+            ServerSettings.barrowsRewardRate = 1.0;
+            int[] denominators = {392, 334, 276, 218, 160, 102};
+            for (int brothers = 1; brothers <= 6; brothers++) {
+                require(BarrowsManager.equipmentRollDenominator(brothers)
+                                == denominators[brothers - 1],
+                        "Preserved unique-roll denominator changed for "
+                                + brothers + " brothers");
+            }
+            boolean invalidRejected = false;
+            try {
+                BarrowsManager.equipmentRollDenominator(0);
+            } catch (IllegalArgumentException expected) {
+                invalidRejected = true;
+            }
+            require(invalidRejected, "Zero brothers cannot roll a Barrows unique");
+            ServerSettings.barrowsRewardRate = 0;
+            boolean invalidRateRejected = false;
+            try {
+                BarrowsManager.equipmentRollDenominator(6);
+            } catch (IllegalStateException expected) {
+                invalidRateRejected = true;
+            }
+            require(invalidRateRejected, "Invalid reward rate must be rejected");
+        } finally {
+            ServerSettings.barrowsRewardRate = saved;
+        }
     }
 
     private static void assertEmptyChest() {
