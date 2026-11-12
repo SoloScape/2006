@@ -12,8 +12,11 @@ import java.util.List;
  * 12/128 brothers, 52/128 skeletons, 32/128 bloodworms, 32/128 crypt rats
  * are the documented OSRS-era odds used as a reference; the precise
  * probabilities in 2006 have not been independently verified.
- * A brother roll with no eligible brother falls back to a skeleton, so
- * a defeated or currently present brother is never selected.
+ * A brother roll with no undefeated brother falls back to a skeleton.
+ * Historical bug preserved deliberately: 2006 door rolls did not exclude an
+ * already-live copy of a brother, so duplicates could appear in the tunnels.
+ * See https://forum.tip.it/topic/35596-strange-barrows-or-hidden-update/
+ * and Jagex's 22 November 2011 patch (which later prevented duplicate spawns).
  */
 public final class BarrowsTunnelEncounter {
     public static final int ROLL_COUNT = 128;
@@ -29,16 +32,19 @@ public final class BarrowsTunnelEncounter {
 
     private BarrowsTunnelEncounter() { }
 
-    /** The two masks use the same brother ordering as BarrowsManager. */
-    public static int[] eligibleBrothers(boolean[] killed, boolean[] active) {
-        if (killed == null || active == null
-                || killed.length < BROTHER_NPC_IDS.length
-                || active.length < BROTHER_NPC_IDS.length) {
-            throw new IllegalArgumentException("Barrows brother state must contain six entries");
+    /**
+     * Eligible for a tunnel door ambush if not yet defeated, even when another
+     * living copy of the same brother is already nearby. The latter is the
+     * documented 2006 duplicate-brother bug (fixed by Jagex in November 2011).
+     * The chest/sarcophagus logic retains its separate active-brother checks.
+     */
+    public static int[] eligibleBrothers(boolean[] killed) {
+        if (killed == null || killed.length < BROTHER_NPC_IDS.length) {
+            throw new IllegalArgumentException("Barrows kill state must contain six entries");
         }
         List<Integer> candidates = new ArrayList<Integer>(BROTHER_NPC_IDS.length);
         for (int i = 0; i < BROTHER_NPC_IDS.length; i++) {
-            if (!killed[i] && !active[i]) candidates.add(BROTHER_NPC_IDS[i]);
+            if (!killed[i]) candidates.add(BROTHER_NPC_IDS[i]);
         }
         int[] ids = new int[candidates.size()];
         for (int i = 0; i < ids.length; i++) ids[i] = candidates.get(i);
