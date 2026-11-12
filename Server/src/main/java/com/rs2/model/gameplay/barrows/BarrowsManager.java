@@ -1137,6 +1137,19 @@ public final class BarrowsManager {
                 || player.isInArea(3562, 3569, 3273, 3279);
     }
 
+    /**
+     * A rewarded chest remains open while the player escapes the collapsing
+     * tunnels. Config 453 is intentionally not persisted because an unlooted
+     * chest may be reopened after logging back in; reconstruct the looted
+     * chest state before InitialVarps sends the native 443 map varps.
+     */
+    public static void restoreChestConfigOnLogin(Player player) {
+        if (player != null && player.barrowsChestOpened
+                && isInBarrowsTunnels(player)) {
+            player.configStates[453] |= 1 << 16;
+        }
+    }
+
     public static void resetBarrowsState(Player player) {
         int index = 0;
         while (index < 6) {
