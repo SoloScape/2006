@@ -63,7 +63,14 @@ public final class BarrowsRepairChecks {
                 "NPC 1799 must be Tindel Marchant");
 
         String squireName = NpcDefinition.forId(1766).getName();
-        System.out.println("Void Knight repair NPC 1766 cache name: " + squireName);
+        System.out.println("Historical NPC 1766 is named in 443: " + squireName);
+        for (int id = 0; id < 9000; id++) {
+            NpcDefinition definition = NpcDefinition.forId(id);
+            if (definition != null && definition.getName() != null
+                    && definition.getName().toLowerCase().contains("squire")) {
+                System.out.println("443 cache Squire candidate: " + id + " " + definition.getName());
+            }
+        }
         require(squireName.toLowerCase().contains("squire"),
                 "NPC 1766 expected Squire but cache returned: " + squireName);
 
