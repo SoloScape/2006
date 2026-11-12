@@ -383,6 +383,9 @@ public final class Barrows2006RestorationChecks {
     }
 
     private static void checkOldManConversationFlow(Player visitor) {
+        // NPC-only dialogue fixtures can have no username; player speech
+        // widgets require one to construct the displayed speaker name.
+        visitor.setUsername("Barrows Tester");
         // Test the surviving branches explicitly rather than relying on
         // random selections. Later quests and 2014 mound-spade text are not
         // evidence for the original 2006 conversations.
