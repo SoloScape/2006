@@ -33,7 +33,7 @@ public final class BarrowsRepairChecks {
     };
     // Each brother's array is helm, weapon, body, legs.
     private static final int[] FULL_COSTS = {60000, 100000, 90000, 80000};
-    private static final int[] REPAIR_NPCS = {519, 1082, 1799, 1766};
+    private static final int[] REPAIR_NPCS = {519, 1082, 1799, 3795};
 
     public static void main(String[] args) {
         ServerSettings.clientBuild = 443;
