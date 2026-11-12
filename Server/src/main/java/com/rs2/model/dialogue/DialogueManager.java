@@ -1749,6 +1749,10 @@ public class DialogueManager {
         if (player.getQuestManager().handleNpcDialogue(dialogueId, dialogueStep, optionIndex, npcId)) {
             return true;
         }
+        if (dialogueId == npcId && BarrowsNpcDialogues.supports(npcId)
+                && BarrowsNpcDialogues.continueDialogue(player, npcId, dialogueStep, optionIndex)) {
+            return true;
+        }
         if (dialogueId == npcId && OldCroneDialogue.isOldCrone(npcId)
                 && OldCroneDialogue.continueDialogue(player, dialogueStep, optionIndex)) {
             return true;
