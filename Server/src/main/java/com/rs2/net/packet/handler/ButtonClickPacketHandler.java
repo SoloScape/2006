@@ -13,7 +13,7 @@ import com.rs2.model.gameplay.partyroom.PartyRoomManager;
 import com.rs2.model.ground.GroundItem;
 import com.rs2.model.ground.GroundItemManager;
 import com.rs2.model.item.ItemStack;
-import com.rs2.model.item.action.BarrowsRepairHandler;
+import com.rs2.model.item.BarrowsEquipmentDurability;
 import com.rs2.model.item.action.MysticStaffEnchantment;
 import com.rs2.model.music.MusicManager;
 import com.rs2.model.music.MusicTrackDefinition;
@@ -509,14 +509,15 @@ implements PacketHandler {
         switch (buttonId) {
             case 14175: {
                 if (player.getPendingDestroyItem() != null) {
-                    BarrowsRepairHandler repairHandler = BarrowsRepairHandler.forItem(player.getPendingDestroyItem());
-                    if (repairHandler != null) {
+                    int brokenBarrowsId = BarrowsEquipmentDurability.fullyDegradedItemId(
+                            player.getPendingDestroyItem().getId());
+                    if (brokenBarrowsId != -1) {
                         if (player.getInventoryManager().getContainer().containsItem(player.getPendingDestroyItem().getId())) {
                             player.packetSender.sendSoundEffect(376, 1, 0);
                             if (!ServerSettings.adminInteractionsAllowed && player.getPlayerRights() >= 2) {
                                 player.packetSender.sendGameMessage("Your item disappears because you're an administrator.");
                             } else {
-                                GroundItemManager.getInstance().spawn(new GroundItem(new ItemStack(repairHandler.getFullyDegradedItemId(), 1), player));
+                                GroundItemManager.getInstance().spawn(new GroundItem(new ItemStack(brokenBarrowsId, 1), player));
                             }
                             if (!player.getInventoryManager().removeItemFromSlot(player.getPendingDestroyItem(), player.getSelectedItemSlot())) {
                                 player.getInventoryManager().removeItem(player.getPendingDestroyItem());
