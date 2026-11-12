@@ -781,6 +781,22 @@ public final class BarrowsManager {
         return false;
     }
 
+    /**
+     * Current preserved Barrows unique-roll odds. The mathematical values
+     * match later OSRS documentation; they are not independently proven
+     * to have remained identical throughout 2006.
+     */
+    public static int equipmentRollDenominator(int killedBrothers) {
+        if (killedBrothers < 1 || killedBrothers > 6) {
+            throw new IllegalArgumentException("Barrows unique rolls require 1-6 brothers");
+        }
+        if (ServerSettings.barrowsRewardRate <= 0.0) {
+            throw new IllegalStateException("Barrows reward rate must be positive");
+        }
+        return Math.max(1, (int) ((450 - killedBrothers * 58)
+                / ServerSettings.barrowsRewardRate));
+    }
+
     private static void awardChestRewards(Player player) {
         // A chest may only produce one reward bundle per Barrows run.
         if (player.barrowsChestOpened) return;
@@ -799,7 +815,8 @@ public final class BarrowsManager {
         }
 
         for (int rollIndex = 0; rollIndex < killedBrothers + 1; ++rollIndex) {
-            int barrowsItemChance = (int)((double)(450 - killedBrothers * 58) / ServerSettings.barrowsRewardRate);
+            int barrowsItemChance = killedBrothers > 0
+                    ? equipmentRollDenominator(killedBrothers) : 0;
             if (killedBrothers > 0 && GameUtil.randomInt(barrowsItemChance) == 0) {
                 int itemPoolIndex = GameUtil.randomInt(availableBarrowsItems.size());
                 rewards.add(new ItemStack(availableBarrowsItems.get(itemPoolIndex), 1));
