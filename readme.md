@@ -226,7 +226,7 @@ SoloScape aims to recreate the **18 December 2006 (revision 443)** experience. T
 **Status key:** ✅ Complete and verified · 🚧 In progress · ⛔ Not yet marked complete (may have partial implementations) · ➖ Outside the 2006 scope
 
 <details>
-<summary><strong>Skills & combat — expand tracker</strong></summary>
+<summary><strong>Skills & combat</strong></summary>
 
 | Name | Status |
 | --- | :---: |
@@ -258,7 +258,7 @@ SoloScape aims to recreate the **18 December 2006 (revision 443)** experience. T
 </details>
 
 <details>
-<summary><strong>Bosses & major encounters — expand tracker</strong></summary>
+<summary><strong>Bosses & major encounters</strong></summary>
 
 | Name | Status |
 | --- | :---: |
@@ -275,7 +275,7 @@ Bosses marked 🚧 have related combat, reward, or encounter code in the reposit
 </details>
 
 <details>
-<summary><strong>All free-to-play quests (18) — expand list</strong></summary>
+<summary><strong>All free-to-play quests (18)</strong></summary>
 
 | Quest | Status |
 | --- | :---: |
@@ -301,7 +301,7 @@ Bosses marked 🚧 have related combat, reward, or encounter code in the reposit
 </details>
 
 <details>
-<summary><strong>All members' quests (98) 🚧 — expand list</strong></summary>
+<summary><strong>All members' quests (98) 🚧</strong></summary>
 
 | Quest | Status |
 | --- | :---: |
@@ -407,7 +407,7 @@ Bosses marked 🚧 have related combat, reward, or encounter code in the reposit
 </details>
 
 <details>
-<summary><strong>Minigames & activities — expand tracker</strong></summary>
+<summary><strong>Minigames & activities</strong></summary>
 
 | Name | Status |
 | --- | :---: |
@@ -437,7 +437,7 @@ Bosses marked 🚧 have related combat, reward, or encounter code in the reposit
 </details>
 
 <details>
-<summary><strong>Combat, world & economy — expand tracker</strong></summary>
+<summary><strong>Combat, world & economy</strong></summary>
 
 | Name | Status |
 | --- | :---: |
@@ -469,7 +469,7 @@ Entries marked ➖ are deliberately **outside the strict 18 December 2006 target
 </details>
 
 <details>
-<summary><strong>Client, tools & supporting systems — expand tracker</strong></summary>
+<summary><strong>Client, tools & supporting systems</strong></summary>
 
 | Name | Status |
 | --- | :---: |
