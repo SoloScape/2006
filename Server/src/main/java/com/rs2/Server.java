@@ -406,6 +406,9 @@ implements Runnable {
             PartyRoomManager.loadPartyChest();
             NpcDropTable.loadDropTables();
             GameplayHelper.loadNpcSpawns();
+            // Include explicit May/December 2006 missing spawns (e.g. Void Knight repair Squire).
+            // The extra spawn CSV is optional and does not duplicate binary spawns.
+            com.rs2.model.npc.ExtraNpcSpawns.load();
             // March 2006 Romeo & Juliet rework supporting characters.
             com.rs2.model.quest.impl.RomeoJulietSupportingNpcs.spawnMissingNpcs();
             if (ServerSettings.grandExchangeEnabled) {
