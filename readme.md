@@ -58,11 +58,11 @@ The [server guide](Server/README.md) describes the implementation in more detail
 
 ## Roadmap
 
-**Overall completion: 7.9%** · **15 / 189** in-scope items marked ✅
+**Overall completion: 8.4%** · **16 / 190** counted roadmap items marked ✅
 
-![Roadmap completion: 7.9% — 15 of 189 in-scope items complete](docs/roadmap-progress.svg)
+![Roadmap completion: 8.4% — 16 of 190 counted roadmap items complete](docs/roadmap-progress.svg)
 
-Progress counts ✅ entries across all roadmap categories. Items marked ➖ (outside the December 2006 scope) are excluded. This is a snapshot of the README's current statuses, not a live gameplay audit.
+Progress counts ✅ entries across all roadmap categories, including optional plugins. Items marked ➖ are excluded. This is a snapshot of the README's current statuses, not a live gameplay audit.
 
 The goal is the **18 December 2006 / revision 443** experience. Open a category below to see its items and their current tracker statuses.
 
@@ -296,10 +296,18 @@ Statuses are provisional: a quest, feature or activity may have code without a f
 | Player-owned houses (POH) | ⛔ |
 | 2006 skill tutors | ⛔ |
 | Capes of Accomplishment | ⛔ |
-| Grand Exchange (released 2007) | ➖ |
 | Modern bank tabs (released 2008) | ➖ |
 | God Wars Dungeon (released 2007) | ➖ |
 | Modern Ironman modes | ➖ |
+
+</details>
+
+<details>
+<summary><strong>Plugins</strong></summary>
+
+| Name | Status |
+| :--- | :---: |
+| Grand Exchange (released 2007) | ✅ |
 
 </details>
 
