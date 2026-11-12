@@ -336,6 +336,10 @@ public final class Barrows2006RestorationChecks {
                 "data/npcs/extra_spawns.csv")), "UTF-8");
         require(spawns.contains("2024,Strange Old Man,3566,3290,0,1"),
                 "Strange Old Man 443 world spawn missing");
+        int manFlags = WalkingCollisionMap.getTileFlags(3566, 3290, 0);
+        require((manFlags & 0x1280100) == 0,
+                "Strange Old Man placed in blocked native 443 collision tile: 0x"
+                        + Integer.toHexString(manFlags));
         byte[] data = Files.readAllBytes(Paths.get("data/world/Item spawn.dat"));
         int count = u16(data, 1);
         require(data.length == 3 + count * 10,
