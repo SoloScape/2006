@@ -302,9 +302,6 @@ The goal is the **18 December 2006 / revision 443** experience. Open a category 
 | Player-owned houses (POH) | 📜 |
 | 2006 skill tutors | 📜 |
 | Capes of Accomplishment | 📜 |
-| Modern bank tabs (released 2008) | ➖ |
-| God Wars Dungeon (released 2007) | ➖ |
-| Modern Ironman modes | ➖ |
 
 </details>
 
