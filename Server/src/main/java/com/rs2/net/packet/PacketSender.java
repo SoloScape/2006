@@ -2036,33 +2036,48 @@ public final class PacketSender {
         return this;
     }
 
-    public final PacketSender sendCameraShake(int value5, int value22, int value32, int value42) {
+    /**
+     * Revision 443's native camera-shake packet is opcode 156 with four
+     * unsigned bytes: camera axis (0..4), random amplitude, sine amplitude,
+     * and oscillation frequency. The native client decodes it in
+     * Bzip2Block (frame 156) and resets it with frame 242.
+     *
+     * Opcode 96 is a six-byte *camera positioning* packet; using it for a
+     * Barrows shake misaligns subsequent packets and never enables shaking.
+     */
+    static PacketWriter buildRevision443CameraShakePacket(
+            com.rs2.net.IsaacCipher cipher, int axis, int randomAmplitude,
+            int sineAmplitude, int frequency) {
+        if (axis < 0 || axis >= 5) {
+            throw new IllegalArgumentException("Invalid camera shake axis: " + axis);
+        }
+        PacketWriter writer = PacketBuffer.allocateWriter(5);
+        writer.writeOpcode(cipher, 156);
+        writer.writeByte(axis);
+        writer.writeByte(randomAmplitude);
+        writer.writeByte(sineAmplitude);
+        writer.writeByte(frequency);
+        return writer;
+    }
+
+    public final PacketSender sendCameraShake(int axis, int randomAmplitude,
+                                              int sineAmplitude, int frequency) {
         if (this.player.isBot) {
             return this;
         }
         if (ServerSettings.clientBuild == 443) {
-            PacketWriter packetWriter = PacketBuffer.allocateWriter(7);
-            packetWriter.writeOpcode(this.player.getOutboundCipher(), 96);
-            packetWriter.writeByte(value5);
-            if (value5 == 1 || value5 == 2 || value5 == 3 || value5 == 4
-                    || value5 == 5 || value5 == 6 || value5 == 10) {
-                if (value5 == 1 || value5 == 10) {
-                    packetWriter.writeShort(value22);
-                } else {
-                    packetWriter.writeShort(value22);
-                    packetWriter.writeShort(value32);
-                    packetWriter.writeByte(value42);
-                }
-            }
-            this.player.writePacketBuffer(packetWriter.getBuffer());
+            PacketWriter writer = buildRevision443CameraShakePacket(
+                    this.player.getOutboundCipher(), axis, randomAmplitude,
+                    sineAmplitude, frequency);
+            this.player.writePacketBuffer(writer.getBuffer());
             return this;
         }
         PacketWriter packetWriter = PacketBuffer.allocateWriter(5);
         packetWriter.writeOpcode(this.player.getOutboundCipher(), 35);
-        packetWriter.writeByte(2);
-        packetWriter.writeByte(3);
-        packetWriter.writeByte(2);
-        packetWriter.writeByte(3);
+        packetWriter.writeByte(axis);
+        packetWriter.writeByte(randomAmplitude);
+        packetWriter.writeByte(sineAmplitude);
+        packetWriter.writeByte(frequency);
         this.player.writePacketBuffer(packetWriter.getBuffer());
         return this;
     }
