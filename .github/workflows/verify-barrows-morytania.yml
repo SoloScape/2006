@@ -13,6 +13,7 @@ on:
       - 'Server/data/world/Item spawn.dat'
       - 'Server/src/test/java/Barrows2006RestorationChecks.java'
       - 'Server/src/test/java/BarrowsTomeAuthenticityChecks.java'
+      - 'Server/src/test/java/BarrowsAhrimSpellChecks.java'
       - 'Server/src/main/java/com/rs2/model/gameplay/barrows/BarrowsTomeHandler.java'
       - 'Server/src/main/java/com/rs2/Server.java'
       - 'Server/src/main/java/com/rs2/model/npc/ExtraNpcSpawns.java'
@@ -141,6 +142,12 @@ jobs:
           javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
             src/test/java/BarrowsSpecialEffectAccuracyChecks.java
           java -cp 'barrows-test-classes:lib/*' BarrowsSpecialEffectAccuracyChecks
+      - name: Verify all four original Ahrim spells and their stat drains
+        working-directory: Server
+        run: |
+          javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
+            src/test/java/BarrowsAhrimSpellChecks.java
+          java -cp 'barrows-test-classes:lib/*' BarrowsAhrimSpellChecks
       - name: Verify 2006 Barrows post-loot escape and collapse cleanup
         working-directory: Server
         run: |
