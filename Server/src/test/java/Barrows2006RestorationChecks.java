@@ -369,6 +369,16 @@ public final class Barrows2006RestorationChecks {
         require(foundMan && foundSquire, "2006 NPCs not actually registered by spawn loader");
         require(DialogueManager.startDialogue(player(6, 2652, 2660, 0), 3797),
                 "Void Knight smith Squire's Talk-to action has no dialogue");
+        Player unpreparedVisitor = player(7, 3566, 3290, 0);
+        require(DialogueManager.startDialogue(unpreparedVisitor, 2024),
+                "Strange Old Man has no Talk-to dialogue");
+        require(unpreparedVisitor.getDialogueManager().getDialogueStep() == 4,
+                "Old Man should direct a visitor without a spade to his spade conversation");
+        unpreparedVisitor.getInventoryManager().addItem(new com.rs2.model.item.ItemStack(952));
+        require(DialogueManager.startDialogue(unpreparedVisitor, 2024),
+                "Old Man does not speak to a player carrying a spade");
+        require(unpreparedVisitor.getDialogueManager().getDialogueStep() == 1,
+                "With-spade dialogue should proceed to the four 2006 conversation variants");
     }
 
     private static int u16(byte[] data, int off) {
