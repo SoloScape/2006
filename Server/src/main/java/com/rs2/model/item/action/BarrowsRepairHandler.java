@@ -7,8 +7,11 @@ import com.rs2.model.player.InventoryManager;
 import com.rs2.model.player.Player;
 
 public final class BarrowsRepairHandler {
-    // Bob (Lumbridge), Dunstan (Burthorpe), Tindel Marchant (Port Khazard).
-    private static final int[] repairNpcIds = {519, 1082, 1799};
+    // Bob, Dunstan, Tindel Marchant, and the Void Knight repair Squire.
+    // Revision-443 cache ID 3795 corresponds to historical/OSRS ID 1766;
+    // NPC 1766 in this cache is a Cow calf and must never accept repairs.
+    private static final int[] repairNpcIds = {519, 1082, 1799, 3795};
+    public static final int ARMOUR_STAND_OBJECT_ID = 6802;
     private final int repairedItemId;
     private final int baseDegradedItemId;
     private final int fullRepairCost;
@@ -37,17 +40,58 @@ public final class BarrowsRepairHandler {
     }
 
     public static boolean repairItem(Player player, ItemStack itemStack) {
-        int repairCost = BarrowsRepairHandler.calculateRepairCost(itemStack);
-        if (repairCost < 0) return false;
-        if (!player.getInventoryManager().containsItemStack(new ItemStack(995, repairCost)) && repairCost > 0) {
+        return repairItemForCost(player, itemStack, calculateRepairCost(itemStack));
+    }
+
+    /**
+     * 2006 POH workshop armour stand (object 6802). A validated, reachable
+     * real object is supplied by ItemOnObjectTask; no standalone POH system is
+     * assumed. Using a friend's stand does not require 55 Construction.
+     */
+    public static boolean handleItemOnArmourStand(Player player, int itemId, int objectId) {
+        if (objectId != ARMOUR_STAND_OBJECT_ID || !BarrowsEquipmentDurability.isBarrowsItem(itemId))
+            return false;
+        int slot = player.getSelectedItemSlot();
+        if (slot < 0 || slot >= player.getInventoryManager().getContainer().getCapacity()) return true;
+        ItemStack item = player.getInventoryManager().getContainer().getItemAt(slot);
+        if (item == null || item.getId() != itemId) return true;
+        int smithing = player.getSkillManager().getCurrentLevels()[13];
+        int cost = calculateArmourStandRepairCost(item, smithing);
+        if (cost < 0) {
+            player.packetSender.sendGameMessage("This equipment does not need repairing.");
+            return true;
+        }
+        if (repairItemForCost(player, item, cost)) {
+            player.packetSender.sendGameMessage("You repair your Barrows equipment for "
+                    + cost + " coins.");
+        }
+        return true;
+    }
+
+    /** Each two Smithing levels discount the ordinary repair by one percent. */
+    public static int calculateArmourStandRepairCost(ItemStack item, int smithingLevel) {
+        int npcCost = calculateRepairCost(item);
+        if (npcCost < 0) return -1;
+        int smithing = Math.max(1, Math.min(200, smithingLevel));
+        return (int) ((long) npcCost * (200 - smithing) / 200);
+    }
+
+    private static boolean repairItemForCost(Player player, ItemStack item, int cost) {
+        BarrowsRepairHandler definition = forItem(item);
+        if (definition == null || cost < 0) return false;
+        int slot = player.getSelectedItemSlot();
+        if (slot < 0 || slot >= player.getInventoryManager().getContainer().getCapacity()) return false;
+        ItemStack selected = player.getInventoryManager().getContainer().getItemAt(slot);
+        if (selected == null || selected.getId() != item.getId()
+                || selected.getMetadata() != item.getMetadata()) return false;
+        InventoryManager inventory = player.getInventoryManager();
+        if (cost > 0 && !inventory.containsItemStack(new ItemStack(995, cost))) {
             player.packetSender.sendGameMessage("You don't have enough coins to fix that.");
             return false;
         }
-        player.getInventoryManager().removeItem(new ItemStack(995, repairCost));
-        player.getInventoryManager().removeItemFromSlot(itemStack, player.getSelectedItemSlot());
-        InventoryManager inventoryManager = player.getInventoryManager();
-        BarrowsRepairHandler repairDefinition = BarrowsRepairHandler.forItem(itemStack);
-        inventoryManager.addItem(new ItemStack(repairDefinition == null ? -1 : repairDefinition.repairedItemId, 1));
+        if (!inventory.removeItemFromSlot(item, slot)) return false;
+        if (cost > 0) inventory.removeItem(new ItemStack(995, cost));
+        inventory.addItem(new ItemStack(definition.repairedItemId, 1));
         return true;
     }
 

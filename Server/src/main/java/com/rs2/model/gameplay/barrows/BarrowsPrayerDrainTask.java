@@ -11,6 +11,30 @@ public final class BarrowsPrayerDrainTask
 extends TickTask {
     private final Player player;
 
+    // Item-model pairs are ordered Ahrim, Dharok, Guthan, Karil, Torag, Verac.
+    // The killed-brother flags are ordered Verac, Torag, Karil, Guthan, Dharok, Ahrim.
+    private static final int[] FACE_FIRST_MODEL_BY_BROTHER =
+            {4771, 4769, 4767, 4765, 4763, 4761};
+
+    /**
+     * Select a ghostly face only from defeated brothers. The prayer loss
+     * itself still happens if the player has not killed a brother.
+     * 'selection' is the zero-based choice among killed brothers.
+     */
+    public static int faceModelForKilledBrother(boolean[] killed, int selection, boolean alternate) {
+        if (killed == null || killed.length < FACE_FIRST_MODEL_BY_BROTHER.length) return -1;
+        int count = 0;
+        for (int i = 0; i < FACE_FIRST_MODEL_BY_BROTHER.length; i++) {
+            if (killed[i]) count++;
+        }
+        if (count == 0 || selection < 0 || selection >= count) return -1;
+        for (int i = 0; i < FACE_FIRST_MODEL_BY_BROTHER.length; i++) {
+            if (!killed[i]) continue;
+            if (selection-- == 0) return FACE_FIRST_MODEL_BY_BROTHER[i] + (alternate ? 1 : 0);
+        }
+        return -1;
+    }
+
     public BarrowsPrayerDrainTask(int value2, Player player) {
         super(30);
         this.player = player;
@@ -23,21 +47,21 @@ extends TickTask {
             return;
         }
         if (this.player.isInBarrows()) {
-            int value = BarrowsManager.prayerDrainModelItemIds[GameUtil.randomInt(12)];
-            int value2 = BarrowsManager.prayerDrainModelInterfaceIds[GameUtil.randomInt(6)];
-            Player player = this.player;
-            player.packetSender.sendInterfaceModel(value2, 100, value);
-            player = this.player;
-            player.packetSender.sendInterfaceAnimation(value2, 2085);
-            value = BarrowsManager.countKilledBrothers(this.player);
-            int[] skillManager = this.player.getSkillManager().getCurrentLevels();
-            skillManager[5] = skillManager[5] - (value += 8);
-            if (this.player.getSkillManager().getCurrentLevels()[5] < 0) {
-                this.player.getSkillManager().getCurrentLevels()[5] = 0;
+            int defeated = BarrowsManager.countKilledBrothers(this.player);
+            if (defeated > 0) {
+                int modelId = faceModelForKilledBrother(this.player.getBarrowsKilledBrothers(),
+                        GameUtil.randomInt(defeated), GameUtil.randomInt(2) == 0);
+                if (modelId != -1) {
+                    int interfaceId = BarrowsManager.prayerDrainModelInterfaceIds[GameUtil.randomInt(6)];
+                    this.player.packetSender.sendInterfaceModel(interfaceId, 100, modelId);
+                    this.player.packetSender.sendInterfaceAnimation(interfaceId, 2085);
+                    World.getTaskScheduler().schedule(
+                            new BarrowsPrayerDrainResetTask(this, 3, this.player, interfaceId));
+                }
             }
+            int[] levels = this.player.getSkillManager().getCurrentLevels();
+            levels[5] = Math.max(0, levels[5] - (defeated + 8));
             this.player.getSkillManager().refreshSkill(5);
-            BarrowsPrayerDrainResetTask barrowsPrayerDrainResetTask = new BarrowsPrayerDrainResetTask(this, 3, this.player, value2);
-            World.getTaskScheduler().schedule(barrowsPrayerDrainResetTask);
             return;
         }
         this.player.activeRecurringEffectId = -1;

@@ -48,6 +48,16 @@ public final class BarrowsEquipmentDurability {
         return entryIndex(itemId) >= 0;
     }
 
+    /**
+     * In 2006, dropping or losing *any* Barrows piece on death turned it into
+     * the tradeable 0% version, including a completely repaired piece.
+     * Returns -1 for unrelated items so normal drop/death rules are unchanged.
+     */
+    public static int fullyDegradedItemId(int itemId) {
+        int index = entryIndex(itemId);
+        return index < 0 ? -1 : DEGRADED_BASE_IDS[index] + 4;
+    }
+
     public static boolean isBroken(int itemId) {
         int i = entryIndex(itemId);
         return i >= 0 && itemId == DEGRADED_BASE_IDS[i] + 4;

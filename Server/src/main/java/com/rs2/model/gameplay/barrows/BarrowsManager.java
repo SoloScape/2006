@@ -717,7 +717,7 @@ public final class BarrowsManager {
             }
             case 6706: {
                 player.moveTo(new Position(3553, 3283, 0));
-                return false;
+                return true;
             }
             case 6705: {
                 player.moveTo(new Position(3565, 3276, 0));

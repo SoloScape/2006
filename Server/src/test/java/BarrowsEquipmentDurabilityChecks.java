@@ -41,6 +41,7 @@ public final class BarrowsEquipmentDurabilityChecks {
         QuestDefinition.loadDefinitions();
         ItemDefinition.loadDefinitions();
         assertAllTwentyFourPieces();
+        assertAllItemLossConversions();
         assertLoginPersistence();
         assertMigrationFromAttackCharges();
         assertCombatTickConditions();
@@ -48,6 +49,21 @@ public final class BarrowsEquipmentDurabilityChecks {
         assertBrokenSetCannotProvideEffect();
         assertBrokenItemCannotBeReequipped();
         System.out.println("Barrows durability: 24/24 pieces, 15h transitions, persistence, combat-only wear, crystal and repairs passed.");
+    }
+
+    private static void assertAllItemLossConversions() {
+        for (int i = 0; i < REPAIRED.length; i++) {
+            int broken = DEGRADED[i] + 4;
+            require(BarrowsEquipmentDurability.fullyDegradedItemId(REPAIRED[i]) == broken,
+                    "Dropping pristine Barrows item " + REPAIRED[i] + " did not break it");
+            for (int stage = 0; stage <= 4; stage++) {
+                require(BarrowsEquipmentDurability.fullyDegradedItemId(DEGRADED[i] + stage) == broken,
+                        "Degradation stage " + stage + " of item " + REPAIRED[i]
+                        + " is not converted to the right broken form");
+            }
+        }
+        require(BarrowsEquipmentDurability.fullyDegradedItemId(995) == -1,
+                "Unrelated items must not be converted to Barrows 0%");
     }
 
     private static void assertAllTwentyFourPieces() {

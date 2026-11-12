@@ -33,7 +33,7 @@ public final class BarrowsRepairChecks {
     };
     // Each brother's array is helm, weapon, body, legs.
     private static final int[] FULL_COSTS = {60000, 100000, 90000, 80000};
-    private static final int[] REPAIR_NPCS = {519, 1082, 1799};
+    private static final int[] REPAIR_NPCS = {519, 1082, 1799, 3795};
 
     public static void main(String[] args) {
         ServerSettings.clientBuild = 443;
@@ -45,8 +45,9 @@ public final class BarrowsRepairChecks {
         checkPricesAcrossEveryPiece();
         checkLegacyMetadata();
         checkPaymentAndItemExchange();
-        System.out.println("Barrows repair: all 24 pieces, three NPCs, partial/full wear, "
-                + "legacy metadata and coin/item exchange passed.");
+        checkArmourStandRepair();
+        System.out.println("Barrows repair: all 24 pieces, four 2006 NPCs, POH stand discounts, "
+                + "partial/full wear, legacy metadata and coin/item exchange passed.");
     }
 
     private static void checkRepairers() {
@@ -60,6 +61,13 @@ public final class BarrowsRepairChecks {
                 "NPC 1082 must be Dunstan");
         require("Tindel Marchant".equalsIgnoreCase(NpcDefinition.forId(1799).getName()),
                 "NPC 1799 must be Tindel Marchant");
+
+        require("Cow calf".equalsIgnoreCase(NpcDefinition.forId(1766).getName()),
+                "Revision-443 NPC 1766 changed; update repairer mapping before proceeding");
+        require("Squire".equalsIgnoreCase(NpcDefinition.forId(3795).getName()),
+                "Revision-443 Void Knight repair Squire (3795) is missing");
+        require(!BarrowsRepairHandler.handleItemOnNpc(player(), 1766, new ItemStack(DEGRADED[0] + 4)),
+                "Cow calf must not offer Barrows repairs");
 
         Player player = player();
         ItemStack damaged = new ItemStack(DEGRADED[0] + 4, 1, -1);
@@ -159,6 +167,54 @@ public final class BarrowsRepairChecks {
         Player player = player();
         require(!BarrowsRepairHandler.repairItem(player, new ItemStack(995)),
                 "Invalid item should fail repair without changing inventory");
+    }
+
+    private static void checkArmourStandRepair() {
+        require(BarrowsRepairHandler.ARMOUR_STAND_OBJECT_ID == 6802,
+                "Original 2006 POH armour stand object must be 6802");
+        for (int i = 0; i < REPAIRED.length; i++) {
+            ItemStack damaged = BarrowsEquipmentDurability.consumeCombatTicks(
+                    new ItemStack(REPAIRED[i]), 45000);
+            int normal = FULL_COSTS[i % FULL_COSTS.length] / 2;
+            require(BarrowsRepairHandler.calculateArmourStandRepairCost(damaged, 1)
+                            == normal * 199 / 200,
+                    "Level 1 Smithing armour stand discount is wrong for " + REPAIRED[i]);
+            require(BarrowsRepairHandler.calculateArmourStandRepairCost(damaged, 60)
+                            == normal * 140 / 200,
+                    "Level 60 Smithing armour stand discount is wrong for " + REPAIRED[i]);
+            require(BarrowsRepairHandler.calculateArmourStandRepairCost(damaged, 99)
+                            == normal * 101 / 200,
+                    "Level 99 Smithing armour stand discount is wrong for " + REPAIRED[i]);
+            require(BarrowsRepairHandler.calculateArmourStandRepairCost(
+                            new ItemStack(REPAIRED[i]), 60) == -1,
+                    "Unworn equipment became a repair target");
+        }
+        Player p = player();
+        p.getSkillManager().setCurrentLevel(13, 60);
+        ItemStack damaged = BarrowsEquipmentDurability.consumeCombatTicks(
+                new ItemStack(REPAIRED[0]), 45000);
+        p.getInventoryManager().getContainer().setItem(0, damaged);
+        p.getInventoryManager().getContainer().setItem(1, new ItemStack(995, 30000));
+        p.setSelectedItemSlot(0);
+        require(!BarrowsRepairHandler.handleItemOnArmourStand(p, damaged.getId(), 6803),
+                "Other objects must not offer stand repair");
+        require(BarrowsRepairHandler.handleItemOnArmourStand(p, damaged.getId(), 6802),
+                "The armour stand did not handle worn Barrows equipment");
+        require(p.getInventoryManager().containsItem(REPAIRED[0]),
+                "Armour stand did not restore the repaired helm");
+        require(p.getInventoryManager().getItemAmount(995) == 9000,
+                "Armour stand failed to apply the 30% Smithing discount");
+
+        Player broke = player();
+        ItemStack broken = new ItemStack(DEGRADED[1] + 4);
+        broke.getInventoryManager().getContainer().setItem(0, broken);
+        broke.setSelectedItemSlot(0);
+        require(BarrowsRepairHandler.handleItemOnArmourStand(broke, broken.getId(), 6802),
+                "Broken gear item-on-stand interaction was not consumed");
+        require(broke.getInventoryManager().containsItem(broken.getId()),
+                "Failed armour-stand payment lost worn gear");
+        require(broke.getInventoryManager().getItemAmount(995) == 0,
+                "Failed armour-stand payment created or removed money");
     }
 
     private static Player player() {
