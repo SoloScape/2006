@@ -135,6 +135,15 @@ public final class BarrowsRepairChecks {
         }
         System.out.println("Native 443 obsolete Squire 3795 static spawn count: "
                 + repairSquireCount);
+        String added = new String(Files.readAllBytes(Paths.get(
+                "data/npcs/extra_spawns.csv")), java.nio.charset.StandardCharsets.UTF_8);
+        require(added.contains("3797,Squire (Void Knights smith),2652,2660,0,0"),
+                "The 443 repair Squire must exist at the Outpost in the world spawn table");
+        com.rs2.util.path.WalkingCollisionMap.loadCollisionMaps();
+        int smithTileFlags = com.rs2.util.path.WalkingCollisionMap.getTileFlags(2652, 2660, 0);
+        require((smithTileFlags & 0x1280100) == 0,
+                "Repair Squire spawn stands in a blocked 443 world tile (flags=0x"
+                        + Integer.toHexString(smithTileFlags) + ")");
         com.rs2.model.objects.WorldObjectLookup.loadWorldObjects();
         for (int x = 2640; x <= 2680; x++) {
             for (int y = 2640; y <= 2680; y++) {
