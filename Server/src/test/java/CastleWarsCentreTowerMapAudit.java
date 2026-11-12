@@ -154,6 +154,10 @@ public final class CastleWarsCentreTowerMapAudit {
                             if (CastleWarsManager.isMiddleIslandTowerTop(groundTile)
                                     || (WalkingCollisionMap.getTileFlags(bx,by,0)
                                             & 0x1280100) != 0) continue;
+                            // Evaluate shots within the normal bow range,
+                            // not arbitrary 15-tile sightlines.
+                            if (Math.max(Math.abs(x - bx), Math.abs(y - by)) > 8)
+                                continue;
                             ground.setPosition(groundTile);
                             if (!CastleWarsManager.isMiddleIslandTowerCrossLevelPair(upper, ground)
                                     || !CastleWarsManager.hasCastleWarsProjectileLineOfSight(upper, ground)
