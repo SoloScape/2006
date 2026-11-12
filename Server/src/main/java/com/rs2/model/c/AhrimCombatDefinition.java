@@ -13,7 +13,7 @@ extends NpcCombatDefinition {
 
     @Override
     public final CombatAttack[] createAttacks(Entity entity, Entity entity2) {
-        return new CombatAttack[]{BaseCombatAttack.createMagicAttack(entity, entity2, SpellDefinition.FIRE_WAVE), BaseCombatAttack.createMagicAttack(entity, entity2, SpellDefinition.CONFUSE), BaseCombatAttack.createMagicAttack(entity, entity2, SpellDefinition.CURSE)};
+        return new CombatAttack[]{BaseCombatAttack.createMagicAttack(entity, entity2, SpellDefinition.FIRE_WAVE), BaseCombatAttack.createMagicAttack(entity, entity2, SpellDefinition.CONFUSE), BaseCombatAttack.createMagicAttack(entity, entity2, SpellDefinition.WEAKEN), BaseCombatAttack.createMagicAttack(entity, entity2, SpellDefinition.CURSE)};
     }
 }
 
