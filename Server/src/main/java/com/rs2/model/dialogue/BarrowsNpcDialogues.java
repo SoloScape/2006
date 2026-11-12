@@ -67,6 +67,9 @@ public final class BarrowsNpcDialogues {
         switch (step) {
             case 1:
                 if (!player.getInventoryManager().containsItem(952)) {
+                    // The surviving no-spade transcript mentions spades at
+                    // every mound, a convenience added after 2006. Do not
+                    // promise those later world spawns in this dialogue.
                     dialogue.showNpcTwoLineDialogue(
                             "Dig, dig, DIG! You can't dig",
                             "without bringing a spade!", 591);
@@ -86,12 +89,13 @@ public final class BarrowsNpcDialogues {
                 dialogue.finishDialogue();
                 return true;
             case 2:
-                // Four period-documented conversation branches. Never start
-                // later miniquest, diary or the post-2021 warnings menu.
+                // Four surviving regular conversation branches. The precise
+                // frequency and verbatim 2006 wording are not authenticated.
+                // Never expose later quest, diary or warning-menu dialogue.
                 int branch = GameUtil.randomInt(4);
                 dialogue.setNextDialogueStep(10 + branch * 10);
                 dialogue.showNpcOneLineDialogue(branch == 0
-                        ? "Psst. Do you want to know a secret?"
+                        ? "Pst, wanna hear a secret?"
                         : branch == 1 ? "Knock, knock."
                         : branch == 2 ? "What? I didn't ask for a book!"
                         : "AAAAAARRRRGGHHHH!", 591);
@@ -101,32 +105,49 @@ public final class BarrowsNpcDialogues {
                 }
                 return true;
             case 10:
-                dialogue.showTwoOptions("Yes, tell me.", "No, thanks.");
+                dialogue.showTwoOptions("Sure!", "No, thanks.");
                 return true;
             case 11:
                 if (option == 1) {
-                    dialogue.showNpcOneLineDialogue("Those brothers aren't ordinary men!", 591);
+                    dialogue.showPlayerOneLineDialogue("Sure!", 591);
                 } else {
-                    dialogue.showPlayerOneLineDialogue("Perhaps another time.", 591);
+                    dialogue.showPlayerOneLineDialogue("No, thanks.", 591);
+                    dialogue.finishDialogue();
                 }
+                return true;
+            case 12:
+                dialogue.showNpcOneLineDialogue("They're not normal!", 591);
                 dialogue.finishDialogue();
                 return true;
             case 20:
                 dialogue.showPlayerOneLineDialogue("Who's there?", 591);
                 return true;
             case 21:
-                dialogue.showNpcTwoLineDialogue(
-                        "Something dreadful beneath the ground!",
-                        "Hah! You should have seen your face.", 591);
+                dialogue.showNpcOneLineDialogue(
+                        "A big scary monster, HAHAHAHAHAHAHAHAHAHA!", 591);
+                return true;
+            case 22:
+                dialogue.showPlayerOneLineDialogue("Okay...", 591);
                 dialogue.finishDialogue();
                 return true;
             case 40:
-                dialogue.showTwoOptions("What's wrong?", "I'll leave you to it.");
+                dialogue.showTwoOptions(
+                        "What's wrong?", "I'll leave you to it, then.");
                 return true;
             case 41:
-                dialogue.showPlayerOneLineDialogue(
-                        option == 1 ? "What's wrong?" : "I'll leave you to it.", 591);
-                dialogue.finishDialogue();
+                if (option == 1) {
+                    dialogue.showPlayerOneLineDialogue("What's wrong?", 591);
+                } else {
+                    dialogue.showPlayerOneLineDialogue(
+                            "I'll leave you to it, then.", 591);
+                    dialogue.finishDialogue();
+                }
+                return true;
+            case 42:
+                // Asking what's wrong repeats the scream and returns to the
+                // same choices, until the player elects to leave.
+                dialogue.showNpcOneLineDialogue("AAAAAARRRRGGHHHH!", 591);
+                dialogue.setNextDialogueStep(40);
                 return true;
             default:
                 dialogue.finishDialogue();
