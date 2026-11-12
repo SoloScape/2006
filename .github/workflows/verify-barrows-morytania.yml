@@ -5,6 +5,13 @@ on:
       - Feature/Barrows
     paths:
       - 'Server/src/main/java/com/rs2/model/gameplay/barrows/**'
+      - 'Server/src/main/java/com/rs2/model/dialogue/BarrowsNpcDialogues.java'
+      - 'Server/src/main/java/com/rs2/model/c/AhrimCombatDefinition.java'
+      - 'Server/src/main/java/com/rs2/model/npc/Npc.java'
+      - 'Server/src/main/java/com/rs2/model/combat/CombatCycleEvent.java'
+      - 'Server/src/main/java/com/rs2/model/interaction/FirstObjectActionTask.java'
+      - 'Server/data/world/Item spawn.dat'
+      - 'Server/src/test/java/Barrows2006RestorationChecks.java'
       - 'Server/src/main/java/com/rs2/Server.java'
       - 'Server/src/main/java/com/rs2/model/npc/ExtraNpcSpawns.java'
       - 'Server/data/npcs/extra_spawns.csv'
@@ -138,6 +145,12 @@ jobs:
           javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
             src/test/java/BarrowsPostLootEscapeChecks.java
           java -cp 'barrows-test-classes:lib/*' BarrowsPostLootEscapeChecks
+      - name: Verify first-run randomisation, private multiplayer and 2006 NPCs
+        working-directory: Server
+        run: |
+          javac -encoding UTF-8 -cp 'barrows-test-classes:lib/*' -d barrows-test-classes \
+            src/test/java/Barrows2006RestorationChecks.java
+          java -cp 'barrows-test-classes:lib/*' Barrows2006RestorationChecks
       - name: Verify native revision-443 Barrows camera shake packet
         working-directory: Server
         run: |
