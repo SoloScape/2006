@@ -58,9 +58,9 @@ The [server guide](Server/README.md) describes the implementation in more detail
 
 ## Roadmap
 
-**Overall completion: 3.7%** · **7 / 189** in-scope items marked ✅
+**Overall completion: 7.9%** · **15 / 189** in-scope items marked ✅
 
-![Roadmap completion: 3.7% — 7 of 189 in-scope items complete](docs/roadmap-progress.svg)
+![Roadmap completion: 7.9% — 15 of 189 in-scope items complete](docs/roadmap-progress.svg)
 
 Progress counts ✅ entries across all roadmap categories. Items marked ➖ (outside the December 2006 scope) are excluded. This is a snapshot of the README's current statuses, not a live gameplay audit.
 
@@ -308,14 +308,14 @@ Statuses are provisional: a quest, feature or activity may have code without a f
 
 | Name | Status |
 | :--- | :---: |
-| Java 8 setup and Windows launchers | 🚧 |
-| Client / server revision 443 support | 🚧 |
-| Character JSON saves & migration | 🚧 |
-| Optional SQLite save backend | 🚧 |
-| World simulation & bot AI | 🚧 |
-| Web / mobile client streaming | 🚧 |
-| Client developer tools / MCP | 🚧 |
-| Automated content audits & checks | 🚧 |
+| Java 8 setup and Windows launchers | ✅ |
+| Client / server revision 443 support | ✅ |
+| Character JSON saves & migration | ✅ |
+| Optional SQLite save backend | ✅ |
+| World simulation & bot AI | ✅ |
+| Web / mobile client streaming | ✅ |
+| Client developer tools / MCP | ✅ |
+| Automated content audits & checks | ✅ |
 
 </details>
 
