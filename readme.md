@@ -308,9 +308,9 @@ The goal is the **18 December 2006 / revision 443** experience. Open a category 
 
 | Name | Status |
 | :--- | :---: |
-| Easter Event | 📜 |
-| Halloween Event | 📜 |
-| Christmas Event | 📜 |
+| Easter Event (Event, Main Theme, Main Menu Artwork) | 📜 |
+| Halloween Event (Event, Main Theme, Main Menu Artwork) | 📜 |
+| Christmas Event (Event, Main Theme, Main Menu Artwork) | 📜 |
 | Grand Exchange (released 2007) | ✅ |
 
 </details>
