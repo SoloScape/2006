@@ -143,7 +143,7 @@ Statuses are provisional: a quest, feature or activity may have code without a f
 | Big Chompy Bird Hunting | 🚧 |
 | Biohazard | 🚧 |
 | Cabin Fever | 🚧 |
-| Clock Tower | 🚧 |
+| Clock Tower | ✅ |
 | Creature of Fenkenstrain | 🚧 |
 | Darkness of Hallowvale | 🚧 |
 | Death Plateau | 🚧 |
@@ -190,7 +190,7 @@ Statuses are provisional: a quest, feature or activity may have code without a f
 | Lunar Diplomacy | 🚧 |
 | Making History | 🚧 |
 | Merlin's Crystal | 🚧 |
-| Monk's Friend | 🚧 |
+| Monk's Friend | ✅ |
 | Monkey Madness | 🚧 |
 | Mountain Daughter | 🚧 |
 | Mourning's End Part I | 🚧 |
@@ -200,8 +200,8 @@ Statuses are provisional: a quest, feature or activity may have code without a f
 | Nature Spirit | 🚧 |
 | Observatory Quest | 🚧 |
 | One Small Favour | 🚧 |
-| Plague City | 🚧 |
-| Priest in Peril | 🚧 |
+| Plague City | ✅ |
+| Priest in Peril | ✅ |
 | Rag and Bone Man | 🚧 |
 | Ratcatchers | 🚧 |
 | Recipe for Disaster | 🚧 |
@@ -214,7 +214,7 @@ Statuses are provisional: a quest, feature or activity may have code without a f
 | Sea Slug | 🚧 |
 | Shades of Mort'ton | 🚧 |
 | Shadow of the Storm | 🚧 |
-| Sheep Herder | 🚧 |
+| Sheep Herder | ✅ |
 | Shilo Village | 🚧 |
 | The Slug Menace | 🚧 |
 | A Soul's Bane | 🚧 |
