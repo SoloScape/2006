@@ -60,9 +60,7 @@ The [server guide](Server/README.md) describes the implementation in more detail
 
 **Overall completion: 3.7%** · **7 / 189** in-scope items marked ✅
 
-```text
-█░░░░░░░░░░░░░░░░░░░░░░░░░░  3.7%
-```
+![Roadmap completion: 3.7% — 7 of 189 in-scope items complete](docs/roadmap-progress.svg)
 
 Progress counts ✅ entries across all roadmap categories. Items marked ➖ (outside the December 2006 scope) are excluded. This is a snapshot of the README's current statuses, not a live gameplay audit.
 
