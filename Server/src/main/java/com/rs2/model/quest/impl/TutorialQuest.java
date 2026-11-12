@@ -831,57 +831,14 @@ extends QuestScript {
                 if (!ServerSettings.tutorialSkipPromptEnabled && value2 < 3) {
                     value2 = 3;
                 }
-                if (value2 == 23 && value32 == 2) {
-                    value2 = 20;
-                    value32 = 0;
-                }
-                if (value2 == 20) {
-                    player.getDialogueManager().showFourOptionsWithTitle("Choose your gamemode", "Normal", "<img=3>Ironman", "<img=4>Ultimate ironman", "<img=5>Hardcore ironman");
-                    player.getDialogueManager().setNextDialogueStep(21);
-                    return true;
-                }
-                if (value2 == 21) {
-                    if (value32 == 1) {
-                        player.getDialogueManager().showOneLineStatement("In normal mode you just play the game normally.");
-                        player.pendingGameMode = 0;
-                    }
-                    if (value32 == 2) {
-                        player.getDialogueManager().showOneLineStatement("In ironman mode you cannot interact with other players.");
-                        player.pendingGameMode = 1;
-                    }
-                    if (value32 == 3) {
-                        player.getDialogueManager().showTwoLineStatement("In ultimate ironman mode you cannot interact with other players,", "and also cannot use banks.");
-                        player.pendingGameMode = 2;
-                    }
-                    if (value32 == 4) {
-                        player.getDialogueManager().showTwoLineStatement("In hardcore ironman mode you cannot interact with other players,", "and only have 1 life.");
-                        player.pendingGameMode = 3;
-                    }
-                    player.getDialogueManager().setNextDialogueStep(22);
-                    return true;
-                }
-                if (value2 == 22) {
-                    player.getDialogueManager().showTwoOptionsWithTitle("Choose this gamemode?", "Yes", "No");
-                    return true;
-                }
-                if (value2 == 23 && value32 == 1) {
-                    player.gameMode = player.pendingGameMode;
-                    String text = "normal";
-                    if (player.gameMode == 1) {
-                        text = "<img=3>ironman";
-                    } else if (player.gameMode == 2) {
-                        text = "<img=4>ultimate ironman";
-                    } else if (player.gameMode == 3) {
-                        text = "<img=5>hardcore ironman";
-                    }
-                    player.getDialogueManager().showOneLineStatement("Your gamemode has been set to: " + text);
-                    player.packetSender.sendAccountStatus();
+                // This historical profile always uses normal 2006 account rules.
+                // Keep legacy dialogue step IDs so old tutorial saves can resume.
+                if (value2 >= 20 && value2 <= 23) {
+                    player.gameMode = 0;
                     player.pendingGameMode = 255;
-                    if (ServerSettings.tutorialSkipPromptEnabled) {
-                        player.getDialogueManager().setNextDialogueStep(1);
-                    } else {
-                        player.getDialogueManager().setNextDialogueStep(3);
-                    }
+                    player.getDialogueManager().showOneLineStatement("Continue your adventure with the classic account rules.");
+                    player.getDialogueManager().setNextDialogueStep(
+                            ServerSettings.tutorialSkipPromptEnabled ? 1 : 3);
                     return true;
                 }
                 if (value2 == 1) {

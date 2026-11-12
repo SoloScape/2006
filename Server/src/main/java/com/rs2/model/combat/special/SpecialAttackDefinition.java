@@ -41,16 +41,11 @@ public abstract class SpecialAttackDefinition {
     private static SpecialAttackDefinition MAGIC_LONGBOW = new MagicLongbowSpecialDefinition(35, new String[0]);
     private static SpecialAttackDefinition DRAGON_BATTLEAXE = new DragonBattleaxeSpecialDefinition(100, new String[0]);
     private static SpecialAttackDefinition EXCALIBUR = new ExcaliburSpecialDefinition(100, new String[0]);
-    private static SpecialAttackDefinition BANDOS_GODSWORD = new BandosGodswordSpecialDefinition(50, new String[0]);
-    private static SpecialAttackDefinition ARMADYL_GODSWORD = new ArmadylGodswordSpecialDefinition(50, new String[0]);
-    private static SpecialAttackDefinition ZAMORAK_GODSWORD = new ZamorakGodswordSpecialDefinition(50, new String[0]);
-    private static SpecialAttackDefinition SARADOMIN_GODSWORD = new SaradominGodswordSpecialDefinition(50, new String[0]);
-    private static SpecialAttackDefinition SARADOMIN_SWORD = new SaradominSwordSpecialDefinition(100, new String[0]);
     private static SpecialAttackDefinition GRANITE_MAUL = new GraniteMaulSpecialDefinition(50, new String[0]);
     private static final SpecialAttackDefinition[] VALUES;
 
     static {
-        VALUES = new SpecialAttackDefinition[]{DRAGON_DAGGER, ABYSSAL_WHIP, RUNE_THROWNAXE, DRAGON_LONGSWORD, DRAGON_SCIMITAR, RUNE_CLAWS, DRAGON_CLAWS, DRAGON_MACE, DRAGON_AXE, DARKLIGHT, DRAGON_SPEAR, DRAGON_HALBERD, DRAGON_2H_SWORD, SEERCULL, DARK_BOW, MAGIC_SHORTBOW, MAGIC_LONGBOW, DRAGON_BATTLEAXE, EXCALIBUR, BANDOS_GODSWORD, ARMADYL_GODSWORD, ZAMORAK_GODSWORD, SARADOMIN_GODSWORD, SARADOMIN_SWORD, GRANITE_MAUL};
+        VALUES = new SpecialAttackDefinition[]{DRAGON_DAGGER, ABYSSAL_WHIP, RUNE_THROWNAXE, DRAGON_LONGSWORD, DRAGON_SCIMITAR, RUNE_CLAWS, DRAGON_CLAWS, DRAGON_MACE, DRAGON_AXE, DARKLIGHT, DRAGON_SPEAR, DRAGON_HALBERD, DRAGON_2H_SWORD, SEERCULL, DARK_BOW, MAGIC_SHORTBOW, MAGIC_LONGBOW, DRAGON_BATTLEAXE, EXCALIBUR, GRANITE_MAUL};
     }
 
     private final String name;

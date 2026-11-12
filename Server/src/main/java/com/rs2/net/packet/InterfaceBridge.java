@@ -707,7 +707,6 @@ public final class InterfaceBridge {
         // 443 widget cache. Sending either as a flat component makes the client
         // interpret it as group 0 with a huge child index and crash on login.
         for (int id = 18890; id <= 19102; id++) ids.add(id); // Grand Exchange widgets
-        for (int id = 19508; id <= 19540; id++) ids.add(id); // custom bank tabs
         for (int id = 19581; id <= 19584; id++) ids.add(id);
         return Collections.unmodifiableSet(ids);
     }
