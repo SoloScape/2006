@@ -600,7 +600,9 @@ public final class BarrowsManager {
      * Enabled aggressive block sorting
      */
     public static boolean handleFirstObjectAction(Player player, int objectId) {
-        if (isBarrowsCryptObject(objectId) && !canAccessBarrows(player)) return true;
+        if (player != null && player.isInBarrows()
+                && isBarrowsCryptObject(objectId)
+                && !canAccessBarrows(player)) return true;
         switch (objectId) {
             case 10284: {
                 if (player.barrowsChestOpened) {
