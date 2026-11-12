@@ -1143,6 +1143,24 @@ public final class BarrowsManager {
      * chest may be reopened after logging back in; reconstruct the looted
      * chest state before InitialVarps sends the native 443 map varps.
      */
+    /**
+     * When config 453 morphs the native closed chest (6774/10284) into 6775,
+     * the client sends 6775 on its next click, while the shared world object
+     * must remain unchanged for other players. Resolve the clicked morph only
+     * against an existing, reachable physical chest at this precise tile.
+     */
+    public static com.rs2.model.objects.WorldObject findBaseChestForMorphedInteraction(
+            Player player, int clickedId, int x, int y, int plane) {
+        if (player == null || clickedId != 6775 || plane != 0
+                || !isInBarrowsTunnels(player)
+                || (player.configStates[453] & (1 << 16)) == 0
+                || x < 3546 || x > 3557 || y < 9689 || y > 9700) return null;
+        com.rs2.model.objects.WorldObject base =
+                SkillActionHelper.findWorldObjectById(6774, x, y, plane);
+        return base != null ? base
+                : SkillActionHelper.findWorldObjectById(10284, x, y, plane);
+    }
+
     public static void restoreChestConfigOnLogin(Player player) {
         if (player != null && player.barrowsChestOpened
                 && isInBarrowsTunnels(player)) {
