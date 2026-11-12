@@ -39,6 +39,7 @@ public final class Barrows2006RestorationChecks {
             checkFirstEverRun();
             checkTwoPlayerOwnershipAndKillCredit();
             checkTwoPlayerChestState();
+            checkPrivateChestMorphLookup();
             checkReconnectRoundTrip();
             checkMembershipGate();
             checkCombatWearStopsAfterLeaving();
@@ -240,6 +241,38 @@ public final class Barrows2006RestorationChecks {
             Files.deleteIfExists(dat.toPath());
             Files.deleteIfExists(staging.toPath());
             ServerSettings.sqlitePlayerSaveEnabled = sqlite;
+        }
+    }
+
+    private static void checkPrivateChestMorphLookup() {
+        Player alice = player(9, 3552, 9694, 0);
+        Player bob = player(10, 3552, 9695, 0);
+        alice.configStates[453] = OPEN_BIT;
+        Position tile = new Position(3551, 9694, 0);
+        com.rs2.model.skill.agility.AgilityObstacleHandler bucket =
+                com.rs2.model.objects.WorldObjectRegionIndex.getOrCreateRegionBucket(tile);
+        com.rs2.model.objects.LoadedWorldObject chest =
+                new com.rs2.model.objects.LoadedWorldObject(
+                        ObjectDefinition.forId(6774), tile, 10, 0);
+        bucket.getLoadedObjects().add(chest);
+        try {
+            require(BarrowsManager.findBaseChestForMorphedInteraction(
+                            alice, 6775, tile.getX(), tile.getY(), tile.getPlane()) != null,
+                    "Client-opened 6775 did not resolve to unchanged 6774 world chest");
+            require(BarrowsManager.findBaseChestForMorphedInteraction(
+                            bob, 6775, tile.getX(), tile.getY(), tile.getPlane()) == null,
+                    "Another player inherited the private opened-chest object");
+            require(BarrowsManager.findBaseChestForMorphedInteraction(
+                            alice, 6775, 3492, 9694, 0) == null,
+                    "Private chest morph was accepted at a nonexistent tile");
+            require(BarrowsManager.findBaseChestForMorphedInteraction(
+                            alice, 6775, tile.getX(), tile.getY(), 3) == null,
+                    "Private chest morph bypassed the actual object plane");
+            require(BarrowsManager.findBaseChestForMorphedInteraction(
+                            alice, 6774, tile.getX(), tile.getY(), 0) == null,
+                    "Only a valid client-morphed object needs alias handling");
+        } finally {
+            bucket.getLoadedObjects().remove(chest);
         }
     }
 
