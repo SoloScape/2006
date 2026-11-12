@@ -5,6 +5,9 @@ on:
       - Feature/Barrows
     paths:
       - 'Server/src/main/java/com/rs2/model/gameplay/barrows/**'
+      - 'Server/src/main/java/com/rs2/Server.java'
+      - 'Server/src/main/java/com/rs2/model/npc/ExtraNpcSpawns.java'
+      - 'Server/data/npcs/extra_spawns.csv'
       - 'Server/src/main/java/com/rs2/model/combat/CombatAction.java'
       - 'Server/src/main/java/com/rs2/model/combat/BarrowsSpecialEffect.java'
       - 'Server/src/main/java/com/rs2/model/combat/CombatManager.java'
