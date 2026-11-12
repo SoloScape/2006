@@ -59,9 +59,9 @@ The [server guide](Server/README.md) describes the implementation in more detail
 ## Roadmap
 
 <!-- roadmap-progress:start -->
-**Overall completion: 8.4%** · **16 / 190** counted roadmap items marked ✅
+**Overall completion: 8.3%** · **16 / 193** counted roadmap items marked ✅
 
-![Roadmap completion: 8.4% — 16 of 190 items](docs/roadmap-progress.svg)
+![Roadmap completion: 8.3% — 16 of 193 items](docs/roadmap-progress.svg)
 <!-- roadmap-progress:end -->
 
 Progress counts ✅ entries across all roadmap categories, including optional plugins; ➖ entries are excluded. The percentage and bar refresh automatically after roadmap changes on `main` via GitHub Actions. This tracks README statuses, not independently verified gameplay.
@@ -96,7 +96,10 @@ Statuses are provisional: a quest, feature or activity may have code without a f
 | Prayer | ⛔ |
 | Magic | ⛔ |
 | Ranged | ⛔ |
-| Melee (Attack, Strength, Defence & Hitpoints) | ⛔ |
+| Attack | ⛔ |
+| Strength | ⛔ |
+| Defence | ⛔ |
+| Hitpoints | ⛔ |
 
 </details>
 
