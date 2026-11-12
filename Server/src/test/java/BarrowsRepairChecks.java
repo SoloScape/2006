@@ -4,6 +4,9 @@ import com.rs2.model.item.ItemDefinition;
 import com.rs2.model.item.ItemStack;
 import com.rs2.model.item.action.BarrowsRepairHandler;
 import com.rs2.model.npc.NpcDefinition;
+import com.rs2.model.objects.ObjectDefinition;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import com.rs2.model.player.Player;
 import com.rs2.model.quest.QuestDefinition;
 
@@ -35,13 +38,14 @@ public final class BarrowsRepairChecks {
     private static final int[] FULL_COSTS = {60000, 100000, 90000, 80000};
     private static final int[] REPAIR_NPCS = {519, 1082, 1799, 3795};
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         ServerSettings.clientBuild = 443;
         NpcDefinition.loadDefinitions();
         // Item definitions include quest requirements and need the quest count initialized.
         QuestDefinition.loadDefinitions();
         ItemDefinition.loadDefinitions();
         checkRepairers();
+        audit443SquireSpawnsAndArmourStand();
         checkPricesAcrossEveryPiece();
         checkLegacyMetadata();
         checkPaymentAndItemExchange();
@@ -83,6 +87,40 @@ public final class BarrowsRepairChecks {
                 "Unknown NPC accepted Barrows gear for repair");
         require(!BarrowsRepairHandler.handleItemOnNpc(player, 519, new ItemStack(995)),
                 "Repair NPC accepted non-Barrows item");
+    }
+
+    /**
+     * The cache contains several unrelated squires. Cross-check the repair
+     * Squire ID against actual 443 world spawns before assigning it a location.
+     */
+    private static void audit443SquireSpawnsAndArmourStand() throws Exception {
+        ObjectDefinition.loadRevision443();
+        ObjectDefinition stand = ObjectDefinition.forId(6802);
+        require(stand != null && stand.name != null
+                        && stand.name.toLowerCase().contains("armour"),
+                "Native revision-443 object 6802 is not the armour stand");
+        System.out.println("443 armour stand 6802: " + stand.name);
+
+        byte[] spawns = Files.readAllBytes(Paths.get("data/npcs/Npc spawn.dat"));
+        int count = unsignedShort(spawns, 1);
+        int repairSquireCount = 0;
+        for (int i = 0, offset = 3; i < count && offset + 8 < spawns.length;
+             i++, offset += 9) {
+            int id = unsignedShort(spawns, offset) - count - i;
+            if (id != 3795 && id != 3781 && (id < 3790 || id > 3802)) continue;
+            int x = unsignedShort(spawns, offset + 4);
+            int y = unsignedShort(spawns, offset + 6);
+            int plane = spawns[offset + 8] & 255;
+            System.out.println("Native 443 Squire spawn: npc=" + id
+                    + " x=" + x + " y=" + y + " plane=" + plane);
+            if (id == 3795) repairSquireCount++;
+        }
+        System.out.println("Native 443 repair Squire 3795 static spawn count: "
+                + repairSquireCount);
+    }
+
+    private static int unsignedShort(byte[] bytes, int offset) {
+        return ((bytes[offset] & 255) << 8) | (bytes[offset + 1] & 255);
     }
 
     private static void checkPricesAcrossEveryPiece() {
