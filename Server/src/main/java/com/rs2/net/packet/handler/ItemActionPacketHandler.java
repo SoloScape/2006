@@ -1484,7 +1484,8 @@ implements PacketHandler {
             return;
         }
         int brokenBarrowsId = BarrowsEquipmentDurability.fullyDegradedItemId(itemStack.getId());
-        if (itemStack.getDefinition().hasDestroyOption() || brokenBarrowsId != -1) {
+        if (itemStack.getDefinition().hasDestroyOption()
+                || brokenBarrowsId != -1 && !BarrowsEquipmentDurability.isBroken(itemStack.getId())) {
             String destroyMessage = "Dropping this item will make you lose it forever.";
             if (itemStack.getId() == 10507 || itemStack.getId() == 10508) {
                 destroyMessage = "Diango in Draynor Village can replace this Christmas reward.";
