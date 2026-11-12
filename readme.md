@@ -60,8 +60,6 @@ The [server guide](Server/README.md) describes the implementation in more detail
 
 **Overall completion: 8.4%** · **16 / 190** counted roadmap items marked ✅
 
-![Roadmap completion: 8.4% — 16 of 190 counted roadmap items complete](docs/roadmap-progress.svg)
-
 Progress counts ✅ entries across all roadmap categories, including optional plugins. Items marked ➖ are excluded. This is a snapshot of the README's current statuses, not a live gameplay audit.
 
 The goal is the **18 December 2006 / revision 443** experience. Open a category below to see its items and their current tracker statuses.
