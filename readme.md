@@ -225,24 +225,37 @@ SoloScape aims to recreate the **18 December 2006 (revision 443)** experience. T
 
 **Status key:** ✅ Complete and verified · 🚧 In progress · ⛔ Not yet marked complete (may have partial implementations) · ➖ Outside the 2006 scope
 
-### Skills & combat
+<details>
+<summary><strong>Skills & combat — expand tracker</strong></summary>
 
-| Skill | Status | Skill | Status |
-| --- | :---: | --- | :---: |
-| Woodcutting | 🚧 | Mining | ⛔ |
-| Agility | ⛔ | Smithing | ⛔ |
-| Herblore | ⛔ | Fishing | ⛔ |
-| Thieving | ⛔ | Cooking | ⛔ |
-| Crafting | ⛔ | Firemaking | ⛔ |
-| Fletching | ⛔ | Runecrafting | ⛔ |
-| Slayer | ⛔ | Farming | ⛔ |
-| Construction | ⛔ | Hunter | ⛔ |
-| Prayer | ⛔ | Magic | ⛔ |
-| Ranged | ⛔ | Melee (Attack, Strength, Defence & Hitpoints) | ⛔ |
+| Name | Status |
+| --- | :---: |
+| Woodcutting | 🚧 |
+| Mining | ⛔ |
+| Agility | ⛔ |
+| Smithing | ⛔ |
+| Herblore | ⛔ |
+| Fishing | ⛔ |
+| Thieving | ⛔ |
+| Cooking | ⛔ |
+| Crafting | ⛔ |
+| Firemaking | ⛔ |
+| Fletching | ⛔ |
+| Runecrafting | ⛔ |
+| Slayer | ⛔ |
+| Farming | ⛔ |
+| Construction | ⛔ |
+| Hunter | ⛔ |
+| Prayer | ⛔ |
+| Magic | ⛔ |
+| Ranged | ⛔ |
+| Melee (Attack, Strength, Defence & Hitpoints) | ⛔ |
 
 **Sailing:** ➖ Not part of the December 2006 skill set, so it is outside this project's historical target rather than an unfinished 2006 skill.
 
 **Important:** Some skills marked ⛔ already have working mechanics in the server. This tracker deliberately does **not** equate ⛔ with “no code exists”; it means the skill has not yet been marked fully implemented and historically verified. Woodcutting is shown as 🚧, as in the proposed tracker. Update statuses as features are tested and completed.
+
+</details>
 
 ### Bosses & major encounters
 
@@ -440,51 +453,85 @@ The following lists cover **all 116 official quests released by 18 December 2006
 
 </details>
 
-### Minigames & activities
+<details>
+<summary><strong>Minigames & activities — expand tracker</strong></summary>
 
-| Content | Status | Content | Status |
-| --- | :---: | --- | :---: |
-| Barrows | ✅ | Castle Wars | ✅ |
-| Duel Arena | 🚧 | TzHaar Fight Caves | 🚧 |
-| Mage Training Arena | 🚧 | Tai Bwo Wannai Cleanup | 🚧 |
-| Falador Party Room | 🚧 | Pest Control | ⛔ |
-| TzHaar Fight Pits | ⛔ | Pyramid Plunder | ⛔ |
-| Rogues' Den | ⛔ | Trouble Brewing | ⛔ |
-| Temple Trekking | ⛔ | Blast Furnace | ⛔ |
-| Fishing Trawler | ⛔ | Rat Pits | ⛔ |
-| Stronghold of Security | ⛔ | Warriors' Guild | ⛔ |
-| Brimhaven Agility Arena | ⛔ | Gnome Restaurant | ⛔ |
+| Name | Status |
+| --- | :---: |
+| Barrows | ✅ |
+| Castle Wars | ✅ |
+| Duel Arena | 🚧 |
+| TzHaar Fight Caves | 🚧 |
+| Mage Training Arena | 🚧 |
+| Tai Bwo Wannai Cleanup | 🚧 |
+| Falador Party Room | 🚧 |
+| Pest Control | ⛔ |
+| TzHaar Fight Pits | ⛔ |
+| Pyramid Plunder | ⛔ |
+| Rogues' Den | ⛔ |
+| Trouble Brewing | ⛔ |
+| Temple Trekking | ⛔ |
+| Blast Furnace | ⛔ |
+| Fishing Trawler | ⛔ |
+| Rat Pits | ⛔ |
+| Stronghold of Security | ⛔ |
+| Warriors' Guild | ⛔ |
+| Brimhaven Agility Arena | ⛔ |
+| Gnome Restaurant | ⛔ |
 
 🚧 means there are dedicated controllers or partial mechanics in source; ⛔ means there is no confirmed complete gameplay loop in the repository audit. In particular, a transport route, dialogue, area flag, or cache asset does **not** establish a working minigame.
 
-### Combat, world & economy
+</details>
 
-| Content | Status | Content | Status |
-| --- | :---: | --- | :---: |
-| Melee / Ranged / Magic combat | 🚧 | PvP / Wilderness combat | 🚧 |
-| Prayer & special attacks | 🚧 | NPC combat and drops | 🚧 |
-| Player trading | 🚧 | Banking & equipment | 🚧 |
-| Shops & prices | 🚧 | Treasure Trails / clue scrolls | 🚧 |
-| Random events | 🚧 | Slayer masters & tasks | 🚧 |
-| NPC dialogue & world interactions | 🚧 | Quest progression & rewards | 🚧 |
-| Movement, teleports & travel | 🚧 | 2006 Christmas rescue | 🚧 |
-| Fairy rings | ⛔ | Player-owned houses (POH) | ⛔ |
-| 2006 skill tutors | ⛔ | Capes of Accomplishment | ⛔ |
-| Grand Exchange (released 2007) | ➖ | Modern bank tabs (released 2008) | ➖ |
-| God Wars Dungeon (released 2007) | ➖ | Modern Ironman modes | ➖ |
+<details>
+<summary><strong>Combat, world & economy — expand tracker</strong></summary>
+
+| Name | Status |
+| --- | :---: |
+| Melee / Ranged / Magic combat | 🚧 |
+| PvP / Wilderness combat | 🚧 |
+| Prayer & special attacks | 🚧 |
+| NPC combat and drops | 🚧 |
+| Player trading | 🚧 |
+| Banking & equipment | 🚧 |
+| Shops & prices | 🚧 |
+| Treasure Trails / clue scrolls | 🚧 |
+| Random events | 🚧 |
+| Slayer masters & tasks | 🚧 |
+| NPC dialogue & world interactions | 🚧 |
+| Quest progression & rewards | 🚧 |
+| Movement, teleports & travel | 🚧 |
+| 2006 Christmas rescue | 🚧 |
+| Fairy rings | ⛔ |
+| Player-owned houses (POH) | ⛔ |
+| 2006 skill tutors | ⛔ |
+| Capes of Accomplishment | ⛔ |
+| Grand Exchange (released 2007) | ➖ |
+| Modern bank tabs (released 2008) | ➖ |
+| God Wars Dungeon (released 2007) | ➖ |
+| Modern Ironman modes | ➖ |
 
 Entries marked ➖ are deliberately **outside the strict 18 December 2006 target**, even where optional or later-era code already exists.
 
-### Client, tools & supporting systems
+</details>
 
-| Content | Status | Content | Status |
-| --- | :---: | --- | :---: |
-| Java 8 setup and Windows launchers | 🚧 | Client / server revision 443 support | 🚧 |
-| Character JSON saves & migration | 🚧 | Optional SQLite save backend | 🚧 |
-| World simulation & bot AI | 🚧 | Web / mobile client streaming | 🚧 |
-| Client developer tools / MCP | 🚧 | Automated content audits & checks | 🚧 |
+<details>
+<summary><strong>Client, tools & supporting systems — expand tracker</strong></summary>
+
+| Name | Status |
+| --- | :---: |
+| Java 8 setup and Windows launchers | 🚧 |
+| Client / server revision 443 support | 🚧 |
+| Character JSON saves & migration | 🚧 |
+| Optional SQLite save backend | 🚧 |
+| World simulation & bot AI | 🚧 |
+| Web / mobile client streaming | 🚧 |
+| Client developer tools / MCP | 🚧 |
+| Automated content audits & checks | 🚧 |
 
 These systems have supporting code or launchers; 🚧 does not imply the associated workflow has passed testing on every supported computer or client configuration.
+
+</details>
 
 ### Other development priorities
 
