@@ -183,6 +183,12 @@ public final class Barrows2006RestorationChecks {
             Player original = new Player(null);
             original.setUsername(username);
             original.setPassword("barrows-test");
+            // Match the live character-save fixture: host metadata must
+            // exist for the legacy staging record to validate.
+            java.lang.reflect.Field hostField =
+                    Player.class.getDeclaredField("hostAddress");
+            hostField.setAccessible(true);
+            hostField.set(original, "127.0.0.1");
             original.setPosition(new Position(3552, 9694, 0));
             original.setBarrowsTargetBrotherIndex(4);
             original.setBarrowsBrotherKilled(0, true);
