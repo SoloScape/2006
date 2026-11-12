@@ -108,7 +108,7 @@ Statuses are provisional: a quest, feature or activity may have code without a f
 </details>
 
 <details>
-<summary><strong>All free-to-play quests (18)</strong></summary>
+<summary><strong>Free-to-play quests</strong></summary>
 
 | Name | Status |
 | :--- | :---: |
@@ -134,7 +134,7 @@ Statuses are provisional: a quest, feature or activity may have code without a f
 </details>
 
 <details>
-<summary><strong>All members' quests (98)</strong></summary>
+<summary><strong>Members' quests</strong></summary>
 
 | Name | Status |
 | :--- | :---: |
