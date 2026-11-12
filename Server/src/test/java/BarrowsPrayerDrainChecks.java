@@ -7,6 +7,12 @@ public final class BarrowsPrayerDrainChecks {
     };
 
     public static void main(String[] args) {
+        require(BarrowsPrayerDrainTask.DRAIN_INTERVAL_TICKS == 30,
+                "Preserved Prayer drain interval changed; recheck period evidence");
+        require(BarrowsPrayerDrainTask.BASE_DRAIN_POINTS == 8,
+                "2006 Prayer drain base amount changed");
+        require(BarrowsPrayerDrainTask.FACE_ANIMATION_ID == 2085,
+                "443 Barrows face animation changed");
         boolean[] slain = new boolean[6];
         require(BarrowsPrayerDrainTask.faceModelForKilledBrother(slain, 0, false) == -1,
                 "A ghostly face appeared before any brother was killed");
