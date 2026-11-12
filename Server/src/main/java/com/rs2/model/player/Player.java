@@ -55,7 +55,7 @@ import com.rs2.model.item.ItemContainer;
 import com.rs2.model.item.ItemContainerType;
 import com.rs2.model.item.ItemDefinition;
 import com.rs2.model.item.ItemStack;
-import com.rs2.model.item.action.BarrowsRepairHandler;
+import com.rs2.model.item.BarrowsEquipmentDurability;
 import com.rs2.model.item.action.CaveLightSourceDefinition;
 import com.rs2.model.item.consumable.FoodHandler;
 import com.rs2.model.item.consumable.PotionHandler;
@@ -5191,12 +5191,11 @@ extends Entity {
             if (itemStack.getDefinition().getName().toLowerCase().contains("clue scroll")) {
                 this.treasureTrailStepCount = 0;
             }
-            BarrowsRepairHandler barrowsRepairHandler = BarrowsRepairHandler.forItem(itemStack);
-            if (itemStack.getDefinition().isUntradeable() && barrowsRepairHandler == null) continue;
-            ItemStack groundStack = new ItemStack(itemStack.getId(), itemStack.getAmount());
-            if (barrowsRepairHandler != null) {
-                groundStack = new ItemStack(barrowsRepairHandler.getFullyDegradedItemId(), 1);
-            }
+            int brokenBarrowsId = BarrowsEquipmentDurability.fullyDegradedItemId(itemStack.getId());
+            if (itemStack.getDefinition().isUntradeable() && brokenBarrowsId == -1) continue;
+            ItemStack groundStack = brokenBarrowsId == -1
+                    ? new ItemStack(itemStack.getId(), itemStack.getAmount(), itemStack.getMetadata())
+                    : new ItemStack(brokenBarrowsId, 1);
             GroundItem groundItem = new GroundItem(groundStack, (Entity)this, lootOwner, this.getDeathPosition());
             GroundItemManager.getInstance().spawn(groundItem);
             if (!entity.isPlayer() || entity == this) continue;
