@@ -301,7 +301,7 @@ Bosses marked 🚧 have related combat, reward, or encounter code in the reposit
 </details>
 
 <details>
-<summary><strong>All members' quests (98) 🚧</strong></summary>
+<summary><strong>All members' quests (98)</strong></summary>
 
 | Quest | Status |
 | --- | :---: |
