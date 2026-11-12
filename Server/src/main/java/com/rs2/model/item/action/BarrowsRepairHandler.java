@@ -8,9 +8,10 @@ import com.rs2.model.player.Player;
 
 public final class BarrowsRepairHandler {
     // Bob, Dunstan, Tindel Marchant, and the Void Knight repair Squire.
-    // Revision-443 cache ID 3795 corresponds to historical/OSRS ID 1766;
-    // NPC 1766 in this cache is a Cow calf and must never accept repairs.
-    private static final int[] repairNpcIds = {519, 1082, 1799, 3795};
+    // Native revision-443 Squire 3797 maps to the original Void Knights' smith
+    // (older/OSRS ID 1766). Squire 3795 has no Talk-to action or world spawn;
+    // NPC 1766 in this 443 cache is a Cow calf.
+    private static final int[] repairNpcIds = {519, 1082, 1799, 3797};
     // Original revision-443 cache object; OSRS/317 uses object 6802 instead.
     public static final int ARMOUR_STAND_OBJECT_ID = 13715;
     private final int repairedItemId;
